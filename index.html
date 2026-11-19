@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Детский сад «Солнышко»</title>
+<meta name="description" content="Детский сад «Солнышко» — информация для аттестации: о нас, образовательная программа, педагоги, достижения, документы и контакты.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fffdf8;
+    --surface: #ffffff;
+    --soft: #fff4e0;
+    --text: #2b2d42;
+    --muted: #5f6377;
+    --primary: #f59e0b;
+    --primary-dark: #b45309;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --pink: #db2777;
+    --border: #f1e6d2;
+    --shadow: 0 10px 30px rgba(180, 83, 9, .08);
+    --radius: 20px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1c24; --surface: #24252f; --soft: #2d2a22; --text: #f3f4f6; --muted: #b5b8c5;
+      --primary: #fbbf24; --primary-dark: #fcd34d; --green: #4ade80; --blue: #60a5fa; --pink: #f472b6;
+      --border: #383a47; --shadow: 0 10px 30px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1b1c24; --surface: #24252f; --soft: #2d2a22; --text: #f3f4f6; --muted: #b5b8c5;
+    --primary: #fbbf24; --primary-dark: #fcd34d; --green: #4ade80; --blue: #60a5fa; --pink: #f472b6;
+    --border: #383a47; --shadow: 0 10px 30px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; font-family: "Nunito", system-ui, sans-serif; font-size: 17px; line-height: 1.6;
+    background: var(--bg); color: var(--text);
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 16px; }
+  section { padding: 72px 0; }
+  section:nth-of-type(even) { background: var(--soft); }
+  h1, h2, h3 { line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; }
+  h3 { font-size: 20px; font-weight: 700; }
+  p { margin: 0 0 12px; color: var(--muted); }
+  .eyebrow { display: inline-block; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .08em; font-size: 13px; margin-bottom: 8px; }
+  .section-head { max-width: 720px; margin-bottom: 40px; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 16px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; text-decoration: none; }
+  .logo-sun { width: 38px; height: 38px; }
+  .menu { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; }
+  .menu a { text-decoration: none; font-weight: 600; color: var(--muted); }
+  .menu a:hover { color: var(--primary-dark); }
+  .burger { display: none; background: none; border: 0; font-size: 28px; color: var(--text); cursor: pointer; }
+  @media (max-width: 900px) {
+    .burger { display: block; }
+    .menu { display: none; position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; gap: 0;
+      background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 16px; }
+    .menu.open { display: flex; }
+    .menu a { display: block; padding: 12px 0; }
+  }
+
+  /* Hero */
+  .hero { padding: 64px 0 80px; background: radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--primary) 25%, transparent), transparent 45%), var(--bg); }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(34px, 5.5vw, 58px); font-weight: 800; }
+  .hero h1 span { color: var(--primary); }
+  .hero .lead { font-size: 19px; max-width: 560px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  .btn { display: inline-block; padding: 14px 26px; border-radius: 999px; font-weight: 700; text-decoration: none; border: 2px solid var(--primary); }
+  .btn-primary { background: var(--primary); color: #2b2d42; }
+  .btn-primary:hover { filter: brightness(1.05); }
+  .btn-outline { color: var(--primary-dark); }
+  .hero-art { background: var(--surface); border-radius: 32px; box-shadow: var(--shadow); padding: 24px; border: 1px solid var(--border); }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 48px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
+  .stat b { display: block; font-size: 34px; color: var(--primary-dark); font-weight: 800; }
+  .stat span { color: var(--muted); font-size: 15px; }
+  @media (max-width: 700px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  /* Cards */
+  .grid { display: grid; gap: 20px; }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+  .icon { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 26px; margin-bottom: 14px; }
+  .i-y { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+  .i-g { background: color-mix(in srgb, var(--green) 18%, transparent); }
+  .i-b { background: color-mix(in srgb, var(--blue) 18%, transparent); }
+  .i-p { background: color-mix(in srgb, var(--pink) 18%, transparent); }
+
+  /* About */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .info-list { list-style: none; padding: 0; margin: 0; }
+  .info-list li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px dashed var(--border); }
+  .info-list li span:first-child { color: var(--muted); }
+  .info-list li span:last-child { font-weight: 700; text-align: right; }
+  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+
+  /* Groups */
+  .group-age { font-weight: 700; color: var(--primary-dark); font-size: 14px; }
+
+  /* Teachers */
+  .teacher { text-align: center; }
+  .avatar { width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 14px; display: grid; place-items: center; font-size: 34px; font-weight: 800; color: #fff; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--soft); color: var(--primary-dark); margin-top: 6px; }
+
+  /* Timeline */
+  .schedule { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 40px; }
+  .slot { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .slot time { font-weight: 800; color: var(--primary-dark); min-width: 110px; }
+  @media (max-width: 700px) { .schedule { grid-template-columns: 1fr; } .slot time { min-width: 92px; } }
+
+  /* Achievements */
+  .achv { display: flex; gap: 16px; align-items: flex-start; }
+  .achv .year { font-weight: 800; background: var(--primary); color: #2b2d42; border-radius: 12px; padding: 6px 10px; font-size: 14px; }
+
+  /* Documents */
+  .doc { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+  .doc:hover { border-color: var(--primary); }
+  .doc .icon { margin: 0; flex-shrink: 0; }
+  .doc small { display: block; color: var(--muted); }
+
+  /* Reviews */
+  .review p { font-style: italic; }
+  .review b { display: block; margin-top: 10px; }
+
+  /* Contacts */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .contact-item { display: flex; gap: 14px; margin-bottom: 18px; }
+  .contact-item .icon { margin: 0; flex-shrink: 0; }
+  .map { min-height: 320px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; color: var(--muted); text-align: center; padding: 16px; }
+  @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+
+  footer { padding: 28px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 15px; }
+  footer .container { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="#top" class="logo">
+      <svg class="logo-sun" viewBox="0 0 64 64" aria-hidden="true">
+        <g stroke="#f59e0b" stroke-width="5" stroke-linecap="round">
+          <line x1="32" y1="4" x2="32" y2="12"/><line x1="32" y1="52" x2="32" y2="60"/>
+          <line x1="4" y1="32" x2="12" y2="32"/><line x1="52" y1="32" x2="60" y2="32"/>
+          <line x1="12" y1="12" x2="17" y2="17"/><line x1="47" y1="47" x2="52" y2="52"/>
+          <line x1="12" y1="52" x2="17" y2="47"/><line x1="47" y1="17" x2="52" y2="12"/>
+        </g>
+        <circle cx="32" cy="32" r="14" fill="#fbbf24"/>
+      </svg>
+      «Солнышко»
+    </a>
+    <button class="burger" aria-label="Открыть меню" aria-expanded="false">☰</button>
+    <ul class="menu">
+      <li><a href="#about">О нас</a></li>
+      <li><a href="#program">Программа</a></li>
+      <li><a href="#teachers">Педагоги</a></li>
+      <li><a href="#achievements">Достижения</a></li>
+      <li><a href="#documents">Документы</a></li>
+      <li><a href="#contacts">Контакты</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow">Государственное дошкольное учреждение</span>
+          <h1>Детский сад <span>«Солнышко»</span> — место, где растут с радостью</h1>
+          <p class="lead">Мы создаём безопасную, тёплую и развивающую среду, в которой каждый ребёнок раскрывает свои таланты, учится дружить и познаёт мир.</p>
+          <div class="btns">
+            <a href="#documents" class="btn btn-primary">Материалы для аттестации</a>
+            <a href="#contacts" class="btn btn-outline">Связаться с нами</a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 400 300" width="100%">
+            <rect x="0" y="230" width="400" height="70" rx="12" fill="#86efac"/>
+            <circle cx="330" cy="60" r="34" fill="#fbbf24"/>
+            <rect x="90" y="120" width="200" height="120" rx="10" fill="#fde68a"/>
+            <polygon points="70,125 190,50 310,125" fill="#f97316"/>
+            <rect x="170" y="170" width="40" height="70" rx="6" fill="#92400e"/>
+            <rect x="110" y="145" width="40" height="36" rx="6" fill="#bfdbfe"/>
+            <rect x="230" y="145" width="40" height="36" rx="6" fill="#bfdbfe"/>
+            <circle cx="40" cy="200" r="28" fill="#22c55e"/><rect x="36" y="200" width="8" height="35" fill="#92400e"/>
+            <circle cx="360" cy="205" r="24" fill="#22c55e"/><rect x="356" y="205" width="8" height="30" fill="#92400e"/>
+            <circle cx="190" cy="95" r="12" fill="#fff"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>25</b><span>лет работы</span></div>
+        <div class="stat"><b>240</b><span>воспитанников</span></div>
+        <div class="stat"><b>12</b><span>групп</span></div>
+        <div class="stat"><b>38</b><span>педагогов</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container about-grid">
+      <div>
+        <span class="eyebrow">О детском саде</span>
+        <h2>Общая информация</h2>
+        <p>Детский сад «Солнышко» работает с 2001 года. Деятельность учреждения осуществляется в соответствии с Государственным общеобязательным стандартом дошкольного воспитания и обучения и Типовой учебной программой.</p>
+        <p><b>Миссия:</b> обеспечить каждому ребёнку качественное дошкольное образование, охрану и укрепление здоровья, всестороннее развитие и готовность к школе.</p>
+        <p><b>Цель:</b> создание благоприятных условий для полноценного проживания ребёнком дошкольного детства и формирования основ базовой культуры личности.</p>
+      </div>
+      <div class="card">
+        <ul class="info-list">
+          <li><span>Полное наименование</span><span>ГККП «Детский сад «Солнышко»</span></li>
+          <li><span>Заведующая</span><span>Иванова Анна Сергеевна</span></li>
+          <li><span>Год открытия</span><span>2001</span></li>
+          <li><span>Проектная мощность</span><span>240 мест</span></li>
+          <li><span>Языки обучения</span><span>казахский, русский</span></li>
+          <li><span>Режим работы</span><span>Пн–Пт, 07:30–18:30</span></li>
+          <li><span>Лицензия</span><span>№ 0000000 от 01.01.2020</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAM -->
+  <section id="program">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Образовательный процесс</span>
+        <h2>Образовательные области</h2>
+        <p>Организованная деятельность строится по пяти образовательным областям с учётом возрастных и индивидуальных особенностей детей.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card"><div class="icon i-g">🏃</div><h3>Здоровье</h3><p>Физическая культура, основы безопасного поведения, закаливание и формирование здорового образа жизни.</p></div>
+        <div class="card"><div class="icon i-b">💬</div><h3>Коммуникация</h3><p>Развитие речи, художественная литература, основы грамоты, казахский язык.</p></div>
+        <div class="card"><div class="icon i-y">🧩</div><h3>Познание</h3><p>Основы математики, сенсорика, конструирование, естествознание и исследовательская деятельность.</p></div>
+        <div class="card"><div class="icon i-p">🎨</div><h3>Творчество</h3><p>Рисование, лепка, аппликация, музыка и театрализованная деятельность.</p></div>
+        <div class="card"><div class="icon i-g">🤝</div><h3>Социум</h3><p>Ознакомление с окружающим миром, нравственно-патриотическое воспитание, программа «Рухани жаңғыру».</p></div>
+        <div class="card"><div class="icon i-b">⭐</div><h3>Дополнительно</h3><p>Кружки: робототехника, английский язык, хореография, шахматы, логопедические занятия.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GROUPS -->
+  <section id="groups">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Контингент</span>
+        <h2>Возрастные группы</h2>
+      </div>
+      <div class="grid grid-4">
+        <div class="card"><div class="group-age">1–2 года</div><h3>Ясельная</h3><p>2 группы · 40 детей</p></div>
+        <div class="card"><div class="group-age">2–3 года</div><h3>Младшая</h3><p>3 группы · 60 детей</p></div>
+        <div class="card"><div class="group-age">3–4 года</div><h3>Средняя</h3><p>3 группы · 65 детей</p></div>
+        <div class="card"><div class="group-age">4–5 лет</div><h3>Старшая / предшкольная</h3><p>4 группы · 75 детей</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHERS -->
+  <section id="teachers">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Кадровый состав</span>
+        <h2>Наши педагоги</h2>
+        <p>Укомплектованность кадрами — 100%. Высшее педагогическое образование имеют 82% педагогов, 64% — первую и высшую категорию (педагог-эксперт, педагог-исследователь).</p>
+      </div>
+      <div class="grid grid-4">
+        <div class="card teacher"><div class="avatar" style="background:#f59e0b">АИ</div><h3>Иванова А. С.</h3><p>Заведующая</p><span class="tag">Стаж 24 года</span></div>
+        <div class="card teacher"><div class="avatar" style="background:#16a34a">ГК</div><h3>Касымова Г. Т.</h3><p>Методист</p><span class="tag">Педагог-исследователь</span></div>
+        <div class="card teacher"><div class="avatar" style="background:#2563eb">МН</div><h3>Нурланова М. Б.</h3><p>Воспитатель</p><span class="tag">Педагог-эксперт</span></div>
+        <div class="card teacher"><div class="avatar" style="background:#db2777">ЕП</div><h3>Петрова Е. В.</h3><p>Музыкальный руководитель</p><span class="tag">Педагог-модератор</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONDITIONS -->
+  <section id="conditions">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Материально-техническая база</span>
+        <h2>Условия для детей</h2>
+      </div>
+      <div class="grid grid-4">
+        <div class="card"><div class="icon i-y">🏫</div><h3>Групповые комнаты</h3><p>Отдельные спальни, игровые и развивающие центры в каждой группе.</p></div>
+        <div class="card"><div class="icon i-g">⚽</div><h3>Спортивный зал</h3><p>Спортзал, бассейн и оборудованная спортивная площадка.</p></div>
+        <div class="card"><div class="icon i-b">🩺</div><h3>Медицинский блок</h3><p>Медицинский кабинет, изолятор, постоянный медицинский контроль.</p></div>
+        <div class="card"><div class="icon i-p">🍲</div><h3>Питание</h3><p>Сбалансированное 4-разовое питание по утверждённому меню.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section id="schedule">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Распорядок</span>
+        <h2>Режим дня</h2>
+      </div>
+      <div class="schedule">
+        <div class="slot"><time>07:30–08:20</time><span>Приём детей, утренняя гимнастика</span></div>
+        <div class="slot"><time>08:20–08:50</time><span>Завтрак</span></div>
+        <div class="slot"><time>09:00–10:30</time><span>Организованная учебная деятельность</span></div>
+        <div class="slot"><time>10:30–12:00</time><span>Прогулка</span></div>
+        <div class="slot"><time>12:15–12:50</time><span>Обед</span></div>
+        <div class="slot"><time>13:00–15:00</time><span>Дневной сон</span></div>
+        <div class="slot"><time>15:00–15:30</time><span>Полдник, оздоровительные процедуры</span></div>
+        <div class="slot"><time>15:30–16:30</time><span>Кружки, игры, самостоятельная деятельность</span></div>
+        <div class="slot"><time>16:30–17:00</time><span>Ужин</span></div>
+        <div class="slot"><time>17:00–18:30</time><span>Прогулка, уход детей домой</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS -->
+  <section id="achievements">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Результаты</span>
+        <h2>Достижения</h2>
+      </div>
+      <div class="grid grid-2">
+        <div class="card achv"><span class="year">2025</span><div><h3>Лучший детский сад города</h3><p>I место в городском конкурсе «Лучшая дошкольная организация».</p></div></div>
+        <div class="card achv"><span class="year">2025</span><div><h3>Областной конкурс педагогов</h3><p>Воспитатель Нурланова М. Б. — победитель конкурса «Үздік педагог».</p></div></div>
+        <div class="card achv"><span class="year">2024</span><div><h3>Творческие конкурсы</h3><p>Воспитанники — призёры республиканского конкурса рисунков «Менің Отаным».</p></div></div>
+        <div class="card achv"><span class="year">2024</span><div><h3>Готовность к школе</h3><p>96% выпускников показали высокий и средний уровень готовности к обучению в школе.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCUMENTS -->
+  <section id="documents">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Аттестация</span>
+        <h2>Документы и материалы</h2>
+        <p>Нормативные документы и материалы самооценки детского сада. Нажмите на документ, чтобы открыть его.</p>
+      </div>
+      <div class="grid grid-3">
+        <a class="card doc" href="#"><div class="icon i-y">📄</div><div><b>Устав организации</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-b">📜</div><div><b>Лицензия на образовательную деятельность</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-g">📊</div><div><b>Отчёт по самооценке</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-p">📚</div><div><b>Образовательная программа</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-y">🗓️</div><div><b>Годовой план работы</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-b">👩‍🏫</div><div><b>Сведения о педагогах</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-g">📈</div><div><b>Мониторинг развития детей</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-p">🏗️</div><div><b>Материально-техническая база</b><small>PDF</small></div></a>
+        <a class="card doc" href="#"><div class="icon i-y">🛡️</div><div><b>Санитарно-эпидемиологическое заключение</b><small>PDF</small></div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section id="reviews">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Родители о нас</span>
+        <h2>Отзывы</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="card review"><p>«Сын ходит в сад с удовольствием. Воспитатели внимательные, много занятий и праздников.»</p><b>— Мама Арсена, средняя группа</b></div>
+        <div class="card review"><p>«Дочка отлично подготовилась к школе: читает, считает и не боится выступать перед публикой.»</p><b>— Папа Айлин, выпускница 2025</b></div>
+        <div class="card review"><p>«Очень чисто, вкусно кормят, всегда на связи. Спасибо коллективу за заботу!»</p><b>— Мама Софии, младшая группа</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="contacts">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Контакты</span>
+        <h2>Как с нами связаться</h2>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <div class="contact-item"><div class="icon i-y">📍</div><div><b>Адрес</b><p>г. Город, ул. Примерная, 10</p></div></div>
+          <div class="contact-item"><div class="icon i-g">📞</div><div><b>Телефон</b><p><a href="tel:+70000000000">+7 (000) 000-00-00</a></p></div></div>
+          <div class="contact-item"><div class="icon i-b">✉️</div><div><b>Электронная почта</b><p><a href="mailto:info@example.com">info@example.com</a></p></div></div>
+          <div class="contact-item"><div class="icon i-p">🕗</div><div><b>Время работы</b><p>Понедельник – пятница, 07:30 – 18:30</p></div></div>
+        </div>
+        <div class="map">Здесь можно разместить карту<br>(вставьте код из 2ГИС или Яндекс Карт)</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <span>© 2026 Детский сад «Солнышко»</span>
+    <span>Все права защищены</span>
+  </div>
+</footer>
+
+<script>
+  const burger = document.querySelector('.burger');
+  const menu = document.querySelector('.menu');
+  burger.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open);
+  });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    menu.classList.remove('open');
+    burger.setAttribute('aria-expanded', false);
+  }));
+</script>
+</body>
+</html>
