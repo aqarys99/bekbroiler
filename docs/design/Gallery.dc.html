@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Фотогалерея — админка</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1F5BD8}a:hover{color:#1747AE}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F5F7; font-family: 'Inter', system-ui, sans-serif; color: #1C2230; font-size: 15px; line-height: 1.5">
+
+  <nav aria-label="Меню админки" style="flex: 1 1 240px; max-width: 100%; box-sizing: border-box; background: #FFFFFF; border-right: 1px solid #E2E5EA; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 10px 18px">
+      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FDF0E1"/><circle cx="18" cy="18" r="8" fill="#F2A516"/></svg>
+      <div style="display: flex; flex-direction: column"><b style="font-size: 16px">«Солнышко»</b><span style="font-size: 13px; color: #5B6372">Управление сайтом</span></div>
+    </div>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 8px 12px 4px">Содержимое</span>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Главная</a>
+    <a href="News.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Новости</a>
+    <a href="Documents.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Документы</a>
+    <a href="Gallery.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; background: #EAF0FD; color: #1F5BD8; font-weight: 600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>Фотогалерея</a>
+    <a href="Videos.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>Видео</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Разделы сайта</span>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg>Страницы</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>Педагоги</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg>Группы</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Система</span>
+    <a href="Settings.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Настройки</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/></svg>Пользователи</a>
+    <div style="margin-top: 24px; padding: 14px 12px; border-top: 1px solid #E2E5EA; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 36px; height: 36px; border-radius: 50%; background: #1F5BD8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">АИ</span>
+        <div style="display: flex; flex-direction: column"><b style="font-size: 14px">Иванова А. С.</b><span style="font-size: 13px; color: #5B6372">Заведующая</span></div>
+      </div>
+      <a href="Login.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; color: #5B6372; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/></svg>Выйти</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 0 0 48px">
+    <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 32px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+      <span style="font-size: 14px; color: #5B6372">Фотогалерея / <b style="color: #1C2230; font-weight: 600">Осенний утренник</b></span>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <div role="group" aria-label="Язык интерфейса" style="display: flex; padding: 3px; background: #F0F2F5; border-radius: 10px">
+          <button type="button" aria-pressed="true" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 600; color: #1C2230; box-shadow: 0 1px 2px rgba(0,0,0,.08)">RU</button>
+          <button type="button" aria-pressed="false" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-weight: 500; color: #5B6372">ҚАЗ</button>
+        </div>
+        <a href="#" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid #D5D9E0; border-radius: 10px; text-decoration: none; color: #1C2230; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Открыть сайт</a>
+      </div>
+    </header>
+
+    <div style="max-width: 1160px; margin: 0 auto; padding: 32px 32px 0; display: flex; flex-direction: column; gap: 24px">
+      <section style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
+          <div>
+            <h1 style="margin: 0 0 6px; font-size: 28px; font-weight: 700">Фотогалерея</h1>
+            <p style="margin: 0; color: #5B6372">Фото разложены по альбомам: праздники, занятия, прогулки.</p>
+          </div>
+          <button type="button" style="min-height: 48px; padding: 0 20px; border: 0; border-radius: 10px; background: #1F5BD8; color: #FFFFFF; font: inherit; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Новый альбом</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px">
+          <a href="#" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 2px solid #1F5BD8; border-radius: 14px; background: #FFFFFF; text-decoration: none; color: #1C2230"><span style="aspect-ratio: 16 / 9; border-radius: 8px; background: #FDF0E1"></span><b style="font-weight: 600; font-size: 14px">Осенний утренник</b><span style="font-size: 13px; color: #5B6372">24 фото · 17.11.2026</span></a>
+          <a href="#" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid #E2E5EA; border-radius: 14px; background: #FFFFFF; text-decoration: none; color: #1C2230"><span style="aspect-ratio: 16 / 9; border-radius: 8px; background: #E6F4EA"></span><b style="font-weight: 600; font-size: 14px">Неделя здоровья</b><span style="font-size: 13px; color: #5B6372">18 фото · 05.11.2026</span></a>
+          <a href="#" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid #E2E5EA; border-radius: 14px; background: #FFFFFF; text-decoration: none; color: #1C2230"><span style="aspect-ratio: 16 / 9; border-radius: 8px; background: #EAF0FD"></span><b style="font-weight: 600; font-size: 14px">День знаний</b><span style="font-size: 13px; color: #5B6372">32 фото · 01.09.2026</span></a>
+          <a href="#" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid #E2E5EA; border-radius: 14px; background: #FFFFFF; text-decoration: none; color: #1C2230"><span style="aspect-ratio: 16 / 9; border-radius: 8px; background: #FCE8F1"></span><b style="font-weight: 600; font-size: 14px">Наши группы</b><span style="font-size: 13px; color: #5B6372">40 фото · 15.08.2026</span></a>
+        </div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 700">Альбом «Осенний утренник»</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <button type="button" style="min-height: 44px; padding: 0 14px; border: 1px solid #D5D9E0; border-radius: 10px; background: #FFFFFF; font: inherit; font-weight: 500; color: #1C2230">Название и описание</button>
+            <label style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: 1px solid #D5D9E0; border-radius: 10px; font-weight: 500"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #1F5BD8">Показывать на сайте</label>
+          </div>
+        </div>
+
+        <button type="button" style="min-height: 150px; border: 2px dashed #8FA9EC; border-radius: 14px; background: #F3F6FE; font: inherit; color: #3A3F4A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px; cursor: pointer">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1F5BD8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+          <b style="font-size: 17px; font-weight: 600; color: #1F5BD8">Перетащите фото сюда или нажмите, чтобы выбрать</b>
+          <span style="font-size: 14px; color: #4A5160">Можно сразу много фото с телефона. JPG, PNG, HEIC.</span>
+        </button>
+
+        <div style="display: flex; gap: 10px; padding: 12px 14px; border-radius: 10px; background: #E6F4EA; color: #145C30; font-size: 14px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Фото уменьшаются автоматически, сайт открывается быстро даже с мобильного интернета. С фото удаляется место съёмки (GPS).</span>
+        </div>
+
+        <div style="border: 1px solid #E2E5EA; border-radius: 12px; overflow: hidden">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding: 12px 16px; background: #F7F8FA; border-bottom: 1px solid #E2E5EA; font-size: 14px">
+            <b style="font-weight: 600">Загрузка: 3 из 6 готово</b>
+            <span style="color: #4A5160">Сэкономлено 28,1 МБ</span>
+          </div>
+          <sc-for list="{{queue}}" as="q" hint-placeholder-count="5">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid #EEF0F3">
+              <span style="width: 48px; height: 48px; flex-shrink: 0; border-radius: 8px; background: {{q.thumb}}"></span>
+              <div style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 14px">
+                  <b style="font-weight: 600">{{q.name}}</b>
+                  <span style="color: #4A5160">{{q.sizes}}</span>
+                </div>
+                <div style="height: 6px; border-radius: 999px; background: #E9ECF1; overflow: hidden"><div style="{{q.barStyle}}"></div></div>
+              </div>
+              <span style="{{q.statusStyle}}">{{q.status}}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px">
+          <h3 style="margin: 0; font-size: 17px; font-weight: 700">Фото в альбоме · 24</h3>
+          <span style="font-size: 13px; color: #5B6372">Перетащите фото, чтобы поменять порядок</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px">
+          <sc-for list="{{photos}}" as="p" hint-placeholder-count="8">
+            <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 10px; background: {{p.bg}}">
+              <sc-if value="{{p.cover}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 8px; top: 8px; padding: 2px 8px; border-radius: 6px; background: #1C2230; color: #FFFFFF; font-size: 12px; font-weight: 600">Обложка</span></sc-if>
+              <button type="button" aria-label="Действия с фото" style="position: absolute; right: 6px; top: 6px; width: 36px; height: 36px; border: 0; border-radius: 8px; background: rgba(255,255,255,.92); color: #1C2230; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const pill = (bg, fg) => 'display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; min-width: 110px; justify-content: center; background: ' + bg + '; color: ' + fg;
+    const bar = (w, c) => 'width: ' + w + '; height: 100%; border-radius: 999px; background: ' + c;
+    const queue = [
+      { name: 'IMG_2041.jpg', sizes: '9,8 МБ → 312 КБ', st: 'done', p: '100%', thumb: '#FDF0E1' },
+      { name: 'IMG_2042.jpg', sizes: '10,4 МБ → 287 КБ', st: 'done', p: '100%', thumb: '#E6F4EA' },
+      { name: 'IMG_2043.HEIC', sizes: '8,9 МБ → 301 КБ', st: 'done', p: '100%', thumb: '#EAF0FD' },
+      { name: 'IMG_2044.jpg', sizes: '11,2 МБ · сжимается…', st: 'work', p: '60%', thumb: '#FCE8F1' },
+      { name: 'IMG_2045.jpg', sizes: '9,1 МБ', st: 'wait', p: '0%', thumb: '#EEF0F3' },
+      { name: 'Скриншот.pdf', sizes: 'Это не фото. Загрузите его в «Документы».', st: 'err', p: '0%', thumb: '#FDECEA' }
+    ].map((q) => ({
+      ...q,
+      status: q.st === 'done' ? 'Готово' : q.st === 'work' ? 'Сжимается' : q.st === 'wait' ? 'В очереди' : 'Ошибка',
+      statusStyle: q.st === 'done' ? pill('#E6F4EA', '#17703A') : q.st === 'work' ? pill('#EAF0FD', '#1F5BD8') : q.st === 'wait' ? pill('#F0F2F5', '#4A5160') : pill('#FDECEA', '#B42318'),
+      barStyle: bar(q.p, q.st === 'done' ? '#2E9D57' : '#1F5BD8')
+    }));
+    const bgs = ['#FDF0E1', '#E6F4EA', '#EAF0FD', '#FCE8F1', '#EEF0F3', '#FFF6D6', '#E3F3F6', '#F1ECFB'];
+    const photos = bgs.map((bg, i) => ({ bg, cover: i === 0 }));
+    return { queue, photos };
+  }
+}
+</script>
+</body>
+</html>

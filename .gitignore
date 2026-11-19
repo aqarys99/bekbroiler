@@ -1,0 +1,12 @@
+/vendor/
+/node_modules/
+/storage/*.sqlite
+/storage/cache/
+/storage/logs/
+/storage/backups/
+/public/uploads/*
+!/public/uploads/.gitkeep
+/config/config.php
+/test-results/
+/playwright-report/
+.phpunit.result.cache

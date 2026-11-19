@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP 8.1 (минимальная версия хостинга)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: pdo_sqlite, gd, fileinfo, mbstring, zip
+          tools: composer
+
+      - name: Проверка синтаксиса PHP
+        run: |
+          files=$(find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*')
+          if [ -n "$files" ]; then echo "$files" | xargs -n1 php -l; else echo "PHP-файлов пока нет"; fi
+
+      - name: Composer install
+        if: hashFiles('composer.json') != ''
+        run: composer install --no-interaction --no-progress
+
+      - name: PHPUnit
+        if: hashFiles('phpunit.xml', 'phpunit.xml.dist') != ''
+        run: vendor/bin/phpunit --colors=never
+
+      - uses: actions/setup-node@v4
+        if: hashFiles('package.json') != ''
+        with:
+          node-version: '22'
+
+      - name: npm install + браузер
+        if: hashFiles('package.json') != ''
+        run: |
+          npm ci || npm install
+          npx playwright install --with-deps chromium
+
+      - name: E2E (каждая кнопка и связи)
+        if: hashFiles('playwright.config.js', 'playwright.config.ts') != ''
+        run: npx playwright test --trace off --reporter=line
+
+      - name: Отчёт Playwright при падении
+        if: failure() && hashFiles('playwright.config.js', 'playwright.config.ts') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

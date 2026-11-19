@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Документы — админка</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1F5BD8}a:hover{color:#1747AE}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F5F7; font-family: 'Inter', system-ui, sans-serif; color: #1C2230; font-size: 15px; line-height: 1.5">
+
+  <nav aria-label="Меню админки" style="flex: 1 1 240px; max-width: 100%; box-sizing: border-box; background: #FFFFFF; border-right: 1px solid #E2E5EA; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 10px 18px">
+      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FDF0E1"/><circle cx="18" cy="18" r="8" fill="#F2A516"/></svg>
+      <div style="display: flex; flex-direction: column"><b style="font-size: 16px">«Солнышко»</b><span style="font-size: 13px; color: #5B6372">Управление сайтом</span></div>
+    </div>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 8px 12px 4px">Содержимое</span>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Главная</a>
+    <a href="News.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Новости</a>
+    <a href="Documents.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; background: #EAF0FD; color: #1F5BD8; font-weight: 600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Документы</a>
+    <a href="Gallery.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>Фотогалерея</a>
+    <a href="Videos.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>Видео</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Разделы сайта</span>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg>Страницы</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>Педагоги</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg>Группы</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Система</span>
+    <a href="Settings.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Настройки</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/></svg>Пользователи</a>
+    <div style="margin-top: 24px; padding: 14px 12px; border-top: 1px solid #E2E5EA; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 36px; height: 36px; border-radius: 50%; background: #1F5BD8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">АИ</span>
+        <div style="display: flex; flex-direction: column"><b style="font-size: 14px">Иванова А. С.</b><span style="font-size: 13px; color: #5B6372">Заведующая</span></div>
+      </div>
+      <a href="Login.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; color: #5B6372; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/></svg>Выйти</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 0 0 48px">
+    <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 32px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+      <span style="font-size: 14px; color: #5B6372">Главная / <b style="color: #1C2230; font-weight: 600">Документы</b></span>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <div role="group" aria-label="Язык интерфейса" style="display: flex; padding: 3px; background: #F0F2F5; border-radius: 10px">
+          <button type="button" aria-pressed="true" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 600; color: #1C2230; box-shadow: 0 1px 2px rgba(0,0,0,.08)">RU</button>
+          <button type="button" aria-pressed="false" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-weight: 500; color: #5B6372">ҚАЗ</button>
+        </div>
+        <a href="#" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid #D5D9E0; border-radius: 10px; text-decoration: none; color: #1C2230; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Открыть сайт</a>
+      </div>
+    </header>
+
+    <div style="max-width: 1160px; margin: 0 auto; padding: 32px 32px 0; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+        <div>
+          <h1 style="margin: 0 0 6px; font-size: 28px; font-weight: 700">Документы</h1>
+          <p style="margin: 0; color: #5B6372">Все документы попадают в раздел «Документы» на сайте. PDF открывается прямо в браузере.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <svg width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="7 из 10"><circle cx="20" cy="20" r="16" fill="none" stroke="#E9ECF1" stroke-width="6"/><circle cx="20" cy="20" r="16" fill="none" stroke="#1F5BD8" stroke-width="6" stroke-dasharray="70.4 100.5" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg>
+        <div style="flex: 1 1 280px">
+          <b style="font-size: 16px">Для аттестации загружено 7 из 10 обязательных документов</b>
+          <p style="margin: 2px 0 0; font-size: 14px; color: #5B6372">Не хватает: отчёт по самооценке, сведения о педагогах, мониторинг развития детей.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+        <div style="flex: 2 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+          <div role="tablist" aria-label="Категории" style="display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{cats}}" as="c" hint-placeholder-count="5">
+              <button type="button" role="tab" aria-selected="{{c.sel}}" onClick="{{c.pick}}" style="{{c.style}}">{{c.label}}</button>
+            </sc-for>
+          </div>
+
+          <div style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; overflow: hidden">
+            <sc-for list="{{docs}}" as="d" hint-placeholder-count="6">
+              <div style="{{d.rowStyle}}">
+                <span style="{{d.badgeStyle}}">{{d.type}}</span>
+                <div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+                  <span style="font-weight: 600">{{d.title}}</span>
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; color: #5B6372">
+                    <sc-if value="{{d.required}}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; padding: 1px 8px; border-radius: 6px; background: #EAF0FD; color: #1F5BD8; font-weight: 600">Для аттестации</span></sc-if>
+                    <span>{{d.meta}}</span>
+                  </div>
+                </div>
+                <span style="{{d.statusStyle}}">{{d.status}}</span>
+                <sc-if value="{{d.missing}}" hint-placeholder-val="{{ false }}">
+                  <button type="button" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: #1F5BD8; color: #FFFFFF; font: inherit; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Загрузить</button>
+                </sc-if>
+                <sc-if value="{{d.present}}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; gap: 4px">
+                    <button type="button" aria-label="Заменить файл" style="width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: #3A3F4A; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
+                    <button type="button" aria-label="Удалить" style="width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: #B42318; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <form style="flex: 1 1 320px; min-width: 0; background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 700">Новый документ</h2>
+          <button type="button" style="min-height: 140px; border: 2px dashed #B9C0CB; border-radius: 12px; background: #F7F8FA; font: inherit; color: #3A3F4A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px; cursor: pointer">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F5BD8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+            <b style="font-weight: 600; color: #1F5BD8">Выбрать файл</b>
+            <span style="font-size: 13px; color: #5B6372">PDF, Word, Excel, скан JPG — до 20 МБ</span>
+          </button>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="dn-ru" style="font-weight: 600; font-size: 14px">Название <span style="color: #B42318">*</span></label>
+            <input id="dn-ru" type="text" value="Отчёт по самооценке за 2025–2026 учебный год" style="min-height: 46px; padding: 0 12px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; color: #1C2230">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="dn-kk" style="font-weight: 600; font-size: 14px">Название на казахском <span style="font-weight: 400; color: #5B6372">(можно позже)</span></label>
+            <input id="dn-kk" type="text" placeholder="Атауы" style="min-height: 46px; padding: 0 12px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; color: #1C2230">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="dc" style="font-weight: 600; font-size: 14px">Категория</label>
+            <select id="dc" style="min-height: 46px; padding: 0 10px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; color: #1C2230; background: #FFFFFF"><option>Аттестация</option><option>Нормативные документы</option><option>Отчёты</option><option>Для родителей</option></select>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="dk" style="font-weight: 600; font-size: 14px">Пункт чек-листа аттестации</label>
+            <select id="dk" style="min-height: 46px; padding: 0 10px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; color: #1C2230; background: #FFFFFF"><option>Отчёт по самооценке</option><option>Не относится к аттестации</option></select>
+            <span style="font-size: 13px; color: #5B6372">Отмеченный пункт станет зелёным на главной.</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px">
+            <label style="flex: 1 1 140px; display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 14px">Дата документа<input type="date" value="2026-11-15" style="min-height: 46px; padding: 0 10px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; font-weight: 400"></label>
+            <label style="flex: 1 1 140px; display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 14px">Действует до<input type="date" style="min-height: 46px; padding: 0 10px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; font-weight: 400"></label>
+          </div>
+          <span style="font-size: 13px; color: #5B6372; margin-top: -8px">Заранее напомним, когда срок будет подходить к концу.</span>
+          <button type="button" style="min-height: 48px; border: 0; border-radius: 10px; background: #1F5BD8; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Сохранить документ</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { cat: 'att' }; }
+  renderVals() {
+    const pill = (bg, fg) => 'display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; background: ' + bg + '; color: ' + fg;
+    const badge = (bg, fg) => 'width: 48px; height: 56px; flex-shrink: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: ' + bg + '; color: ' + fg;
+    const all = [
+      { cat: 'att', title: 'Устав организации', type: 'PDF', required: true, meta: 'Загружен 02.09.2026 · 1,4 МБ', st: 'ok' },
+      { cat: 'att', title: 'Лицензия на образовательную деятельность', type: 'PDF', required: true, meta: 'Загружена 02.09.2026 · 0,6 МБ', st: 'ok' },
+      { cat: 'att', title: 'Санитарно-эпидемиологическое заключение', type: 'PDF', required: true, meta: 'Действует до 15.12.2026 · 0,9 МБ', st: 'warn' },
+      { cat: 'att', title: 'Отчёт по самооценке', type: '—', required: true, meta: 'Файл ещё не загружен', st: 'none' },
+      { cat: 'att', title: 'Сведения о педагогах', type: '—', required: true, meta: 'Файл ещё не загружен', st: 'none' },
+      { cat: 'att', title: 'Годовой план работы на 2026–2027', type: 'DOCX', required: true, meta: 'Загружен 10.09.2026 · 0,3 МБ', st: 'ok' },
+      { cat: 'norm', title: 'Правила внутреннего распорядка', type: 'PDF', required: false, meta: 'Загружены 05.09.2026 · 0,4 МБ', st: 'ok' },
+      { cat: 'rep', title: 'Отчёт о финансово-хозяйственной деятельности', type: 'XLSX', required: false, meta: 'Загружен 01.10.2026 · 0,2 МБ', st: 'ok' },
+      { cat: 'par', title: 'Памятка для родителей по адаптации', type: 'PDF', required: false, meta: 'Загружена 12.09.2026 · 0,5 МБ', st: 'ok' }
+    ];
+    const ST = {
+      ok: { label: 'На сайте', style: pill('#E6F4EA', '#17703A') },
+      warn: { label: 'Истекает через 26 дней', style: pill('#FDF0E1', '#9A4D00') },
+      none: { label: 'Нет файла', style: pill('#FDECEA', '#B42318') }
+    };
+    const c = this.state.cat;
+    const docs = all.filter((d) => c === 'all' || d.cat === c).map((d) => ({
+      ...d,
+      status: ST[d.st].label, statusStyle: ST[d.st].style,
+      missing: d.st === 'none', present: d.st !== 'none',
+      badgeStyle: d.st === 'none' ? badge('#F0F2F5', '#5B6372') : d.type === 'PDF' ? badge('#FDECEA', '#B42318') : d.type === 'XLSX' ? badge('#E6F4EA', '#17703A') : badge('#EAF0FD', '#1F5BD8'),
+      rowStyle: 'display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid #EEF0F3;' + (d.st === 'none' ? ' background: #FFFBFA;' : '')
+    }));
+    const on = 'min-height: 44px; padding: 0 14px; border: 1px solid #1F5BD8; border-radius: 999px; background: #1F5BD8; color: #FFFFFF; font: inherit; font-weight: 600; font-size: 14px; cursor: pointer';
+    const off = 'min-height: 44px; padding: 0 14px; border: 1px solid #D5D9E0; border-radius: 999px; background: #FFFFFF; color: #1C2230; font: inherit; font-weight: 500; font-size: 14px; cursor: pointer';
+    const cats = [
+      { id: 'all', label: 'Все' }, { id: 'att', label: 'Аттестация' }, { id: 'norm', label: 'Нормативные' }, { id: 'rep', label: 'Отчёты' }, { id: 'par', label: 'Для родителей' }
+    ].map((x) => ({ ...x, sel: x.id === c ? 'true' : 'false', style: x.id === c ? on : off, pick: () => this.setState({ cat: x.id }) }));
+    return { docs, cats };
+  }
+}
+</script>
+</body>
+</html>

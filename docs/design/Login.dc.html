@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Вход в админку</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1F5BD8}a:hover{color:#1747AE}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; padding: 48px 16px; display: flex; align-items: center; justify-content: center; background: #F4F5F7; font-family: 'Inter', system-ui, sans-serif; color: #1C2230; font-size: 15px; line-height: 1.5">
+  <div style="width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; justify-content: flex-end">
+      <div role="group" aria-label="Язык интерфейса" style="display: flex; padding: 3px; background: #E9ECF1; border-radius: 10px">
+        <button type="button" aria-pressed="{{isRu}}" onClick="{{setRu}}" style="{{ruStyle}}">Русский</button>
+        <button type="button" aria-pressed="{{isKk}}" onClick="{{setKk}}" style="{{kkStyle}}">Қазақша</button>
+      </div>
+    </div>
+    <form style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 20px; padding: 36px 32px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 8px 24px rgba(28,34,48,.06)">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+        <svg width="56" height="56" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FDF0E1"/><circle cx="18" cy="18" r="8" fill="#F2A516"/></svg>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 700">{{t.title}}</h1>
+        <p style="margin: 0; color: #5B6372">{{t.sub}}</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="login" style="font-weight: 600; font-size: 14px">{{t.login}}</label>
+        <input id="login" type="text" value="ivanova" autocomplete="username" style="min-height: 48px; padding: 0 14px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; color: #1C2230; background: #FFFFFF">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="pass" style="font-weight: 600; font-size: 14px">{{t.pass}}</label>
+        <div style="display: flex; align-items: center; border: 1px solid #C9CED6; border-radius: 10px; background: #FFFFFF">
+          <input id="pass" type="password" value="password123" autocomplete="current-password" style="flex: 1 1 auto; min-width: 0; min-height: 46px; padding: 0 14px; border: 0; border-radius: 10px; font: inherit; color: #1C2230; background: transparent">
+          <button type="button" aria-label="{{t.show}}" style="width: 46px; height: 46px; border: 0; background: transparent; color: #5B6372; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+      <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #1F5BD8">{{t.remember}}</label>
+      <a href="Main.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 10px; background: #1F5BD8; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 16px">{{t.enter}}</a>
+      <div style="display: flex; gap: 10px; padding: 12px 14px; border-radius: 10px; background: #F4F5F7; font-size: 14px; color: #4A5160">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17h.01"/></svg>
+        <span>{{t.forgot}}</span>
+      </div>
+    </form>
+    <p style="margin: 0; text-align: center; font-size: 13px; color: #5B6372">{{t.lock}}</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { lang: 'ru' }; }
+  renderVals() {
+    const on = 'min-height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 600; color: #1C2230; box-shadow: 0 1px 2px rgba(0,0,0,.08); cursor: pointer';
+    const off = 'min-height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-weight: 500; color: #4A5160; cursor: pointer';
+    const ru = this.state.lang === 'ru';
+    const T = {
+      ru: { title: 'Вход в админку', sub: 'Детский сад «Солнышко»', login: 'Логин', pass: 'Пароль', show: 'Показать пароль', remember: 'Запомнить меня на этом устройстве', enter: 'Войти', forgot: 'Забыли пароль? Обратитесь к ответственному за сайт — он сбросит пароль в разделе «Пользователи».', lock: 'После 5 неверных попыток вход блокируется на 15 минут.' },
+      kk: { title: 'Әкімшілік бөлімге кіру', sub: '«Күншуақ» балабақшасы', login: 'Логин', pass: 'Құпиясөз', show: 'Құпиясөзді көрсету', remember: 'Осы құрылғыда есте сақтау', enter: 'Кіру', forgot: 'Құпиясөзді ұмыттыңыз ба? Сайтқа жауапты адамға хабарласыңыз — ол «Пайдаланушылар» бөлімінде құпиясөзді қалпына келтіреді.', lock: '5 рет қате енгізілгеннен кейін кіру 15 минутқа бұғатталады.' }
+    };
+    return {
+      t: ru ? T.ru : T.kk,
+      isRu: ru ? 'true' : 'false', isKk: ru ? 'false' : 'true',
+      ruStyle: ru ? on : off, kkStyle: ru ? off : on,
+      setRu: () => this.setState({ lang: 'ru' }),
+      setKk: () => this.setState({ lang: 'kk' })
+    };
+  }
+}
+</script>
+</body>
+</html>

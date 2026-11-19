@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Настройки — админка</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1F5BD8}a:hover{color:#1747AE}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F5F7; font-family: 'Inter', system-ui, sans-serif; color: #1C2230; font-size: 15px; line-height: 1.5">
+
+  <nav aria-label="Меню админки" style="flex: 1 1 240px; max-width: 100%; box-sizing: border-box; background: #FFFFFF; border-right: 1px solid #E2E5EA; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 10px 18px">
+      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FDF0E1"/><circle cx="18" cy="18" r="8" fill="#F2A516"/></svg>
+      <div style="display: flex; flex-direction: column"><b style="font-size: 16px">«Солнышко»</b><span style="font-size: 13px; color: #5B6372">Управление сайтом</span></div>
+    </div>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 8px 12px 4px">Содержимое</span>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Главная</a>
+    <a href="News.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Новости</a>
+    <a href="Documents.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Документы</a>
+    <a href="Gallery.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>Фотогалерея</a>
+    <a href="Videos.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>Видео</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Разделы сайта</span>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg>Страницы</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>Педагоги</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg>Группы</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Система</span>
+    <a href="Settings.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; background: #EAF0FD; color: #1F5BD8; font-weight: 600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Настройки</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/></svg>Пользователи</a>
+    <div style="margin-top: 24px; padding: 14px 12px; border-top: 1px solid #E2E5EA; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 36px; height: 36px; border-radius: 50%; background: #1F5BD8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">АИ</span>
+        <div style="display: flex; flex-direction: column"><b style="font-size: 14px">Иванова А. С.</b><span style="font-size: 13px; color: #5B6372">Заведующая</span></div>
+      </div>
+      <a href="Login.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; color: #5B6372; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/></svg>Выйти</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 0 0 48px">
+    <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 32px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+      <span style="font-size: 14px; color: #5B6372">Главная / <b style="color: #1C2230; font-weight: 600">Настройки</b></span>
+      <button type="button" style="min-height: 44px; padding: 0 20px; border: 0; border-radius: 10px; background: #1F5BD8; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Сохранить изменения</button>
+    </header>
+
+    <div style="max-width: 1120px; margin: 0 auto; padding: 32px 32px 0; display: flex; flex-direction: column; gap: 24px">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700">Настройки сайта</h1>
+      <div role="tablist" aria-label="Разделы настроек" style="display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid #E2E5EA">
+        <button type="button" role="tab" aria-selected="false" style="min-height: 48px; padding: 0 16px; border: 0; border-bottom: 3px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #4A5160">Основное</button>
+        <button type="button" role="tab" aria-selected="true" style="min-height: 48px; padding: 0 16px; border: 0; border-bottom: 3px solid #1F5BD8; background: transparent; font: inherit; font-weight: 600; color: #1C2230">Оформление и языки</button>
+        <button type="button" role="tab" aria-selected="false" style="min-height: 48px; padding: 0 16px; border: 0; border-bottom: 3px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #4A5160">Контакты и карта</button>
+        <button type="button" role="tab" aria-selected="false" style="min-height: 48px; padding: 0 16px; border: 0; border-bottom: 3px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #4A5160">Резервные копии</button>
+      </div>
+
+      <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <div>
+          <h2 style="margin: 0 0 4px; font-size: 18px; font-weight: 700">Тема оформления</h2>
+          <p style="margin: 0; font-size: 14px; color: #5B6372">Меняется только внешний вид. Новости, фото и документы остаются на месте.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px">
+          <sc-for list="{{themes}}" as="th" hint-placeholder-count="3">
+            <button type="button" aria-pressed="{{th.sel}}" onClick="{{th.pick}}" style="{{th.style}}">
+              <span style="display: flex; height: 110px; border-radius: 10px; overflow: hidden; background: {{th.bg}}">
+                <span style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; padding: 14px">
+                  <span style="width: 60%; height: 12px; border-radius: 4px; background: {{th.main}}"></span>
+                  <span style="width: 85%; height: 8px; border-radius: 4px; background: rgba(0,0,0,.12)"></span>
+                  <span style="width: 70%; height: 8px; border-radius: 4px; background: rgba(0,0,0,.12)"></span>
+                  <span style="margin-top: auto; width: 40%; height: 18px; border-radius: 999px; background: {{th.main}}"></span>
+                </span>
+              </span>
+              <span style="display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left">
+                <span style="display: flex; flex-direction: column"><b style="font-weight: 600">{{th.name}}</b><span style="font-size: 13px; color: #5B6372">{{th.desc}}</span></span>
+                <sc-if value="{{th.selB}}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; padding: 2px 8px; border-radius: 6px; background: #1F5BD8; color: #FFFFFF; font-size: 12px; font-weight: 600">Выбрана</span></sc-if>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; padding-top: 8px">
+          <fieldset style="flex: 1 1 260px; margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 10px">
+            <legend style="padding: 0; margin-bottom: 8px; font-weight: 600; font-size: 14px">Основной цвет</legend>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px">
+              <sc-for list="{{colors}}" as="c" hint-placeholder-count="6">
+                <button type="button" aria-label="{{c.name}}" aria-pressed="{{c.sel}}" onClick="{{c.pick}}" style="{{c.style}}"></button>
+              </sc-for>
+            </div>
+          </fieldset>
+          <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px">
+            <span style="font-weight: 600; font-size: 14px">Логотип</span>
+            <div style="display: flex; align-items: center; gap: 14px">
+              <svg width="56" height="56" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FDF0E1"/><circle cx="18" cy="18" r="8" fill="#F2A516"/></svg>
+              <button type="button" style="min-height: 44px; padding: 0 16px; border: 1px solid #D5D9E0; border-radius: 10px; background: #FFFFFF; font: inherit; font-weight: 500; color: #1C2230">Заменить логотип</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 4px">
+        <h2 style="margin: 0 0 12px; font-size: 18px; font-weight: 700">Языки сайта</h2>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+          <div style="flex: 1 1 260px; display: flex; flex-direction: column"><b style="font-weight: 600">Русский</b><span style="font-size: 13px; color: #5B6372">Основной язык. Всегда включён.</span></div>
+          <span style="display: inline-flex; padding: 4px 10px; border-radius: 999px; background: #E6F4EA; color: #17703A; font-size: 13px; font-weight: 600">Включён</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+          <div style="flex: 1 1 260px; display: flex; flex-direction: column"><b style="font-weight: 600">Қазақша</b><span style="font-size: 13px; color: #5B6372">{{kkHint}}</span></div>
+          <label style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer">
+            <button type="button" role="switch" aria-checked="{{kkOn}}" aria-label="Показывать казахскую версию сайта" onClick="{{toggleKk}}" style="{{switchStyle}}"><span style="{{knobStyle}}"></span></button>
+            <span style="font-weight: 500">{{kkLabel}}</span>
+          </label>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0">
+          <label for="deflang" style="flex: 1 1 260px; display: flex; flex-direction: column"><b style="font-weight: 600">Язык, который видят при первом входе</b><span style="font-size: 13px; color: #5B6372">Посетитель всегда может переключить язык в шапке сайта.</span></label>
+          <select id="deflang" style="min-height: 44px; padding: 0 10px; border: 1px solid #C9CED6; border-radius: 10px; font: inherit; color: #1C2230; background: #FFFFFF"><option>Русский</option><option>Қазақша</option></select>
+        </div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+        <div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 4px">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 700">Версия для слабовидящих</h2>
+          <span style="font-size: 14px; color: #5B6372">Кнопка в шапке сайта: крупный шрифт и высокий контраст.</span>
+        </div>
+        <label style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 500"><input type="checkbox" checked style="width: 22px; height: 22px; accent-color: #1F5BD8">Показывать кнопку</label>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { theme: 'sun', color: '#F2A516', kk: false }; }
+  renderVals() {
+    const card = (sel) => 'display: flex; flex-direction: column; gap: 12px; padding: 12px; border-radius: 14px; background: #FFFFFF; font: inherit; color: #1C2230; cursor: pointer; border: ' + (sel ? '2px solid #1F5BD8' : '1px solid #E2E5EA');
+    const themes = [
+      { id: 'sun', name: 'Солнышко', desc: 'Тёплая, детская', bg: '#FFF8EC', main: '#F2A516' },
+      { id: 'official', name: 'Официальная', desc: 'Строгая, для госорганов', bg: '#F3F5F9', main: '#1F4E9C' },
+      { id: 'nature', name: 'Природа', desc: 'Зелёная, спокойная', bg: '#F1F8F2', main: '#2E8B57' }
+    ].map((t) => ({ ...t, selB: t.id === this.state.theme, sel: t.id === this.state.theme ? 'true' : 'false', style: card(t.id === this.state.theme), pick: () => this.setState({ theme: t.id }) }));
+    const colors = [
+      { name: 'Оранжевый', hex: '#F2A516' }, { name: 'Синий', hex: '#1F5BD8' }, { name: 'Зелёный', hex: '#2E8B57' },
+      { name: 'Бирюзовый', hex: '#0F8B8D' }, { name: 'Розовый', hex: '#D0447A' }, { name: 'Фиолетовый', hex: '#6A4BC4' }
+    ].map((c) => {
+      const sel = c.hex === this.state.color;
+      return { ...c, sel: sel ? 'true' : 'false', pick: () => this.setState({ color: c.hex }), style: 'width: 44px; height: 44px; border-radius: 50%; cursor: pointer; background: ' + c.hex + '; border: 3px solid #FFFFFF; box-shadow: 0 0 0 ' + (sel ? '3px #1C2230' : '1px #C9CED6') };
+    });
+    const kk = this.state.kk;
+    return {
+      themes, colors,
+      kkOn: kk ? 'true' : 'false',
+      kkLabel: kk ? 'Показывается' : 'Скрыта',
+      kkHint: kk ? 'Посетители видят переключатель RU / ҚАЗ. Где нет перевода, показывается русский текст.' : 'Включите, когда переведёте основные разделы. Переведено 12 из 30.',
+      toggleKk: () => this.setState({ kk: !kk }),
+      switchStyle: 'position: relative; width: 52px; height: 30px; padding: 0; border: 0; border-radius: 999px; cursor: pointer; background: ' + (kk ? '#1F5BD8' : '#B9C0CB'),
+      knobStyle: 'position: absolute; top: 3px; left: ' + (kk ? '25px' : '3px') + '; width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,.25)'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Главная админки</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1F5BD8}a:hover{color:#1747AE}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F5F7; font-family: 'Inter', system-ui, sans-serif; color: #1C2230; font-size: 15px; line-height: 1.5">
+
+  <nav aria-label="Меню админки" style="flex: 1 1 240px; max-width: 100%; box-sizing: border-box; background: #FFFFFF; border-right: 1px solid #E2E5EA; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 10px 18px">
+      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FDF0E1"/><circle cx="18" cy="18" r="8" fill="#F2A516"/></svg>
+      <div style="display: flex; flex-direction: column"><b style="font-size: 16px">«Солнышко»</b><span style="font-size: 13px; color: #5B6372">Управление сайтом</span></div>
+    </div>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 8px 12px 4px">Содержимое</span>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; background: #EAF0FD; color: #1F5BD8; font-weight: 600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Главная</a>
+    <a href="News.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Новости</a>
+    <a href="Documents.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Документы</a>
+    <a href="Gallery.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>Фотогалерея</a>
+    <a href="Videos.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>Видео</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Разделы сайта</span>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg>Страницы</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>Педагоги</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg>Группы</a>
+    <span style="font-size: 12px; font-weight: 600; color: #5B6372; text-transform: uppercase; letter-spacing: .06em; padding: 16px 12px 4px">Система</span>
+    <a href="Settings.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Настройки</a>
+    <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: #3A3F4A; font-weight: 500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/></svg>Пользователи</a>
+    <div style="margin-top: 24px; padding: 14px 12px; border-top: 1px solid #E2E5EA; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 36px; height: 36px; border-radius: 50%; background: #1F5BD8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">АИ</span>
+        <div style="display: flex; flex-direction: column"><b style="font-size: 14px">Иванова А. С.</b><span style="font-size: 13px; color: #5B6372">Заведующая</span></div>
+      </div>
+      <a href="Login.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; color: #5B6372; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/></svg>Выйти</a>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 0 0 48px">
+    <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 32px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+      <span style="font-size: 14px; color: #5B6372">Главная</span>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <div role="group" aria-label="Язык интерфейса" style="display: flex; padding: 3px; background: #F0F2F5; border-radius: 10px">
+          <button type="button" aria-pressed="true" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 600; color: #1C2230; box-shadow: 0 1px 2px rgba(0,0,0,.08)">RU</button>
+          <button type="button" aria-pressed="false" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-weight: 500; color: #5B6372">ҚАЗ</button>
+        </div>
+        <a href="#" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid #D5D9E0; border-radius: 10px; text-decoration: none; color: #1C2230; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Открыть сайт</a>
+      </div>
+    </header>
+
+    <div style="max-width: 1120px; margin: 0 auto; padding: 32px 32px 0; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+        <div>
+          <h1 style="margin: 0 0 6px; font-size: 28px; font-weight: 700">Добрый день, Анна Сергеевна</h1>
+          <p style="margin: 0; color: #5B6372">Здесь видно, что уже готово к аттестации и что нужно добавить.</p>
+        </div>
+        <a href="NewsEdit.dc.html" style="display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 10px; background: #1F5BD8; color: #FFFFFF; text-decoration: none; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Добавить новость</a>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+        <section style="flex: 2 1 480px; min-width: 0; background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+            <h2 style="margin: 0; font-size: 20px; font-weight: 700">Готовность к аттестации</h2>
+            <span style="font-size: 15px; color: #5B6372"><b style="color: #1C2230; font-size: 20px">7</b> из 10 документов</span>
+          </div>
+          <div style="height: 10px; border-radius: 999px; background: #E9ECF1; overflow: hidden" role="img" aria-label="Готово 70 процентов"><div style="width: 70%; height: 100%; background: #1F5BD8; border-radius: 999px"></div></div>
+
+          <div style="display: flex; flex-direction: column">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+              <span style="flex: 1 1 220px; font-weight: 500">Отчёт по самооценке</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #FDECEA; color: #B42318; font-size: 13px; font-weight: 600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>Нет файла</span>
+              <a href="Documents.dc.html" style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 8px; background: #EAF0FD; color: #1F5BD8; text-decoration: none; font-weight: 600; font-size: 14px">Загрузить</a>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+              <span style="flex: 1 1 220px; font-weight: 500">Сведения о педагогах</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #FDECEA; color: #B42318; font-size: 13px; font-weight: 600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>Нет файла</span>
+              <a href="Documents.dc.html" style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 8px; background: #EAF0FD; color: #1F5BD8; text-decoration: none; font-weight: 600; font-size: 14px">Загрузить</a>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+              <span style="flex: 1 1 220px; font-weight: 500">Мониторинг развития детей</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #FDECEA; color: #B42318; font-size: 13px; font-weight: 600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>Нет файла</span>
+              <a href="Documents.dc.html" style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 8px; background: #EAF0FD; color: #1F5BD8; text-decoration: none; font-weight: 600; font-size: 14px">Загрузить</a>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+              <span style="flex: 1 1 220px; font-weight: 500">Санитарно-эпидемиологическое заключение</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #FDF0E1; color: #9A4D00; font-size: 13px; font-weight: 600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg>Истекает 15.12.2026</span>
+              <a href="Documents.dc.html" style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 8px; background: #EAF0FD; color: #1F5BD8; text-decoration: none; font-weight: 600; font-size: 14px">Обновить</a>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+              <span style="flex: 1 1 220px; font-weight: 500">Устав организации</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #E6F4EA; color: #17703A; font-size: 13px; font-weight: 600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>Загружен</span>
+              <span style="min-width: 96px"></span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0">
+              <span style="flex: 1 1 220px; font-weight: 500">Лицензия на образовательную деятельность</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #E6F4EA; color: #17703A; font-size: 13px; font-weight: 600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>Загружена</span>
+              <span style="min-width: 96px"></span>
+            </div>
+          </div>
+          <a href="Documents.dc.html" style="font-weight: 600; text-decoration: none">Показать все 10 документов →</a>
+        </section>
+
+        <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+          <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px">
+            <h2 style="margin: 0 0 16px; font-size: 18px; font-weight: 700">Быстрые действия</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+              <a href="Gallery.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 16px; min-height: 96px; box-sizing: border-box; border: 1px solid #E2E5EA; border-radius: 12px; text-decoration: none; color: #1C2230; font-weight: 600; font-size: 14px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5BD8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>Загрузить фото</a>
+              <a href="Documents.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 16px; min-height: 96px; box-sizing: border-box; border: 1px solid #E2E5EA; border-radius: 12px; text-decoration: none; color: #1C2230; font-weight: 600; font-size: 14px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5BD8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Загрузить документ</a>
+              <a href="Videos.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 16px; min-height: 96px; box-sizing: border-box; border: 1px solid #E2E5EA; border-radius: 12px; text-decoration: none; color: #1C2230; font-weight: 600; font-size: 14px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5BD8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>Добавить видео</a>
+              <a href="#" style="display: flex; flex-direction: column; gap: 10px; padding: 16px; min-height: 96px; box-sizing: border-box; border: 1px solid #E2E5EA; border-radius: 12px; text-decoration: none; color: #1C2230; font-weight: 600; font-size: 14px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5BD8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>Добавить педагога</a>
+            </div>
+          </section>
+
+          <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; gap: 10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F5BD8" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><h2 style="margin: 0; font-size: 18px; font-weight: 700">Казахская версия</h2></div>
+            <p style="margin: 0; color: #5B6372; font-size: 14px">Переведено <b style="color: #1C2230">12 из 30</b> материалов. Где перевода нет, на сайте показывается русский текст.</p>
+            <div style="height: 8px; border-radius: 999px; background: #E9ECF1; overflow: hidden" role="img" aria-label="Переведено 40 процентов"><div style="width: 40%; height: 100%; background: #C26A00; border-radius: 999px"></div></div>
+            <a href="News.dc.html" style="font-weight: 600; font-size: 14px; text-decoration: none">Что ещё перевести →</a>
+          </section>
+
+          <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 700">Место на сайте</h2>
+            <p style="margin: 0; color: #5B6372; font-size: 14px">Занято <b style="color: #1C2230">1,2 ГБ</b> из 5 ГБ</p>
+            <div style="height: 8px; border-radius: 999px; background: #E9ECF1; overflow: hidden" role="img" aria-label="Занято 24 процента"><div style="width: 24%; height: 100%; background: #1F5BD8; border-radius: 999px"></div></div>
+            <span style="font-size: 13px; color: #5B6372">Фото: 0,8 ГБ · Видео: 0,3 ГБ · Документы: 0,1 ГБ</span>
+          </section>
+        </div>
+      </div>
+
+      <section style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 700">Последние новости</h2>
+          <a href="News.dc.html" style="font-weight: 600; font-size: 14px; text-decoration: none">Все новости →</a>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+          <span style="flex: 1 1 260px; font-weight: 500">Осенний утренник в старшей группе</span>
+          <span style="font-size: 14px; color: #5B6372; min-width: 110px">18.11.2026</span>
+          <span style="display: inline-flex; padding: 4px 10px; border-radius: 999px; background: #E6F4EA; color: #17703A; font-size: 13px; font-weight: 600">Опубликована</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #EEF0F3">
+          <span style="flex: 1 1 260px; font-weight: 500">Родительское собрание 25 ноября</span>
+          <span style="font-size: 14px; color: #5B6372; min-width: 110px">25.11.2026</span>
+          <span style="display: inline-flex; padding: 4px 10px; border-radius: 999px; background: #EAF0FD; color: #1F5BD8; font-size: 13px; font-weight: 600">Запланирована</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 0">
+          <span style="flex: 1 1 260px; font-weight: 500">Неделя здоровья: итоги</span>
+          <span style="font-size: 14px; color: #5B6372; min-width: 110px">—</span>
+          <span style="display: inline-flex; padding: 4px 10px; border-radius: 999px; background: #F0F2F5; color: #4A5160; font-size: 13px; font-weight: 600">Черновик</span>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
