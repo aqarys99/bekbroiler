@@ -1,0 +1,38 @@
+name: Deploy to PS.kz
+
+# Запуск вручную: GitHub → Actions → "Deploy to PS.kz" → Run workflow.
+# Нужны секреты репозитория (Settings → Secrets and variables → Actions):
+#   FTP_SERVER   — адрес FTP из письма/панели PS.kz (например ftp.ваш-домен.kz)
+#   FTP_USERNAME — FTP-логин
+#   FTP_PASSWORD — FTP-пароль
+# И переменная (вкладка Variables), если папка сайта не public_html:
+#   FTP_SERVER_DIR — например public_html/  (обязательно со слешем в конце)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Собрать файлы для выкладки
+        run: |
+          mkdir -p dist
+          # Сейчас на хостинг идёт только лендинг.
+          # Когда будет готова админка (фича 01+), здесь будет копироваться приложение.
+          cp index.html dist/
+          ls -la dist
+
+      - name: Выложить по FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist/
+          server-dir: ${{ vars.FTP_SERVER_DIR || 'public_html/' }}
+          dangerous-clean-slate: false
