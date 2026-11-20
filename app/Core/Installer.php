@@ -40,7 +40,7 @@ final class Installer
         } finally {
             flock($tmp, LOCK_UN);
             fclose($tmp);
-                    }
+        }
     }
 
     private static function run(array $input, ?string $basePath): int

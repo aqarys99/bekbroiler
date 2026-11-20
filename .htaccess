@@ -3,7 +3,7 @@ Options -Indexes
 DirectoryIndex index.php
 
 # Защита без mod_rewrite
-<FilesMatch "(^\.|\.(json|lock|md|xml|sqlite|yml|yaml|sql|log|dist)$)">
+<FilesMatch "^(\.|composer\.(json|lock)$|package(-lock)?\.json$|phpunit\.xml(\.dist)?$|playwright\.config\.js$|.+\.(md|sqlite|sql|log|lock|yml|yaml|dist)$)">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
