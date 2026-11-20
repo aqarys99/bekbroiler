@@ -17,6 +17,7 @@ module.exports = defineConfig({
     url: 'http://127.0.0.1:8080/install.php',
     reuseExistingServer: !process.env.CI,
     env: {
+      PHP_CLI_SERVER_WORKERS: '4',
       APP_ENV: 'testing',
       APP_STORAGE_DIR: storage,
       APP_CONFIG_FILE: path.join(storage, 'config.php'),

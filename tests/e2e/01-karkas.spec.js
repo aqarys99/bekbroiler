@@ -239,14 +239,48 @@ test.describe('до установки', () => {
     expect(usersCount()).toBe(1);
   });
 
-  test('install-submit: две параллельные отправки — один пользователь, вторая получает 403', async ({ page }) => {
+  test('install-submit: две параллельные отправки из разных сессий — ровно один владелец', async ({ browser }) => {
+    const ctxs = [await browser.newContext(), await browser.newContext()];
+    try {
+      const pages = await Promise.all(ctxs.map((c) => c.newPage()));
+      const tokens = await Promise.all(pages.map((p) => csrfFromInstallPage(p)));
+      const rs = await Promise.all(pages.map((p, i) => p.request.post('/install.php', {
+        form: validPost(tokens[i], { login: 'owner' + i }),
+      })));
+      expect(rs.map((r) => r.status()).sort()).toEqual([200, 403]);
+      expect(Number(dbQuery("SELECT COUNT(*) AS c FROM users WHERE role='owner'")[0].c)).toBe(1);
+    } finally {
+      await Promise.all(ctxs.map((c) => c.close()));
+    }
+  });
+
+  test('install-submit: лишнее поле base_path не попадает в конфиг и не уводит на чужой домен', async ({ page }) => {
     const csrf = await csrfFromInstallPage(page);
-    const rs = await Promise.all([
-      page.request.post('/install.php', { form: validPost(csrf) }),
-      page.request.post('/install.php', { form: validPost(csrf) }),
-    ]);
-    expect(rs.map((r) => r.status()).sort()).toEqual([200, 403]);
-    expect(usersCount()).toBe(1);
+    const r = await page.request.post('/install.php', { form: validPost(csrf, { login: 'owner', base_path: '//evil.example' }) });
+    expect(r.status()).toBe(200);
+    const cfg = fs.readFileSync(path.join(STORAGE, 'config.php'), 'utf8');
+    expect(cfg).not.toContain('evil.example');
+    expect(cfg).toMatch(/'base_path' => ''/);
+    const res = await page.goto('/');
+    expect(res.status()).toBe(200);
+    await expect(page.getByTestId('stub-site-name')).toBeVisible();
+    for (const h of await page.locator('a').evaluateAll((els) => els.map((e) => e.getAttribute('href')))) {
+      expect(h || '').not.toContain('evil.example');
+    }
+  });
+
+  test('install-submit: массивы в полях (site_name[], login[]) — 422 с ошибкой поля, не 500, с CSRF и без', async ({ page }) => {
+    const csrf = await csrfFromInstallPage(page);
+    const headers = { 'content-type': 'application/x-www-form-urlencoded' };
+    const base = 'owner_name=Ivan&password=Secret-pass-2026&password_confirm=Secret-pass-2026';
+    const withCsrf = await page.request.post('/install.php', { headers, data: `_csrf=${csrf}&site_name[]=x&login[]=x&${base}` });
+    expect(withCsrf.status()).toBe(422);
+    expect(await withCsrf.text()).toContain('field__error');
+    const noCsrf = await page.request.post('/install.php', { headers, data: `site_name[]=x&login[]=x&${base}` });
+    expect([400, 422]).toContain(noCsrf.status());
+    const badCsrf = await page.request.post('/install.php', { headers, data: `_csrf[]=x&site_name[]=x&login[]=x&${base}` });
+    expect([400, 422]).toContain(badCsrf.status());
+    expect(noDb()).toBe(true);
   });
 
   test('install-error: неверный или отсутствующий _csrf даёт 400 и плашку', async ({ page }) => {
@@ -395,6 +429,22 @@ test.describe('после установки', () => {
     const log = readLog();
     expect(log).toContain('Test error');
     expect(log).toContain('/__test/error');
+  });
+
+  test('error-500: lock есть, а БД удалена — страница 500, пустая БД не создаётся', async ({ page }) => {
+    for (const f of ['database.sqlite', 'database.sqlite-wal', 'database.sqlite-shm']) fs.rmSync(path.join(STORAGE, f), { force: true });
+    const res = await page.goto('/');
+    expect(res.status()).toBe(500);
+    await expect(page.getByTestId('error-500')).toBeVisible();
+    expect(fs.existsSync(path.join(STORAGE, 'database.sqlite'))).toBe(false);
+  });
+
+  test('error-403: после установки GET /install.php — 403 со страницей ошибки и ссылкой «На главную»', async ({ page }) => {
+    const res = await page.goto('/install.php');
+    expect(res.status()).toBe(403);
+    await expect(page.getByTestId('error-403')).toBeVisible();
+    await page.getByTestId('error-403-home').click();
+    await expect(page.getByTestId('stub-site-name')).toBeVisible();
   });
 
   test('error-500-details: при debug=true видны класс, сообщение, файл:строка', async ({ page }) => {

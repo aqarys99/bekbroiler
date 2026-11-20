@@ -57,6 +57,11 @@ final class Requirements
         $okUploads = self::ensureWritable($uploads);
         $add('writable_uploads', $okUploads, $wr($okUploads), 'fail', 'install.hint.writable');
 
+        $save = (string)ini_get('session.save_path');
+        $save = $save !== '' ? (string)preg_replace('/^\d+;(?:0?\d+;)?/', '', $save) : sys_get_temp_dir();
+        $okSessions = is_dir($save) && is_writable($save);
+        $add('writable_sessions', $okSessions, $wr($okSessions), 'warn', 'install.hint.sessions');
+
         // Подмена статусов — только в тестовом окружении
         if (getenv('APP_ENV') === 'testing') {
             $fake = $storage . '/fake-requirements.json';

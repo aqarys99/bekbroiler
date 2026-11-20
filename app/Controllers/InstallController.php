@@ -25,17 +25,21 @@ final class InstallController
         if (Installer::isInstalled()) {
             return $this->locked();
         }
+        $input = [];
+        foreach (['site_name', 'owner_name', 'login', 'password', 'password_confirm'] as $field) {
+            $input[$field] = is_string($_POST[$field] ?? null) ? $_POST[$field] : '';
+        }
         $old = [
-            'site_name'  => (string)($_POST['site_name'] ?? ''),
-            'owner_name' => (string)($_POST['owner_name'] ?? ''),
-            'login'      => (string)($_POST['login'] ?? ''),
+            'site_name'  => $input['site_name'],
+            'owner_name' => $input['owner_name'],
+            'login'      => $input['login'],
         ];
         $token = $_POST['_csrf'] ?? null;
         if (!is_string($token) || !csrf_verify($token)) {
             return $this->form(400, $old, [], t('install.error.csrf'));
         }
         try {
-            Installer::install($_POST);
+            Installer::install($input);
         } catch (AlreadyInstalledException) {
             return $this->locked();
         } catch (ValidationException $e) {

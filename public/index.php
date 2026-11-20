@@ -35,7 +35,11 @@ if (!Installer::isInstalled()) {
     redirect(url('/install.php'), 302);
 }
 
-// 4. Установлено: новые миграции и маршрутизация
+// 4. Установлено: БД обязана существовать (пустую не создаём)
+if (!is_file(\App\Core\Config::dbPath())) {
+    throw new RuntimeException('Файл базы данных не найден, хотя установка отмечена как выполненная');
+}
+
 (new Migrator())->migrate();
 
 $router = new Router();

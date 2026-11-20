@@ -16,10 +16,10 @@ final class Installer
     }
 
     /**
-     * @param array{site_name?:mixed,owner_name?:mixed,login?:mixed,password?:mixed,password_confirm?:mixed,base_path?:string} $input
+     * @param array{site_name?:mixed,owner_name?:mixed,login?:mixed,password?:mixed,password_confirm?:mixed} $input
      * @return int id владельца
      */
-    public static function install(array $input): int
+    public static function install(array $input, ?string $basePath = null): int
     {
         $storage = Config::storageDir();
         if (!is_dir($storage)) {
@@ -36,15 +36,14 @@ final class Installer
             if (self::isInstalled()) {
                 throw new AlreadyInstalledException();
             }
-            return self::run($input);
+            return self::run($input, $basePath);
         } finally {
             flock($tmp, LOCK_UN);
             fclose($tmp);
-            @unlink($storage . '/install.lock.tmp');
-        }
+                    }
     }
 
-    private static function run(array $input): int
+    private static function run(array $input, ?string $basePath): int
     {
         if (Requirements::hasFail(Requirements::check())) {
             throw new InstallException('install.error.requirements', 422);
@@ -55,18 +54,17 @@ final class Installer
         $configFile = Config::configFile();
         $dbExisted = is_file($dbPath);
         $configExisted = is_file($configFile);
-        $basePath = isset($input['base_path']) ? (string)$input['base_path'] : Config::detectBasePath();
+        $basePath ??= Config::detectBasePath();
 
         try {
             Database::setConnection(null);
             $pdo = Database::connection();
             $migrations = (new Migrator($pdo))->migrate();
 
-            if ((int)Database::fetchValue("SELECT COUNT(*) FROM users WHERE role = 'owner'") > 0) {
-                throw new InstallException('install.error.owner_exists', 422);
-            }
-
-            $ownerId = (int)Database::transaction(static function () use ($data): int {
+            $ownerId = (int)self::immediateTransaction($pdo, static function () use ($data): int {
+                if ((int)Database::fetchValue("SELECT COUNT(*) FROM users WHERE role = 'owner'") > 0) {
+                    throw new InstallException('install.error.owner_exists', 422);
+                }
                 $now = gmdate('Y-m-d H:i:s');
                 $id = Database::insert('users', [
                     'name'          => $data['owner_name'],
@@ -105,6 +103,22 @@ final class Installer
         }
     }
 
+    private static function immediateTransaction(\PDO $pdo, callable $fn): mixed
+    {
+        $pdo->exec('BEGIN IMMEDIATE');
+        try {
+            $result = $fn();
+            $pdo->exec('COMMIT');
+            return $result;
+        } catch (\Throwable $e) {
+            try {
+                $pdo->exec('ROLLBACK');
+            } catch (\Throwable) {
+            }
+            throw $e;
+        }
+    }
+
     private static function cleanup(string $dbPath, string $configFile, bool $removeDb, bool $removeConfig): void
     {
         Database::setConnection(null);
@@ -126,7 +140,7 @@ final class Installer
     /** @return array{site_name:string,owner_name:string,login:string,password:string} */
     private static function validate(array $in): array
     {
-        $clean = static fn($v): string => trim((string)preg_replace('/\s+/u', ' ', trim((string)($v ?? ''))));
+        $clean = static fn($v): string => is_string($v) ? trim((string)preg_replace('/\s+/u', ' ', trim($v))) : '';
         $errors = [];
 
         $site = $clean($in['site_name'] ?? '');
@@ -144,7 +158,7 @@ final class Installer
             $errors['owner_name'] = 'validation.owner_name.length';
         }
 
-        $login = mb_strtolower(trim((string)($in['login'] ?? '')));
+        $login = is_string($in['login'] ?? null) ? mb_strtolower(trim($in['login'])) : '';
         $ll = mb_strlen($login);
         if ($login === '') {
             $errors['login'] = 'validation.login.required';
@@ -154,14 +168,14 @@ final class Installer
             $errors['login'] = 'validation.login.format';
         }
 
-        $pass = (string)($in['password'] ?? '');
+        $pass = is_string($in['password'] ?? null) ? $in['password'] : '';
         if ($pass === '') {
             $errors['password'] = 'validation.password.required';
         } elseif (mb_strlen($pass) < 8) {
             $errors['password'] = 'validation.password.min';
         } elseif (mb_strlen($pass) > 64 || strlen($pass) > 72) {
             $errors['password'] = 'validation.password.max';
-        } elseif ($pass !== (string)($in['password_confirm'] ?? '')) {
+        } elseif ($pass !== (is_string($in['password_confirm'] ?? null) ? $in['password_confirm'] : '')) {
             $errors['password_confirm'] = 'validation.password.confirm';
         }
 

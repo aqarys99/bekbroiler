@@ -68,4 +68,14 @@ final class RequirementsTest extends TestCase
         $this->assertDirectoryExists($p['storage'] . '/backups');
         $this->assertDirectoryExists($p['storage'] . '/cache');
     }
+
+    public function testSessionFolderRequirementPresent(): void
+    {
+        $rows = Requirements::check($this->paths());
+        $sess = array_values(array_filter($rows, fn($r) => str_contains($r['key'], 'session')));
+        $this->assertCount(1, $sess, 'ожидается пункт требований для папки сессий');
+        $this->assertSame('ok', $sess[0]['status']);
+        $this->assertNotSame('', $sess[0]['label']);
+        $this->assertNotSame($sess[0]['key'], $sess[0]['label'], 'нет перевода install.req.<key>');
+    }
 }

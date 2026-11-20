@@ -2,6 +2,19 @@
 Options -Indexes
 DirectoryIndex index.php
 
+# Защита без mod_rewrite
+<FilesMatch "(^\.|\.(json|lock|md|xml|sqlite|yml|yaml|sql|log|dist)$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+RedirectMatch 404 ^/(\.git|\.claude|\.github)(/|$)
+RedirectMatch 404 ^/(docs|tests|vendor|node_modules|storage|config|app|migrations|admin-views|bin)(/|$)
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
