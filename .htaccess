@@ -1,0 +1,24 @@
+# Вариант Б: корень сайта = корень проекта. Всё, кроме public/, закрыто.
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Точечные файлы (.git, .env, .github), кроме .well-known
+    RewriteRule (^|/)\.(?!well-known) - [F,L]
+
+    # Служебные папки
+    RewriteRule ^(app|storage|config|migrations|admin-views|bin|tests|vendor|node_modules|docs|themes/[^/]+/[^/]+\.php)(/|$) - [F,L]
+
+    # Служебные файлы в корне проекта
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^(?!public/).*\.(sqlite|sql|log|md|lock|json|xml|dist|js\.map)$ - [F,L]
+
+    # Прямой запрос /public/... -> без префикса public
+    RewriteCond %{THE_REQUEST} "^[A-Z]+ /([^ ]*/)?public/"
+    RewriteRule ^public/(.*)$ $1 [R=301,L]
+
+    # Всё остальное отдаёт public/
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+</IfModule>

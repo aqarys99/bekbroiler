@@ -1,0 +1,10 @@
+{
+  "name": "sadik-e2e",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test --trace off"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
