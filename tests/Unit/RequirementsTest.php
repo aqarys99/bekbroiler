@@ -9,7 +9,7 @@ use Tests\TestCase;
 final class RequirementsTest extends TestCase
 {
     private const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'zip',
-        'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads'];
+        'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads', 'writable_sessions'];
 
     private function paths(): array
     {
@@ -17,7 +17,7 @@ final class RequirementsTest extends TestCase
         return ['storage' => $d . '/s', 'config' => $d . '/c', 'uploads' => $d . '/u'];
     }
 
-    public function testAllElevenKeys(): void
+    public function testAllTwelveKeys(): void
     {
         $rows = Requirements::check($this->paths());
         $this->assertSame(self::KEYS, array_column($rows, 'key'));
@@ -74,7 +74,9 @@ final class RequirementsTest extends TestCase
         $rows = Requirements::check($this->paths());
         $sess = array_values(array_filter($rows, fn($r) => str_contains($r['key'], 'session')));
         $this->assertCount(1, $sess, 'ожидается пункт требований для папки сессий');
-        $this->assertSame('ok', $sess[0]['status']);
+        $this->assertSame('writable_sessions', $sess[0]['key']);
+        $this->assertContains($sess[0]['status'], ['ok', 'warn']); // warn — не блокирует установку
+        $this->assertFalse(Requirements::hasFail(array_filter(Requirements::check($this->paths()), fn($r) => $r['key'] === 'writable_sessions')));
         $this->assertNotSame('', $sess[0]['label']);
         $this->assertNotSame($sess[0]['key'], $sess[0]['label'], 'нет перевода install.req.<key>');
     }

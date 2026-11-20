@@ -47,6 +47,15 @@ final class ErrorHandlerTest extends TestCase
         $this->assertStringNotContainsString('<b>error</b>', $html);
     }
 
+    public function testForbiddenPageUsesErrors403InAuthLayout(): void
+    {
+        $html = ErrorHandler::render(new HttpException(403));
+        $this->assertStringContainsString('data-testid="error-403"', $html);
+        $this->assertStringContainsString('data-testid="error-403-home"', $html);
+        $this->assertStringContainsString('Доступ запрещён', $html);
+        $this->assertStringContainsString('<html', $html); // внутри layouts/auth
+    }
+
     public function testHttpPagesRendered(): void
     {
         $this->assertStringContainsString('error-404', ErrorHandler::render(new HttpException(404)));

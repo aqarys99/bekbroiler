@@ -8,7 +8,7 @@ const {
 } = require('./helpers');
 
 const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'zip',
-  'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads'];
+  'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads', 'writable_sessions'];
 const usersCount = () => Number(dbQuery('SELECT COUNT(*) AS c FROM users')[0].c);
 // reset.php при --debug=0 кладёт тестовый config.php, поэтому «ничего не создано» = нет БД и lock
 const noDb = () => !fs.existsSync(path.join(STORAGE, 'database.sqlite')) && !fs.existsSync(path.join(STORAGE, 'install.lock'));
@@ -38,7 +38,7 @@ test.describe('до установки', () => {
     expect(inst.status()).toBe(200);
   });
 
-  test('install-requirements: блок показывает все 11 строк с data-status', async ({ page }) => {
+  test('install-requirements: блок показывает все 12 строк с data-status', async ({ page }) => {
     await page.goto('/install.php');
     await expect(page.getByTestId('install-requirements')).toBeVisible();
     for (const k of KEYS) {
@@ -46,7 +46,7 @@ test.describe('до установки', () => {
     }
   });
 
-  test('install-req-{key}: название, значение, статус и подсказка у каждой из 11 строк', async ({ page }) => {
+  test('install-req-{key}: название, значение, статус и подсказка у каждой из 12 строк', async ({ page }) => {
     await resetApp({ fail: ['pdo_sqlite', 'zip:warn'] });
     await page.goto('/install.php');
     for (const k of KEYS) {
@@ -437,14 +437,6 @@ test.describe('после установки', () => {
     expect(res.status()).toBe(500);
     await expect(page.getByTestId('error-500')).toBeVisible();
     expect(fs.existsSync(path.join(STORAGE, 'database.sqlite'))).toBe(false);
-  });
-
-  test('error-403: после установки GET /install.php — 403 со страницей ошибки и ссылкой «На главную»', async ({ page }) => {
-    const res = await page.goto('/install.php');
-    expect(res.status()).toBe(403);
-    await expect(page.getByTestId('error-403')).toBeVisible();
-    await page.getByTestId('error-403-home').click();
-    await expect(page.getByTestId('stub-site-name')).toBeVisible();
   });
 
   test('error-500-details: при debug=true видны класс, сообщение, файл:строка', async ({ page }) => {

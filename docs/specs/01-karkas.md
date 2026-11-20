@@ -197,6 +197,7 @@ docs/DEPLOY.md
 | `writable_storage` | `storage/` (и `logs/`, `cache/`, `backups/` — создаются, если нет) доступны на запись | fail |
 | `writable_config` | каталог `config/` доступен на запись (каталог файла `APP_CONFIG_FILE`) | fail |
 | `writable_uploads` | `public/uploads/` доступен на запись | fail |
+| `writable_sessions` | папка `session.save_path` (или системная temp) доступна на запись | warn |
 
 При `APP_ENV=testing`: если есть `{storage}/fake-requirements.json` (`{"pdo_sqlite":"fail","zip":"warn"}`), указанные статусы подменяются. В других окружениях файл игнорируется.
 
@@ -225,8 +226,8 @@ docs/DEPLOY.md
 | testid | Экран | Элемент | Действие пользователя | Ожидаемый результат | Ошибки/пограничные случаи |
 |---|---|---|---|---|---|
 | install-redirect | Любой URL до установки | (поведение) | Открыть `/`, `/admin`, `/abc` на неустановленном сайте | `302` на `/install.php`, открывается экран установки | `/assets/admin/admin.css` отдаётся как файл (200), без редиректа; `/install.php` не редиректит сам на себя |
-| install-requirements | Установка | Блок «Проверка сервера» | Открыть `/install.php` | Видны все 11 строк из таблицы Requirements, у каждой `data-testid="install-req-{key}"` и `data-status="ok|warn|fail"` | Строки `warn` не блокируют установку |
-| install-req-{key} | Установка | Строка требования (11 шт.) | — | Текст названия, текущее значение (версия PHP, лимит в МБ, «есть/нет», «запись разрешена/запрещена») | `fail` → красный цвет и подсказка, `warn` → оранжевый и подсказка |
+| install-requirements | Установка | Блок «Проверка сервера» | Открыть `/install.php` | Видны все 12 строк из таблицы Requirements, у каждой `data-testid="install-req-{key}"` и `data-status="ok|warn|fail"` | Строки `warn` не блокируют установку |
+| install-req-{key} | Установка | Строка требования (12 шт.) | — | Текст названия, текущее значение (версия PHP, лимит в МБ, «есть/нет», «запись разрешена/запрещена») | `fail` → красный цвет и подсказка, `warn` → оранжевый и подсказка |
 | install-requirements-failed | Установка | Плашка «Сервер не готов к установке» | Открыть при хотя бы одном `fail` (через `fake-requirements.json`) | Красная плашка над формой, кнопка `install-submit` `disabled`, поля формы неактивны | Принудительный POST (в обход `disabled`) → 422, требования показаны, БД и конфиг не созданы |
 | install-recheck | Установка | Кнопка «Проверить снова» | Нажать после исправления прав/расширений | Страница перезагружается (GET `/install.php`), статусы пересчитаны | Показывается всегда; это обычная ссылка GET, поэтому уже введённые в форму данные сбрасываются (форма пустая) |
 | install-site-name | Установка | Поле «Название детского сада» | Ввести «Детский сад «Солнышко»» | Сохраняется в `settings.site_name`, показывается на заглушке | Пусто / только пробелы → «Укажите название детского сада»; < 2 или > 150 символов → «От 2 до 150 символов»; HTML `<b>x</b>` сохраняется как текст и выводится экранированным |
@@ -250,9 +251,9 @@ docs/DEPLOY.md
 | error-500 | Страница 500 | Заголовок «Что-то пошло не так» | Открыть `/__test/error` при `debug=false` | Код 500, текст «Мы уже записали ошибку. Попробуйте обновить страницу через минуту.»; в HTML нет `Test error`, путей к файлам, слова `RuntimeException`; в `storage/logs/app-<дата>.log` есть строка с `Test error` и `/__test/error` | При `APP_ENV≠testing` маршрут `/__test/error` → 404 |
 | error-500-details | Страница 500 (режим разработки) | Блок «Подробности» | Открыть `/__test/error` при `debug=true` | Виден класс `RuntimeException`, сообщение `Test error`, файл:строка и трассировка, всё экранировано | При `debug=false` блока нет в HTML |
 | error-500-home | Страница 500 | Ссылка «На главную» | Нажать | Переход на `/` | — |
-| error-403 | Страница 403 | Заголовок «Доступ запрещён» (`admin-views/errors/403.php`) и ссылка `error-403-home` «На главную» | Открыть `/install.php` после установки | Код 403, текст страницы ошибки, ссылка ведёт на `/` | — |
+| error-403 | Страница 403 | Заголовок «Доступ запрещён» (`admin-views/errors/403.php`) и ссылка `error-403-home` «На главную» | `HttpException(403)` из контроллера (в фиче 02 — editor открывает запрещённый раздел) | Код 403, страница ошибки в layout auth, ссылка ведёт на `/` | `/install.php` после установки показывает не её, а `install-locked`. В 01 шаблон покрыт PHPUnit (`ErrorHandlerTest`), E2E появится в фиче 02 |
 
-Итого строк: 26 (строка `install-req-{key}` покрывает 11 элементов).
+Итого строк: 26 (строка `install-req-{key}` покрывает 12 элементов).
 
 ## Связи с другими фичами
 Существующие строки, которые фича затрагивает: нет прямых (I-14, I-15 опираются на таблицы `users` и `audit_log`, созданные здесь; их тестирует фича 02).
@@ -398,7 +399,7 @@ docs/DEPLOY.md
   - `RouterTest` — статичный путь, `{name}`, `{id:\d+}`, декодирование `%D0%B0`, 404, 405 + Allow, HEAD, слеш в конце (301 для GET, совпадение для POST), дубль маршрута → `LogicException`, query-string игнорируется.
   - `ConfigTest` — точечная нотация, значение по умолчанию, неизвестный драйвер → исключение.
   - `ViewTest` — рендер в layout, переменные, нет шаблона → исключение, `..` → исключение.
-  - `RequirementsTest` — 11 ключей; подмена через `fake-requirements.json` только при `APP_ENV=testing`; папка без прав на запись → `fail`.
+  - `RequirementsTest` — 12 ключей; подмена через `fake-requirements.json` только при `APP_ENV=testing`; папка без прав на запись → `fail`.
   - `LoggerTest` — файл `app-YYYY-MM-DD.log`, формат строки, недоступная папка не бросает исключение.
 - PHPUnit `tests/Feature`:
   - `DatabaseTest` — `foreign_keys=1`, `journal_mode=wal`, `busy_timeout=5000`, `transaction` откатывает при исключении, `insert` возвращает id.
@@ -406,7 +407,7 @@ docs/DEPLOY.md
   - `InstallerTest` — успешная установка (все проверки из критериев); `password_verify` и поиск по логину `ADMIN`/`admin` без учёта регистра (**I-18**, часть 01); `settings.site_name` читается обратно (**I-19**); каждая ошибка валидации; повторная установка → `AlreadyInstalledException` (**I-21**); владелец уже есть в БД → ошибка; сбой миграции → БД и конфиг удалены; `config.php` валиден (`require` возвращает массив, `debug=false`).
   - `ErrorHandlerTest` — `debug=false`/`true` разметка 500, лог содержит сообщение и не содержит значения поля `password` из `$_POST` (**I-20**).
   - `HtaccessTest` — в корневом `.htaccess` есть запрет `app|storage|config|migrations|admin-views|bin` и переписывание в `public/`; в каждой закрытой папке есть `.htaccess` с `Require all denied`; в `public/uploads/.htaccess` запрет `php` и `php_flag` только внутри `IfModule`.
-- E2E `tests/e2e/01-karkas.spec.js`: по одному тесту на каждую строку «Элементы интерфейса» (имя теста начинается с testid; `install-req-{key}` — один тест, проверяющий все 11 строк и `data-status`), включая пограничные случаи из столбца «Ошибки» (двойной клик, CSRF, `fake-requirements`, XSS в названии, 405, 301, HEAD, 404 для `/uploads/x.php`). `afterEach` — `expectNoPageErrors()`.
+- E2E `tests/e2e/01-karkas.spec.js`: по одному тесту на каждую строку «Элементы интерфейса» (имя теста начинается с testid; `install-req-{key}` — один тест, проверяющий все 12 строк и `data-status`), включая пограничные случаи из столбца «Ошибки» (двойной клик, CSRF, `fake-requirements`, XSS в названии, 405, 301, HEAD, 404 для `/uploads/x.php`). `afterEach` — `expectNoPageErrors()`.
 - E2E `tests/e2e/integration/`:
   - `I-17.spec.js` — после `resetApp({installed:true})` и первого запроса `dbQuery('SELECT version FROM schema_migrations')` содержит ровно одну строку `001`. Применение новой миграции `002` проверяется в PHPUnit `MigratorTest` (класть файлы в общую папку `migrations/` из E2E нельзя).
   - `I-19.spec.js` — название, введённое в мастере, видно на `/` и `/admin` (`stub-site-name`).
