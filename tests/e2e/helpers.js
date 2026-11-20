@@ -80,4 +80,52 @@ function expectNoPageErrors() {
   expect(tracker ? tracker.errors : []).toEqual([]);
 }
 
-module.exports = { OWNER, ROOT, STORAGE, resetApp, dbQuery, readLog, trackPageErrors, expectNoPageErrors };
+const VALID = {
+  siteName: OWNER.siteName,
+  ownerName: OWNER.name,
+  login: 'Admin',
+  password: 'Secret-pass-2026',
+  confirm: 'Secret-pass-2026',
+};
+
+/** Заполнить форму установки (undefined-поля пропускаются). */
+async function fillInstall(page, o = {}) {
+  const v = { ...VALID, ...o };
+  await page.getByTestId('install-site-name').fill(v.siteName);
+  await page.getByTestId('install-owner-name').fill(v.ownerName);
+  await page.getByTestId('install-login').fill(v.login);
+  await page.getByTestId('install-password').fill(v.password);
+  await page.getByTestId('install-password-confirm').fill(v.confirm);
+}
+
+/** Открыть /install.php, заполнить и отправить форму. */
+async function installViaUI(page, o = {}) {
+  await page.goto('/install.php');
+  await fillInstall(page, o);
+  await page.getByTestId('install-submit').click();
+}
+
+/** CSRF-токен из HTML формы установки (в сессии контекста страницы). */
+async function csrfFromInstallPage(page) {
+  const res = await page.request.get('/install.php');
+  const m = /name="_csrf" value="([0-9a-f]{64})"/.exec(await res.text());
+  if (!m) throw new Error('csrf token not found');
+  return m[1];
+}
+
+function validPost(csrf, o = {}) {
+  return {
+    _csrf: csrf,
+    site_name: VALID.siteName,
+    owner_name: VALID.ownerName,
+    login: 'second',
+    password: 'Other-pass-2026',
+    password_confirm: 'Other-pass-2026',
+    ...o,
+  };
+}
+
+module.exports = {
+  OWNER, ROOT, STORAGE, VALID, resetApp, dbQuery, readLog, trackPageErrors, expectNoPageErrors,
+  fillInstall, installViaUI, csrfFromInstallPage, validPost,
+};

@@ -83,8 +83,10 @@ final class Migrator
                 }
                 $this->pdo->exec('COMMIT');
             } catch (\Throwable $e) {
-                if ($this->pdo->inTransaction()) {
+                try {
                     $this->pdo->exec('ROLLBACK');
+                } catch (\Throwable) {
+                    // транзакции уже нет — откатывать нечего
                 }
                 throw new \RuntimeException('Миграция ' . $info['name'] . ': ' . $e->getMessage(), 0, $e);
             }
