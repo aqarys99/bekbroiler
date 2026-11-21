@@ -36,8 +36,8 @@ final class Auth
     public static function attempt(string $login, string $password, bool $remember, string $ip): AuthResult
     {
         $login = LoginThrottle::normalize($login);
-        $left = LoginThrottle::lockedFor($ip, $login);
-        if ($left > 0) {
+        [$left, $slot] = LoginThrottle::reserve($ip, $login);
+        if ($left > 0 || $slot === null) {
             return new AuthResult(AuthResult::LOCKED, null, (int)ceil($left / 60));
         }
 
@@ -47,7 +47,6 @@ final class Auth
 
         if (!$valid) {
             $uid = $user !== null ? (int)$user['id'] : null;
-            LoginThrottle::fail($ip, $login);
             Audit::log(null, 'login_failed', 'user', $uid);
             $left = LoginThrottle::lockedFor($ip, $login);
             if ($left > 0) {
@@ -59,6 +58,7 @@ final class Auth
 
         $id = (int)$user['id'];
         if ((int)$user['is_active'] !== 1) {
+            LoginThrottle::release($slot);
             return new AuthResult(AuthResult::BLOCKED, $id);
         }
 

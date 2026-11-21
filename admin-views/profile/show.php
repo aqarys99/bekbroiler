@@ -14,6 +14,9 @@
   <h2><?= e(t('profile.change_password')) ?></h2>
   <form class="form" method="post" action="<?= e(admin_url('/profile/password')) ?>" novalidate data-once>
     <?= csrf_field() ?>
+    <?php if (!empty($generalError)): ?>
+    <div class="alert alert--danger" role="alert" data-testid="form-error"><?= e($generalError) ?></div>
+    <?php endif; ?>
     <?php
     $f = ['name' => 'current_password', 'type' => 'password', 'label' => t('profile.current_password'), 'testid' => 'profile-current-password', 'toggle' => 'profile-password-toggle', 'error' => $errors['current_password'] ?? null, 'autocomplete' => 'current-password'];
     include __DIR__ . '/../partials/field.php';

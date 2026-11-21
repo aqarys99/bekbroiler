@@ -4,6 +4,9 @@
 <div class="card card--form">
   <form class="form" method="post" action="<?= e($formAction) ?>" novalidate data-once>
     <?= csrf_field() ?>
+    <?php if (!empty($generalError)): ?>
+    <div class="alert alert--danger" role="alert" data-testid="form-error"><?= e($generalError) ?></div>
+    <?php endif; ?>
     <p class="section-title"><?= e(t('users.password.for', ['name' => $target['name']])) ?></p>
     <?php
     $f = ['name' => 'password', 'type' => 'password', 'label' => t('users.password.new'), 'testid' => 'user-password-new', 'toggle' => 'user-password-toggle', 'error' => $errors['password'] ?? null, 'autocomplete' => 'new-password', 'autofocus' => true];

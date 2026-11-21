@@ -15,11 +15,13 @@ final class UsersController extends BaseController
 {
     public function index(array $params = []): string
     {
+        $this->freshOwner($this->currentUser());
         return $this->renderIndex(200, null);
     }
 
     public function create(array $params = []): string
     {
+        $this->freshOwner($this->currentUser());
         return $this->renderForm(200, null, ['name' => '', 'login' => '', 'role' => 'editor'], []);
     }
 
@@ -40,14 +42,14 @@ final class UsersController extends BaseController
             return $this->renderForm(422, null, $old, $errors);
         }
         try {
-            $id = (int)Database::transaction(static function () use ($name, $login, $password, $role, $me): int {
+            $id = (int)Database::immediate(function () use ($name, $login, $password, $role, $me): int {
+                $me = $this->freshOwner($me);
                 $id = User::create($name, $login, $password, $role);
                 Audit::log((int)$me['id'], 'create', 'user', $id);
                 return $id;
             });
-        } catch (\PDOException) {
-            // гонка по уникальному логину
-            return $this->renderForm(422, null, $old, ['login' => 'validation.login.taken']);
+        } catch (\PDOException $e) {
+            return $this->dbFailure($e, fn(int $st, ?string $msg, array $err) => $this->renderForm($st, null, $old, $err, $msg));
         }
         Flash::set('success', 'users.created', ['name' => $name]);
         redirect(admin_url('/users'));
@@ -55,6 +57,7 @@ final class UsersController extends BaseController
 
     public function edit(array $params): string
     {
+        $this->freshOwner($this->currentUser());
         $target = $this->target($params);
         return $this->renderForm(200, $target, ['name' => $target['name'], 'login' => $target['login'], 'role' => $target['role']], []);
     }
@@ -77,6 +80,7 @@ final class UsersController extends BaseController
         $general = null;
         try {
             Database::immediate(function () use ($id, $me, $name, $login, $role, &$general): void {
+                $me = $this->freshOwner($me);
                 $cur = User::find($id);
                 if ($cur === null) {
                     throw new HttpException(404);
@@ -103,8 +107,8 @@ final class UsersController extends BaseController
                     Audit::log((int)$me['id'], 'role_change', 'user', $id);
                 }
             });
-        } catch (\PDOException) {
-            return $this->renderForm(422, $target, $old, ['login' => 'validation.login.taken']);
+        } catch (\PDOException $e) {
+            return $this->dbFailure($e, fn(int $st, ?string $msg, array $err) => $this->renderForm($st, $target, $old, $err, $msg));
         }
         if ($general !== null) {
             return $this->renderForm(422, $target, $old, [], t($general));
@@ -120,7 +124,9 @@ final class UsersController extends BaseController
         $id = (int)$target['id'];
         $error = null;
         $done = false;
+        try {
         Database::immediate(function () use ($id, $me, &$error, &$done): void {
+            $me = $this->freshOwner($me);
             $cur = User::find($id);
             if ($cur === null) {
                 throw new HttpException(404);
@@ -141,6 +147,9 @@ final class UsersController extends BaseController
             Audit::log((int)$me['id'], 'block', 'user', $id);
             $done = true;
         });
+        } catch (\PDOException $e) {
+            return $this->dbFailure($e, fn(int $st, ?string $msg) => $this->renderIndex($st, $msg));
+        }
         if ($error !== null) {
             return $this->renderIndex(422, t($error));
         }
@@ -150,20 +159,25 @@ final class UsersController extends BaseController
         redirect(admin_url('/users'));
     }
 
-    public function unblock(array $params): never
+    public function unblock(array $params): string
     {
         $me = $this->currentUser();
         $target = $this->target($params);
         $id = (int)$target['id'];
         $done = false;
-        Database::transaction(function () use ($id, $me, &$done): void {
-            $cur = User::find($id);
-            if ($cur !== null && (int)$cur['is_active'] === 0) {
-                User::setActive($id, true);
-                Audit::log((int)$me['id'], 'unblock', 'user', $id);
-                $done = true;
-            }
-        });
+        try {
+            Database::immediate(function () use ($id, $me, &$done): void {
+                $me = $this->freshOwner($me);
+                $cur = User::find($id);
+                if ($cur !== null && (int)$cur['is_active'] === 0) {
+                    User::setActive($id, true);
+                    Audit::log((int)$me['id'], 'unblock', 'user', $id);
+                    $done = true;
+                }
+            });
+        } catch (\PDOException $e) {
+            return $this->dbFailure($e, fn(int $st, ?string $msg) => $this->renderIndex($st, $msg));
+        }
         if ($done) {
             Flash::set('success', 'users.unblocked', ['name' => $target['name']]);
         }
@@ -172,7 +186,7 @@ final class UsersController extends BaseController
 
     public function passwordForm(array $params): string
     {
-        $me = $this->currentUser();
+        $me = $this->freshOwner($this->currentUser());
         $target = $this->target($params);
         if ((int)$target['id'] === (int)$me['id']) {
             redirect(admin_url('/profile'));
@@ -192,13 +206,46 @@ final class UsersController extends BaseController
         if ($err = UserValidator::passwordError($password)) {
             return $this->renderPassword(422, $target, ['password' => $err]);
         }
-        Database::transaction(static function () use ($id, $me, $password): void {
-            User::setPassword($id, $password);
-            Auth::bumpVersion($id);
-            Audit::log((int)$me['id'], 'password_reset', 'user', $id);
-        });
+        try {
+            Database::immediate(function () use ($id, $me, $password): void {
+                $me = $this->freshOwner($me);
+                User::setPassword($id, $password);
+                Auth::bumpVersion($id);
+                Audit::log((int)$me['id'], 'password_reset', 'user', $id);
+            });
+        } catch (\PDOException $e) {
+            return $this->dbFailure($e, fn(int $st, ?string $msg) => $this->renderPassword($st, $target, [], $msg));
+        }
         Flash::set('success', 'users.password.done', ['name' => $target['name']]);
         redirect(admin_url('/users'));
+    }
+
+    /** Роль и активность актора перечитываются под блокировкой записи (сессия могла устареть). */
+    private function freshOwner(array $me): array
+    {
+        $cur = User::find((int)$me['id']);
+        if ($cur === null || $cur['role'] !== 'owner' || (int)$cur['is_active'] !== 1) {
+            throw new HttpException(403);
+        }
+        return $cur;
+    }
+
+    /**
+     * Ошибка БД → ответ: UNIQUE → «логин занят», занято (SQLITE_BUSY) → «сервер занят», остальное — дальше.
+     * @param callable(int,?string,array<string,string>):string $render
+     */
+    private function dbFailure(\PDOException $e, callable $render): string
+    {
+        $msg = $e->getMessage();
+        $code = (int)($e->errorInfo[1] ?? 0);
+        if (str_contains($msg, 'UNIQUE constraint')) {
+            return $render(422, null, ['login' => 'validation.login.taken']);
+        }
+        if (in_array($code & 0xff, [5, 6], true) || stripos($msg, 'database is locked') !== false
+            || stripos($msg, 'database table is locked') !== false) {
+            return $render(503, t('error.busy'), []);
+        }
+        throw $e;
     }
 
     private function target(array $params): array
@@ -267,16 +314,17 @@ final class UsersController extends BaseController
         ], $status);
     }
 
-    private function renderPassword(int $status, array $target, array $errors): string
+    private function renderPassword(int $status, array $target, array $errors, ?string $generalError = null): string
     {
         return $this->page('users/password', t('users.password.title'), [
             $this->home(),
             ['label' => t('users.title'), 'url' => admin_url('/users')],
             ['label' => t('users.password.title'), 'url' => null],
         ], [
-            'target'     => $target,
-            'errors'     => $errors,
-            'formAction' => admin_url('/users/' . (int)$target['id'] . '/password'),
+            'target'       => $target,
+            'errors'       => $errors,
+            'generalError' => $generalError,
+            'formAction'   => admin_url('/users/' . (int)$target['id'] . '/password'),
         ], $status);
     }
 

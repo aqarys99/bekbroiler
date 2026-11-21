@@ -6,6 +6,7 @@ namespace App\Controllers\Admin;
 use App\Core\Audit;
 use App\Core\Auth;
 use App\Core\Flash;
+use App\Core\LoginThrottle;
 use App\Core\UserValidator;
 use App\Models\User;
 
@@ -26,10 +27,20 @@ final class ProfileController extends BaseController
         $confirm = self::post('new_password_confirm');
 
         $errors = [];
+        $slot = null;
         if ($current === '') {
             $errors['current_password'] = 'validation.current_password.required';
-        } elseif (!password_verify($current, (string)$fresh['password_hash'])) {
-            $errors['current_password'] = 'validation.current_password.wrong';
+        } else {
+            // отдельный счётчик попыток текущего пароля: 5 за 15 минут
+            [$left, $slot] = LoginThrottle::reserve('profile:' . $id, 'password');
+            if ($slot === null) {
+                return $this->render(429, [], t('profile.error.locked', ['minutes' => (int)ceil($left / 60)]));
+            }
+            if (!password_verify($current, (string)$fresh['password_hash'])) {
+                $errors['current_password'] = 'validation.current_password.wrong';
+            } else {
+                LoginThrottle::release($slot);
+            }
         }
         if ($err = UserValidator::passwordError($new)) {
             $errors['new_password'] = $err;
@@ -49,11 +60,11 @@ final class ProfileController extends BaseController
         redirect(admin_url('/profile'));
     }
 
-    private function render(int $status, array $errors): string
+    private function render(int $status, array $errors, ?string $generalError = null): string
     {
         return $this->page('profile/show', t('profile.title'), [
             $this->home(),
             ['label' => t('profile.title'), 'url' => null],
-        ], ['errors' => $errors], $status);
+        ], ['errors' => $errors, 'generalError' => $generalError], $status);
     }
 }

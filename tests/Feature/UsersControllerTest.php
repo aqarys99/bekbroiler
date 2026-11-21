@@ -203,7 +203,7 @@ final class UsersControllerTest extends AuthTestCase
         (new ProfileController())->changePassword();
         $this->assertSame(422, http_response_code());
         $this->assertSame([], $this->audit());
-        $this->assertSame(0, (int)Database::fetchValue('SELECT COUNT(*) FROM login_attempts'));
+        $this->assertSame(0, (int)Database::fetchValue("SELECT COUNT(*) FROM login_attempts WHERE ip NOT LIKE 'profile:%'"));
 
         $this->nextRequest();
         $this->post(['current_password' => 'Editor-pass-2026', 'new_password' => 'Editor-pass-2026', 'new_password_confirm' => 'Editor-pass-2026']);
@@ -255,5 +255,34 @@ final class UsersControllerTest extends AuthTestCase
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $r = $this->redirectOf(fn() => Guard::wrap(static fn() => 'ok')([]));
         $this->assertSame('/admin/login', $r->url);
+    }
+
+    /** Owner понижен после Guard, но до действия контроллера: перечитывание $me даёт 403. */
+    public function testOwnerDemotedInsideWindowGets403(): void
+    {
+        $this->loginAs('owner');
+        Auth::user(); // Guard уже получил пользователя с ролью owner
+        Database::query("UPDATE users SET role='editor' WHERE id = ?", [$this->ownerId]);
+        $this->post(['name' => 'Хак', 'login' => 'hack1', 'role' => 'editor', 'password' => 'Teacher-pass-1']);
+        $calls = [
+            'index' => fn() => (new UsersController())->index(),
+            'create' => fn() => (new UsersController())->create(),
+            'store' => fn() => (new UsersController())->store(),
+            'update' => fn() => (new UsersController())->update(['id' => (string)$this->editorId]),
+            'block' => fn() => (new UsersController())->block(['id' => (string)$this->editorId]),
+            'unblock' => fn() => (new UsersController())->unblock(['id' => (string)$this->editorId]),
+            'resetPassword' => fn() => (new UsersController())->resetPassword(['id' => (string)$this->editorId]),
+        ];
+        $hash = Database::fetchValue('SELECT password_hash FROM users WHERE id = ?', [$this->editorId]);
+        foreach ($calls as $name => $fn) {
+            try {
+                $fn();
+                $this->fail("$name не вернул 403");
+            } catch (HttpException $e) {
+                $this->assertSame(403, $e->getStatusCode(), $name);
+            }
+        }
+        $this->assertSame(2, (int)Database::fetchValue('SELECT COUNT(*) FROM users'));
+        $this->assertSame($hash, Database::fetchValue('SELECT password_hash FROM users WHERE id = ?', [$this->editorId]));
     }
 }

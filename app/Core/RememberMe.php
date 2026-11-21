@@ -14,6 +14,11 @@ final class RememberMe
     {
         $now = time();
         Database::query('DELETE FROM remember_tokens WHERE expires_at < ?', [gmdate('Y-m-d H:i:s', $now)]);
+        // новый вход на этом устройстве заменяет его прежний токен
+        $oldRaw = $_COOKIE[self::COOKIE] ?? null;
+        if (is_string($oldRaw) && preg_match('/^([0-9a-f]{24}):/', $oldRaw, $om)) {
+            Database::query('DELETE FROM remember_tokens WHERE selector = ? AND user_id = ?', [$om[1], $userId]);
+        }
         $selector = bin2hex(random_bytes(12));
         $validator = bin2hex(random_bytes(32));
         $expires = $now + self::DAYS * 86400;
@@ -55,8 +60,14 @@ final class RememberMe
             return null;
         }
         $userId = (int)$row['user_id'];
-        if (!hash_equals((string)$row['token_hash'], hash('sha256', $validator))) {
+        $presented = hash('sha256', $validator);
+        $rotate = false;
+        if (hash_equals((string)$row['token_hash'], $presented)) {
+            $rotate = true;
+        } elseif (!self::matchesPrev($row, $presented)) {
+            // и не текущий, и не недавно заменённый: признак кражи
             Database::query('DELETE FROM remember_tokens WHERE user_id = ?', [$userId]);
+            Auth::bumpVersion($userId);
             self::clearCookie();
             return null;
         }
@@ -66,13 +77,40 @@ final class RememberMe
             self::clearCookie();
             return null;
         }
-        $newValidator = bin2hex(random_bytes(32));
-        Database::query('UPDATE remember_tokens SET token_hash = ?, last_used_at = ? WHERE id = ?',
-            [hash('sha256', $newValidator), gmdate('Y-m-d H:i:s'), $row['id']]);
-        self::setCookie($selector . ':' . $newValidator, (int)strtotime($row['expires_at'] . ' UTC'));
+        if ($rotate) {
+            $newValidator = bin2hex(random_bytes(32));
+            $st = Database::query(
+                'UPDATE remember_tokens SET token_hash = ?, prev_hash = ?, rotated_at = ?, last_used_at = ?
+                 WHERE id = ? AND token_hash = ?',
+                [hash('sha256', $newValidator), $row['token_hash'], gmdate('Y-m-d H:i:s'), gmdate('Y-m-d H:i:s'),
+                 $row['id'], $row['token_hash']]
+            );
+            if ($st->rowCount() === 1) {
+                self::setCookie($selector . ':' . $newValidator, (int)strtotime($row['expires_at'] . ' UTC'));
+            } else {
+                // параллельный запрос уже обновил токен: проверяем окно предыдущего
+                $fresh = Database::fetch('SELECT * FROM remember_tokens WHERE id = ?', [$row['id']]);
+                if ($fresh === null || !self::matchesPrev($fresh, $presented)) {
+                    self::clearCookie();
+                    return null;
+                }
+            }
+        }
+        // в окне предыдущего токена cookie не трогаем: браузер уже получил новый от параллельного запроса
         Auth::establish($user);
         Audit::log($userId, 'login_remember', 'user', $userId);
         return $userId;
+    }
+
+    public const PREV_WINDOW = 30;
+
+    private static function matchesPrev(array $row, string $presented): bool
+    {
+        if (empty($row['prev_hash']) || empty($row['rotated_at'])) {
+            return false;
+        }
+        $age = time() - (int)strtotime($row['rotated_at'] . ' UTC');
+        return $age >= 0 && $age <= self::PREV_WINDOW && hash_equals((string)$row['prev_hash'], $presented);
     }
 
     /** Удалить токен этого устройства и cookie. */

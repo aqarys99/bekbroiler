@@ -27,6 +27,29 @@ final class LoginThrottle
         Database::query('DELETE FROM login_attempts WHERE created_at < ?', [gmdate('Y-m-d H:i:s', $now - 86400)]);
     }
 
+    /**
+     * Атомарно: проверить блокировку и занять попытку (строка пишется ДО проверки пароля,
+     * поэтому параллельные запросы не обходят лимит).
+     * @return array{0:int,1:?int} [секунд до разблокировки, id строки-резерва (null, если заблокировано)]
+     */
+    public static function reserve(string $ip, string $login): array
+    {
+        return Database::immediate(static function () use ($ip, $login): array {
+            $left = self::lockedFor($ip, $login);
+            if ($left > 0) {
+                return [$left, null];
+            }
+            self::fail($ip, $login);
+            return [0, (int)Database::connection()->lastInsertId()];
+        });
+    }
+
+    /** Снять резерв (успех или попытка, которая не считается неудачной). */
+    public static function release(int $id): void
+    {
+        Database::query('DELETE FROM login_attempts WHERE id = ?', [$id]);
+    }
+
     /** Секунды до разблокировки (0 — свободно). */
     public static function lockedFor(string $ip, string $login): int
     {

@@ -23,11 +23,11 @@
 
   // Защита от двойной отправки
   document.querySelectorAll('form[data-once]').forEach(function (form) {
-    var sent = false;
+    form.__sent = false;
     form.addEventListener('submit', function (ev) {
       if (ev.defaultPrevented) { return; }
-      if (sent) { ev.preventDefault(); return; }
-      sent = true;
+      if (form.__sent) { ev.preventDefault(); return; }
+      form.__sent = true;
       // отключаем в следующем тике, чтобы форма успела уйти
       setTimeout(function () {
         form.querySelectorAll('button[type="submit"]').forEach(function (b) { b.disabled = true; });
@@ -38,6 +38,7 @@
   // «Назад» из кэша: вернуть кнопки в рабочее состояние
   window.addEventListener('pageshow', function (ev) {
     if (!ev.persisted) { return; }
+    document.querySelectorAll('form[data-once]').forEach(function (f) { f.__sent = false; });
     document.querySelectorAll('form[data-once] button[type="submit"]').forEach(function (b) { b.disabled = false; });
   });
 })();
