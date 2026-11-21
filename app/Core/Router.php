@@ -18,6 +18,18 @@ final class Router
         $this->add('POST', $pattern, $handler);
     }
 
+    /** @return array<int,array{method:string,pattern:string,handler:mixed}> все маршруты (для тестов охраны) */
+    public function routes(): array
+    {
+        $out = [];
+        foreach ($this->routes as $method => $list) {
+            foreach ($list as $r) {
+                $out[] = ['method' => $method, 'pattern' => $r['pattern'], 'handler' => $r['handler']];
+            }
+        }
+        return $out;
+    }
+
     private function add(string $method, string $pattern, mixed $handler): void
     {
         foreach ($this->routes[$method] ?? [] as $r) {

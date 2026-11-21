@@ -151,30 +151,19 @@ final class Installer
             $errors['site_name'] = 'validation.site_name.length';
         }
 
-        $name = $clean($in['owner_name'] ?? '');
-        if ($name === '') {
-            $errors['owner_name'] = 'validation.owner_name.required';
-        } elseif (mb_strlen($name) > 100) {
-            $errors['owner_name'] = 'validation.owner_name.length';
+        $name = UserValidator::cleanName($in['owner_name'] ?? '');
+        if ($err = UserValidator::nameError($name)) {
+            $errors['owner_name'] = $err;
         }
 
-        $login = is_string($in['login'] ?? null) ? mb_strtolower(trim($in['login'])) : '';
-        $ll = mb_strlen($login);
-        if ($login === '') {
-            $errors['login'] = 'validation.login.required';
-        } elseif ($ll < 3 || $ll > 50) {
-            $errors['login'] = 'validation.login.length';
-        } elseif (!preg_match('/^[a-z0-9._-]+$/', $login)) {
-            $errors['login'] = 'validation.login.format';
+        $login = UserValidator::cleanLogin($in['login'] ?? '');
+        if ($err = UserValidator::loginError($login, null, false)) {
+            $errors['login'] = $err;
         }
 
         $pass = is_string($in['password'] ?? null) ? $in['password'] : '';
-        if ($pass === '') {
-            $errors['password'] = 'validation.password.required';
-        } elseif (mb_strlen($pass) < 8) {
-            $errors['password'] = 'validation.password.min';
-        } elseif (mb_strlen($pass) > 64 || strlen($pass) > 72) {
-            $errors['password'] = 'validation.password.max';
+        if ($err = UserValidator::passwordError($pass)) {
+            $errors['password'] = $err;
         } elseif ($pass !== (is_string($in['password_confirm'] ?? null) ? $in['password_confirm'] : '')) {
             $errors['password_confirm'] = 'validation.password.confirm';
         }

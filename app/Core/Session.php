@@ -33,11 +33,54 @@ final class Session
         session_name('sadik_sid');
         session_set_cookie_params([
             'lifetime' => 0,
-            'path'     => '/',
+            'path'     => self::cookiePath(),
             'secure'   => $https,
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
         session_start();
+    }
+
+    public static function cookiePath(): string
+    {
+        return (string)config('base_path', '') ?: '/';
+    }
+
+    public static function isHttps(): bool
+    {
+        return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    }
+
+    /** Новый ID сессии (после входа и смены пароля). */
+    public static function regenerate(): void
+    {
+        self::start();
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
+        session_regenerate_id(true);
+    }
+
+    /** Полностью завершить сессию и удалить cookie. */
+    public static function destroy(): void
+    {
+        $_SESSION = [];
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
+        if (!headers_sent()) {
+            setcookie('sadik_sid', '', [
+                'expires'  => time() - 3600,
+                'path'     => self::cookiePath(),
+                'secure'   => self::isHttps(),
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
+        unset($_COOKIE['sadik_sid']);
     }
 }
