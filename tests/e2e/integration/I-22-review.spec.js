@@ -53,6 +53,8 @@ test('I-22: кража remember-токена — владелец со стар�
   const tp = await thief.newPage();
   await tp.goto('/admin');
   await expect(tp.getByTestId('dashboard-greeting')).toBeVisible();
+  // защитное окно 30 с после ротации истекло
+  execSql("UPDATE remember_tokens SET rotated_at=datetime(rotated_at,'-60 seconds')");
   // владелец приходит со старым validator
   await page.goto('/admin');
   await expect(page.getByTestId('login-form')).toBeVisible();
@@ -61,6 +63,22 @@ test('I-22: кража remember-токена — владелец со стар�
   await tp.goto('/admin');
   await expect(tp.getByTestId('login-form')).toBeVisible();
   await thief.close();
+});
+
+test('I-22: старый validator внутри окна 30 с принимается и не удаляет токены', async ({ page }) => {
+  await login(page, OWNER, { remember: true });
+  const c0 = (await page.context().cookies()).find((c) => c.name === 'sadik_remember');
+  await page.context().clearCookies({ name: 'sadik_sid' });
+  const other = await page.context().browser().newContext();
+  await other.addCookies([{ ...c0 }]);
+  const op = await other.newPage();
+  await op.goto('/admin');
+  await expect(op.getByTestId('dashboard-greeting')).toBeVisible();
+  // параллельная вкладка со старым validator сразу после ротации
+  await page.goto('/admin');
+  await expect(page.getByTestId('dashboard-greeting')).toBeVisible();
+  expect(tokens()).toBeGreaterThanOrEqual(1);
+  await other.close();
 });
 
 test('I-22: 3 параллельных GET /admin с одним remember-cookie — токен не удаляется', async ({ page }) => {
@@ -86,11 +104,11 @@ test('I-22: профиль — 5 неверных текущих паролей 
   const body = (cur) => ({ _csrf: csrf, current_password: cur, new_password: 'New-editor-pass-1', new_password_confirm: 'New-editor-pass-1' });
   let last;
   for (let i = 0; i < 5; i++) last = await post(page, '/admin/profile/password', body('Wrong-current-' + i));
-  expect([422, 429]).toContain(last.status());
-  expect(await last.text()).toMatch(/Слишком много|Попробуйте через/);
+  expect(last.status()).toBe(429);
+  expect(await last.text()).toMatch(/data-testid="form-error"[^>]*>Слишком много попыток\. Попробуйте через \d+ мин\./);
   const sixth = await post(page, '/admin/profile/password', body(EDITOR.password));
-  expect([422, 429]).toContain(sixth.status());
-  expect(await sixth.text()).toMatch(/Слишком много|Попробуйте через/);
+  expect(sixth.status()).toBe(429);
+  expect(await sixth.text()).toContain('form-error');
   expect(dbQuery("SELECT password_hash AS h FROM users WHERE login='editor'")[0].h).toBe(hash);
 });
 

@@ -80,6 +80,11 @@ function readLog() {
     .join('\n');
 }
 
+/** Версии всех файлов из migrations/ (NNN_name.sql -> NNN). */
+function migrationVersions() {
+  return fs.readdirSync(path.join(ROOT, 'migrations')).filter((f) => /^\d+_.*\.sql$/.test(f)).map((f) => f.split('_')[0]).sort();
+}
+
 let current = null;
 
 /**
@@ -157,6 +162,6 @@ function validPost(csrf, o = {}) {
 }
 
 module.exports = {
-  OWNER, EDITOR, ROOT, STORAGE, VALID, resetApp, dbQuery, execSql, login, logout, ageSession, readLog, trackPageErrors, expectNoPageErrors,
+  OWNER, EDITOR, ROOT, migrationVersions, STORAGE, VALID, resetApp, dbQuery, execSql, login, logout, ageSession, readLog, trackPageErrors, expectNoPageErrors,
   fillInstall, installViaUI, csrfFromInstallPage, validPost,
 };

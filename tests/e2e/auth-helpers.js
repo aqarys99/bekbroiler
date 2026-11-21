@@ -26,7 +26,7 @@ const q = (s) => String(s).replace(/'/g, "''");
 const userId = (loginName) => Number(dbQuery(`SELECT id FROM users WHERE login='${q(loginName)}'`)[0].id);
 const audit = (action) => dbQuery(`SELECT user_id, entity, entity_id FROM audit_log WHERE action='${q(action)}' ORDER BY id`);
 const count = (sql) => Number(dbQuery(sql)[0].c);
-const attempts = () => count('SELECT COUNT(*) AS c FROM login_attempts');
+const attempts = () => count("SELECT COUNT(*) AS c FROM login_attempts WHERE ip NOT LIKE 'profile:%'");
 const tokens = () => count('SELECT COUNT(*) AS c FROM remember_tokens');
 
 /** Новая независимая сессия (контекст), вошедшая под user. */

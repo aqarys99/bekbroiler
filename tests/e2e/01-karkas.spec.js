@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 const {
-  STORAGE, VALID, resetApp, dbQuery, readLog, trackPageErrors, expectNoPageErrors,
+  STORAGE, VALID, migrationVersions, resetApp, dbQuery, readLog, trackPageErrors, expectNoPageErrors,
   fillInstall, installViaUI, csrfFromInstallPage, validPost,
 } = require('./helpers');
 
@@ -211,7 +211,7 @@ test.describe('до установки', () => {
   test('install-submit: установка создаёт БД, пользователя, настройку, аудит, конфиг, lock', async ({ page }) => {
     await installViaUI(page);
     await expect(page.getByTestId('install-done')).toBeVisible();
-    expect(dbQuery("SELECT version FROM schema_migrations").map((r) => r.version)).toEqual(['001', '002']);
+    expect(dbQuery("SELECT version FROM schema_migrations").map((r) => r.version)).toEqual(migrationVersions());
     const tables = dbQuery("SELECT name FROM sqlite_master WHERE type='table'").map((r) => r.name);
     for (const t of ['users', 'login_attempts', 'settings', 'audit_log', 'schema_migrations']) expect(tables).toContain(t);
     const u = dbQuery('SELECT id, role, login FROM users');
