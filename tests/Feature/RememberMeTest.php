@@ -55,10 +55,11 @@ final class RememberMeTest extends AuthTestCase
         $this->assertNotSame($hashBefore, Database::fetchValue('SELECT token_hash FROM remember_tokens'));
         $this->assertSame($expBefore, Database::fetchValue('SELECT expires_at FROM remember_tokens'));
         $this->assertSame(1, (int)Database::fetchValue("SELECT COUNT(*) FROM audit_log WHERE action = 'login_remember'"));
-        // в окне 30 с старый validator ещё принимается (параллельные вкладки), cookie не меняется
+        // в окне 10 с старый validator ещё принимается (параллельные вкладки), cookie не меняется
         $this->restart("$sel:$val");
         $this->assertNotNull(Auth::user());
         $this->assertArrayHasKey('sadik_remember', $_COOKIE);
+        $this->assertSame(1, (int)Database::fetchValue("SELECT COUNT(*) FROM audit_log WHERE action = 'login_remember_prev'"));
         // после окна — признак кражи: удаляются все токены и завершаются сессии
         Database::query('UPDATE remember_tokens SET rotated_at = ?', [gmdate('Y-m-d H:i:s', time() - 60)]);
         $this->restart("$sel:$val");

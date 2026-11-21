@@ -128,4 +128,13 @@ final class Database
             throw $e;
         }
     }
+
+    /** SQLITE_BUSY / «database is locked». */
+    public static function isBusy(\PDOException $e): bool
+    {
+        $code = (int)($e->errorInfo[1] ?? 0);
+        return in_array($code & 0xff, [5, 6], true)
+            || stripos($e->getMessage(), 'database is locked') !== false
+            || stripos($e->getMessage(), 'database table is locked') !== false;
+    }
 }

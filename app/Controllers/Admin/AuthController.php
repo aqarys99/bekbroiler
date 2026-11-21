@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Auth;
 use App\Core\AuthResult;
+use App\Core\Database;
 use App\Core\Flash;
 use App\Core\Guard;
 use App\Core\View;
@@ -50,7 +51,14 @@ final class AuthController extends BaseController
             return $this->form(422, $old, $errors, null, null, $next);
         }
 
-        $res = Auth::attempt($login, $password, self::post('remember') === '1', Auth::ip());
+        try {
+            $res = Auth::attempt($login, $password, self::post('remember') === '1', Auth::ip());
+        } catch (\PDOException $e) {
+            if (!Database::isBusy($e)) {
+                throw $e;
+            }
+            return $this->form(503, $old, [], t('error.busy'), null, $next);
+        }
         switch ($res->status) {
             case AuthResult::OK:
                 redirect(Guard::safeNext($next));

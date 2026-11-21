@@ -236,13 +236,10 @@ final class UsersController extends BaseController
      */
     private function dbFailure(\PDOException $e, callable $render): string
     {
-        $msg = $e->getMessage();
-        $code = (int)($e->errorInfo[1] ?? 0);
-        if (str_contains($msg, 'UNIQUE constraint')) {
+        if (str_contains($e->getMessage(), 'UNIQUE constraint')) {
             return $render(422, null, ['login' => 'validation.login.taken']);
         }
-        if (in_array($code & 0xff, [5, 6], true) || stripos($msg, 'database is locked') !== false
-            || stripos($msg, 'database table is locked') !== false) {
+        if (Database::isBusy($e)) {
             return $render(503, t('error.busy'), []);
         }
         throw $e;

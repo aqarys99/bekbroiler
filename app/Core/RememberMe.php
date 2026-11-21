@@ -62,8 +62,10 @@ final class RememberMe
         $userId = (int)$row['user_id'];
         $presented = hash('sha256', $validator);
         $rotate = false;
+        $viaPrev = true;
         if (hash_equals((string)$row['token_hash'], $presented)) {
             $rotate = true;
+            $viaPrev = false;
         } elseif (!self::matchesPrev($row, $presented)) {
             // и не текущий, и не недавно заменённый: признак кражи
             Database::query('DELETE FROM remember_tokens WHERE user_id = ?', [$userId]);
@@ -94,15 +96,16 @@ final class RememberMe
                     self::clearCookie();
                     return null;
                 }
+                $viaPrev = true;
             }
         }
         // в окне предыдущего токена cookie не трогаем: браузер уже получил новый от параллельного запроса
         Auth::establish($user);
-        Audit::log($userId, 'login_remember', 'user', $userId);
+        Audit::log($userId, $viaPrev ? 'login_remember_prev' : 'login_remember', 'user', $userId);
         return $userId;
     }
 
-    public const PREV_WINDOW = 30;
+    public const PREV_WINDOW = 10;
 
     private static function matchesPrev(array $row, string $presented): bool
     {

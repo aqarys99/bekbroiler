@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Audit;
 use App\Core\Auth;
+use App\Core\Database;
 use App\Core\Flash;
 use App\Core\LoginThrottle;
 use App\Core\UserValidator;
@@ -32,7 +33,14 @@ final class ProfileController extends BaseController
             $errors['current_password'] = 'validation.current_password.required';
         } else {
             // отдельный счётчик попыток текущего пароля: 5 за 15 минут
-            [$left, $slot] = LoginThrottle::reserve('profile:' . $id, 'password');
+            try {
+                [$left, $slot] = LoginThrottle::reserve('profile:' . $id, 'password');
+            } catch (\PDOException $e) {
+                if (!Database::isBusy($e)) {
+                    throw $e;
+                }
+                return $this->render(503, [], t('error.busy'));
+            }
             if ($slot === null) {
                 return $this->render(429, [], t('profile.error.locked', ['minutes' => (int)ceil($left / 60)]));
             }

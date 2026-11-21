@@ -53,8 +53,8 @@ test('I-22: кража remember-токена — владелец со стар�
   const tp = await thief.newPage();
   await tp.goto('/admin');
   await expect(tp.getByTestId('dashboard-greeting')).toBeVisible();
-  // защитное окно 30 с после ротации истекло
-  execSql("UPDATE remember_tokens SET rotated_at=datetime(rotated_at,'-60 seconds')");
+  // защитное окно 10 с после ротации истекло
+  execSql("UPDATE remember_tokens SET rotated_at=datetime(rotated_at,'-20 seconds')");
   // владелец приходит со старым validator
   await page.goto('/admin');
   await expect(page.getByTestId('login-form')).toBeVisible();
@@ -65,7 +65,7 @@ test('I-22: кража remember-токена — владелец со стар�
   await thief.close();
 });
 
-test('I-22: старый validator внутри окна 30 с принимается и не удаляет токены', async ({ page }) => {
+test('I-22: старый validator внутри окна 10 с принимается и не удаляет токены', async ({ page }) => {
   await login(page, OWNER, { remember: true });
   const c0 = (await page.context().cookies()).find((c) => c.name === 'sadik_remember');
   await page.context().clearCookies({ name: 'sadik_sid' });

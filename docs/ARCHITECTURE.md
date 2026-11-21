@@ -109,7 +109,8 @@ sadik/
 | Таблица | Главные поля | Для чего |
 |---|---|---|
 | `users` | id, name, login, password_hash, role (`owner`/`editor`), is_active, last_login_at | Пользователи админки |
-| `login_attempts` | ip, login, created_at | Защита от подбора пароля |
+| `login_attempts` | ip, login, created_at | Защита от подбора пароля. Для лимита текущего пароля в профиле `ip` = `profile:<id пользователя>`, `login` = `password` |
+| `remember_tokens` | id, user_id, selector, token_hash, prev_hash, rotated_at, expires_at, last_used_at | «Запомнить меня»: в БД только SHA-256 validator; `prev_hash`/`rotated_at` — прошлый хэш, действует 10 с после ротации (параллельные вкладки) |
 | `settings` | key, value (JSON) | Название, контакты, логотип, тема, цвета, соцсети, часы работы, лицензия |
 | `pages` | id, slug, title, body, sort, is_published | Статичные разделы: «О нас», «Программа», «Режим дня», «Питание», «Условия» |
 | `news` | id, slug, title, excerpt, body, cover_media_id, status (`draft`/`published`), published_at, author_id | Новости и объявления |
@@ -225,7 +226,8 @@ flowchart TD
 ## 9. Безопасность
 
 - Пароли: `password_hash()` (bcrypt/argon2id), минимум 8 символов.
-- Защита от подбора: после 5 неудачных попыток вход блокируется на 15 минут (по IP и логину).
+- Защита от подбора: 5 неудачных попыток по паре (IP, логин) или 20 с одного IP → блок на 15 минут. Попытка занимается в БД под `BEGIN IMMEDIATE` до проверки пароля (параллельные запросы не обходят лимит). Тот же лимит (5 попыток, 429) действует на ввод текущего пароля в профиле.
+- «Запомнить меня»: токен selector+validator, в БД только хэш, ротация при каждом использовании; предъявлен ни текущий, ни прошлый (окно 10 с) validator — считается кражей: удаляются все токены пользователя и завершаются его сессии (`auth_version`).
 - Сессии: cookie `HttpOnly`, `Secure`, `SameSite=Lax`, новый ID после входа, выход через 2 часа бездействия.
 - CSRF-токен в каждой форме админки.
 - Все SQL-запросы — подготовленные (PDO).

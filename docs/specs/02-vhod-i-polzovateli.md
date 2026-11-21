@@ -124,7 +124,9 @@ tests/e2e/helpers.js                (EDITOR, login(), logout(), execSql(), ageSe
 
 ### RememberMe
 - `issue(int $userId)`: `selector = bin2hex(random_bytes(12))`, `validator = bin2hex(random_bytes(32))`; в БД `hash('sha256', validator)`, `expires_at = now + 30 дней`; cookie `sadik_remember = selector:validator`, `expires` +30 дней, `HttpOnly`, `SameSite=Lax`, `Secure` при HTTPS, путь как у сессии. У пользователя > 10 токенов → удалить самые старые. Истёкшие токены всех пользователей удаляются здесь же.
-- `consume(): ?int`: формат cookie `^[0-9a-f]{24}:[0-9a-f]{64}$`, иначе удалить cookie → `null`. Нет строки по `selector` или истёк → удалить cookie/строку → `null`. `hash_equals` не совпал → удалить **все** токены этого пользователя (признак кражи), cookie → `null`. Пользователь заблокирован → удалить его токены → `null`. Успех: ротация (новый validator в той же строке, `last_used_at`, cookie перевыпускается; `expires_at` не продлевается), вход как в `Auth::attempt` шаг 5 без пароля, `Audit::log($id, 'login_remember', 'user', $id)`.
+- `consume(): ?int`: формат cookie `^[0-9a-f]{24}:[0-9a-f]{64}$`, иначе удалить cookie → `null`. Нет строки по `selector` или истёк → удалить cookie/строку → `null`. Сравнение с текущим `token_hash` и с `prev_hash` (см. ниже); не совпал ни с одним → кража: удалить **все** токены пользователя, `Auth::bumpVersion($userId)` (завершает его открытые сессии), cookie → `null`. Пользователь заблокирован → удалить его токены → `null`. Успех: ротация условным `UPDATE … SET token_hash=new, prev_hash=old, rotated_at=now WHERE id=? AND token_hash=old` (cookie перевыпускается; `expires_at` не продлевается); если 0 строк — параллельный запрос уже ротировал, проверяется окно `prev_hash`, вход как в `Auth::attempt` шаг 5 без пароля, `Audit::log($id, 'login_remember', 'user', $id)`.
+- Окно прошлого токена (миграция `003_remember_rotation.sql`: `prev_hash`, `rotated_at`): validator, чей хэш равен `prev_hash`, принимается **10 с** после `rotated_at` (восстановление вкладок, параллельные GET); вход без ротации и без перевыпуска cookie, аудит `login_remember_prev`. Позже 10 с — кража (см. выше).
+- `issue()` при новом входе с галочкой удаляет прежний токен этого устройства (по cookie запроса).
 - `forgetCurrent()`: удалить строку по selector из cookie и сам cookie.
 
 ### Guard
@@ -146,7 +148,7 @@ tests/e2e/helpers.js                (EDITOR, login(), logout(), execSql(), ageSe
 
 ### Аудит (I-15)
 `entity = 'user'`, `entity_id` = id затронутого пользователя, `user_id` = кто сделал (null для неудачных входов):
-`login`, `login_remember`, `login_failed`, `login_locked`, `logout`, `create`, `update` (имя/логин изменились), `role_change` (роль изменилась; при одновременной смене имени и роли — две записи), `block`, `unblock`, `password_reset`, `password_change`. Неудачная валидация и отказ по правам — без записи. Сохранение без изменений — без записи.
+`login`, `login_remember`, `login_remember_prev`, `login_failed`, `login_locked`, `logout`, `create`, `update` (имя/логин изменились), `role_change` (роль изменилась; при одновременной смене имени и роли — две записи), `block`, `unblock`, `password_reset`, `password_change`. Неудачная валидация и отказ по правам — без записи. Сохранение без изменений — без записи.
 
 ### Меню `app/admin_menu.php`
 Возвращает массив групп `['label' => 'menu.group.content', 'items' => [['key','label','url','icon','role','testid']]]`. В 02: группа «Содержимое» → `dashboard` (`{a}`, editor+); группа «Система» → `users` (`{a}/users`, owner). Группа без видимых пунктов не выводится. Активный пункт — по префиксу пути (`{a}` — только точное совпадение).
@@ -223,7 +225,11 @@ tests/e2e/helpers.js                (EDITOR, login(), logout(), execSql(), ageSe
 | error-400 | Страница 400 | «Сессия устарела» + «Обновите страницу и попробуйте снова.» | Вошедшим отправить POST админки без/с неверным `_csrf` | Код 400, данные не изменены | Для формы входа вместо страницы — `login-error` (400) |
 | error-400-home | Страница 400 | Ссылка «На главную» | Нажать | Переход на `/` | — |
 
-Итого строк: 52.
+| form-error | Формы профиля и сброса пароля, формы пользователей | Плашка общей ошибки формы (`role="alert"`) | Вызвать ошибку, не относящуюся к полю | Текст ошибки: «Слишком много попыток. Попробуйте через N мин.» (профиль, 429), «Сервер занят, попробуйте ещё раз» (503), защита владельцев (422) | Не показывается без ошибки |
+
+Лимит текущего пароля в профиле: `LoginThrottle::reserve('profile:<id>', 'password')` — 5 неверных попыток за 15 минут → 429 `profile.error.locked`, верная попытка сбрасывает резерв. `SQLITE_BUSY` в проверке попыток входа/профиля и в действиях с пользователями → 503 с `error.busy`.
+
+Итого строк: 53.
 
 ## Связи с другими фичами
 Существующие строки:
