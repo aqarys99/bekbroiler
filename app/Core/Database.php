@@ -120,8 +120,10 @@ final class Database
             $pdo->exec('COMMIT');
             return $result;
         } catch (\Throwable $e) {
-            if ($pdo->inTransaction()) {
+            try {
                 $pdo->exec('ROLLBACK');
+            } catch (\Throwable) {
+                // транзакции уже нет
             }
             throw $e;
         }

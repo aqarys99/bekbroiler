@@ -37,6 +37,10 @@ final class ProfileController extends BaseController
                 return $this->render(429, [], t('profile.error.locked', ['minutes' => (int)ceil($left / 60)]));
             }
             if (!password_verify($current, (string)$fresh['password_hash'])) {
+                $left = LoginThrottle::lockedFor('profile:' . $id, 'password');
+                if ($left > 0) {
+                    return $this->render(429, [], t('profile.error.locked', ['minutes' => (int)ceil($left / 60)]));
+                }
                 $errors['current_password'] = 'validation.current_password.wrong';
             } else {
                 LoginThrottle::release($slot);
