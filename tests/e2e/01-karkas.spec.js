@@ -211,7 +211,7 @@ test.describe('до установки', () => {
   test('install-submit: установка создаёт БД, пользователя, настройку, аудит, конфиг, lock', async ({ page }) => {
     await installViaUI(page);
     await expect(page.getByTestId('install-done')).toBeVisible();
-    expect(dbQuery("SELECT version FROM schema_migrations").map((r) => r.version)).toEqual(['001']);
+    expect(dbQuery("SELECT version FROM schema_migrations").map((r) => r.version)).toEqual(['001', '002']);
     const tables = dbQuery("SELECT name FROM sqlite_master WHERE type='table'").map((r) => r.name);
     for (const t of ['users', 'login_attempts', 'settings', 'audit_log', 'schema_migrations']) expect(tables).toContain(t);
     const u = dbQuery('SELECT id, role, login FROM users');
@@ -315,8 +315,8 @@ test.describe('после установки', () => {
     resetApp();
     await installViaUI(page);
     await page.getByTestId('install-go-admin').click();
-    await expect(page).toHaveURL(/\/admin$/);
-    await expect(page.getByTestId('stub-message')).toBeVisible();
+    await expect(page).toHaveURL(/\/admin\/login\?next=(%2F|\/)admin$/);
+    await expect(page.getByTestId('login-form')).toBeVisible();
   });
 
   test('install-locked: GET и POST дают 403, форма скрыта, пароль прежний', async ({ page }) => {
@@ -336,8 +336,8 @@ test.describe('после установки', () => {
   test('install-locked-admin: ссылка ведёт на /admin', async ({ page }) => {
     await page.goto('/install.php');
     await page.getByTestId('install-locked-admin').click();
-    await expect(page).toHaveURL(/\/admin$/);
-    await expect(page.getByTestId('stub-message')).toBeVisible();
+    await expect(page).toHaveURL(/\/admin\/login/);
+    await expect(page.getByTestId('login-form')).toBeVisible();
   });
 
   test('stub-site-name: название из settings, <script> выводится текстом', async ({ page }) => {
@@ -346,10 +346,10 @@ test.describe('после установки', () => {
     page.on('dialog', (d) => { dialog = true; d.dismiss(); });
     await installViaUI(page, { siteName: '<script>alert(1)</script>' });
     await expect(page.getByTestId('install-done')).toBeVisible();
-    for (const p of ['/', '/admin']) {
-      await page.goto(p);
-      await expect(page.getByTestId('stub-site-name')).toHaveText('<script>alert(1)</script>');
-    }
+    await page.goto('/');
+    await expect(page.getByTestId('stub-site-name')).toHaveText('<script>alert(1)</script>');
+    await page.goto('/admin/login');
+    await expect(page.getByTestId('login-site-name')).toHaveText('<script>alert(1)</script>');
     expect(dialog).toBe(false);
   });
 
@@ -358,12 +358,12 @@ test.describe('после установки', () => {
     await expect(page.getByTestId('stub-site-name')).toHaveText('Детский сад «Солнышко»');
   });
 
-  test('stub-message: / и /admin — 200, /admin/ — 301, HEAD / пустой, POST / — 405', async ({ page }) => {
-    for (const p of ['/', '/admin']) {
-      const res = await page.goto(p);
-      expect(res.status()).toBe(200);
-      await expect(page.getByTestId('stub-message')).toHaveText('Установка завершена. Админка будет доступна после фичи 02.');
-    }
+  test('stub-message: / — 200, /admin требует вход, /admin/ — 301, HEAD / пустой, POST / — 405', async ({ page }) => {
+    const res = await page.goto('/');
+    expect(res.status()).toBe(200);
+    await expect(page.getByTestId('stub-message')).toHaveText('Сайт скоро откроется.');
+    const adm = await page.request.get('/admin', { maxRedirects: 0 });
+    expect(adm.status()).toBe(302);
     const slash = await page.request.get('/admin/', { maxRedirects: 0 });
     expect(slash.status()).toBe(301);
     expect(slash.headers()['location']).toBe('/admin');
