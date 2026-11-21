@@ -106,4 +106,24 @@ final class Database
             throw $e;
         }
     }
+
+    /** Транзакция с немедленной блокировкой записи (проверки «последний владелец» без гонок). */
+    public static function immediate(callable $fn): mixed
+    {
+        $pdo = self::connection();
+        if ($pdo->inTransaction()) {
+            return $fn();
+        }
+        $pdo->exec('BEGIN IMMEDIATE');
+        try {
+            $result = $fn();
+            $pdo->exec('COMMIT');
+            return $result;
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->exec('ROLLBACK');
+            }
+            throw $e;
+        }
+    }
 }

@@ -13,6 +13,8 @@ const ENV = {
   APP_CONFIG_FILE: path.join(STORAGE, 'config.php'),
 };
 
+const EDITOR = { name: 'Петрова Анна Сергеевна', login: 'editor', password: 'Editor-pass-2026' };
+
 const OWNER = {
   name: 'Иванова Мария Петровна',
   login: 'owner',
@@ -24,12 +26,41 @@ const OWNER = {
  * Сбросить тестовое приложение.
  * fail: ['pdo_sqlite', 'zip:warn'] — подмена требований (по умолчанию статус fail).
  */
-function resetApp({ installed = false, debug = false, fail = [] } = {}) {
+function resetApp({ installed = false, debug = false, fail = [], withEditor = false } = {}) {
   const args = ['tests/e2e/bin/reset.php'];
   if (installed) args.push('--installed');
+  if (withEditor) args.push('--with-editor');
   args.push(`--debug=${debug ? 1 : 0}`);
   if (fail.length) args.push(`--fail=${fail.join(',')}`);
   execFileSync('php', args, { cwd: ROOT, env: ENV, stdio: 'pipe' });
+}
+
+/** Выполнить UPDATE/INSERT/DELETE в тестовой БД, вернуть число затронутых строк. */
+function execSql(sql) {
+  const out = execFileSync('php', ['tests/e2e/bin/exec.php', sql], { cwd: ROOT, env: ENV, stdio: 'pipe' });
+  return parseInt(out.toString('utf8').trim(), 10);
+}
+
+/** Войти через форму. user — OWNER или EDITOR. */
+async function login(page, user, { remember = false } = {}) {
+  await page.goto('/admin/login');
+  await page.getByTestId('login-login').fill(user.login);
+  await page.getByTestId('login-password').fill(user.password);
+  if (remember) await page.getByTestId('login-remember').check();
+  await page.getByTestId('login-submit').click();
+  await page.waitForURL((u) => !u.pathname.endsWith('/admin/login'));
+}
+
+/** Выйти кнопкой в меню. */
+async function logout(page) {
+  await page.getByTestId('nav-logout').click();
+  await page.waitForURL('**/admin/login');
+}
+
+/** Состарить сессию на N секунд (таймаут бездействия). */
+async function ageSession(page, seconds) {
+  const res = await page.request.get(`/__test/session-age?seconds=${seconds}`);
+  expect(res.status()).toBe(204);
 }
 
 /** Выполнить SELECT в тестовой БД, вернуть массив строк. */
@@ -126,6 +157,6 @@ function validPost(csrf, o = {}) {
 }
 
 module.exports = {
-  OWNER, ROOT, STORAGE, VALID, resetApp, dbQuery, readLog, trackPageErrors, expectNoPageErrors,
+  OWNER, EDITOR, ROOT, STORAGE, VALID, resetApp, dbQuery, execSql, login, logout, ageSession, readLog, trackPageErrors, expectNoPageErrors,
   fillInstall, installViaUI, csrfFromInstallPage, validPost,
 };

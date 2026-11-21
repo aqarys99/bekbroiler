@@ -111,6 +111,10 @@ if (!function_exists('abort')) {
 if (!function_exists('redirect')) {
     function redirect(string $url, int $code = 302): never
     {
+        if (PHP_SAPI === 'cli') {
+            // консоль (тесты): не завершаем процесс
+            throw new \App\Core\RedirectException($url, $code);
+        }
         if (!headers_sent()) {
             header('Location: ' . str_replace(["\r", "\n"], '', $url), true, $code);
         }

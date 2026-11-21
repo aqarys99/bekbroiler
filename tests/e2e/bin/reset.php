@@ -28,10 +28,12 @@ use App\Core\Config;
 use App\Core\Database;
 use App\Core\Installer;
 
-$opts = ['installed' => false, 'debug' => null, 'fail' => []];
+$opts = ['installed' => false, 'debug' => null, 'fail' => [], 'editor' => false];
 foreach ($args as $a) {
     if ($a === '--installed') {
         $opts['installed'] = true;
+    } elseif ($a === '--with-editor') {
+        $opts['editor'] = true;
     } elseif (str_starts_with($a, '--debug=')) {
         $opts['debug'] = substr($a, 8) === '1';
     } elseif (str_starts_with($a, '--fail=')) {
@@ -89,6 +91,11 @@ if ($opts['installed']) {
     ]);
     if ($opts['debug'] !== null) {
         writeTestConfig($configFile, $opts['debug']);
+    }
+    if ($opts['editor']) {
+        Config::load();
+        Database::setConnection(null);
+        \App\Models\User::create('Петрова Анна Сергеевна', 'editor', 'Editor-pass-2026', 'editor');
     }
 }
 
