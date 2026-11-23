@@ -10,11 +10,10 @@ final class StubController
 {
     public function index(array $params = []): string
     {
-        $raw = Database::fetchValue("SELECT value FROM settings WHERE key = 'site_name'");
-        $name = $raw !== null ? json_decode((string)$raw, true) : null;
+        $name = setting('site_name');
         return View::render('stub', [
             'title'    => t('stub.title'),
-            'siteName' => is_string($name) ? $name : t('app.name'),
+            'siteName' => is_string($name) && $name !== '' ? $name : t('app.name'),
         ]);
     }
 }

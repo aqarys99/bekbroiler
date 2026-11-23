@@ -12,6 +12,7 @@ use App\Controllers\Admin\NewsController;
 use App\Controllers\Admin\PagesController;
 use App\Controllers\Admin\ProfileController;
 use App\Controllers\Admin\ReviewsController;
+use App\Controllers\Admin\SettingsController;
 use App\Controllers\Admin\StaffController;
 use App\Controllers\Admin\UsersController;
 use App\Controllers\Admin\VideosController;
@@ -125,6 +126,8 @@ return static function (Router $r): void {
     $r->post($a . '/reviews/{id:\d+}/move', Guard::wrap([ReviewsController::class, 'move']));
     $r->post($a . '/reviews/{id:\d+}/delete', Guard::wrap([ReviewsController::class, 'delete']));
 
+    $r->get($a . '/settings', Guard::wrap([SettingsController::class, 'show'], 'owner'));
+    $r->post($a . '/settings', Guard::wrap([SettingsController::class, 'save'], 'owner'));
     $r->get($a . '/users', Guard::wrap([UsersController::class, 'index'], 'owner'));
     $r->get($a . '/users/new', Guard::wrap([UsersController::class, 'create'], 'owner'));
     $r->post($a . '/users', Guard::wrap([UsersController::class, 'store'], 'owner'));

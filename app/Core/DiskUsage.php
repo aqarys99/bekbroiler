@@ -30,7 +30,7 @@ final class DiskUsage
 
     private static function total(): ?int
     {
-        $quota = config('disk_quota_mb');
+        $quota = \App\Models\Settings::get('disk_quota_mb') ?? config('disk_quota_mb');
         if (is_numeric($quota) && (float)$quota > 0) {
             return (int)round((float)$quota * 1048576);
         }

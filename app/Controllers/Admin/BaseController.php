@@ -13,12 +13,7 @@ abstract class BaseController
 {
     protected function siteName(): string
     {
-        try {
-            $raw = Database::fetchValue("SELECT value FROM settings WHERE key = 'site_name'");
-        } catch (\Throwable) {
-            $raw = null;
-        }
-        $name = $raw !== null ? json_decode((string)$raw, true) : null;
+        $name = setting('site_name');
         return is_string($name) && $name !== '' ? $name : t('app.name');
     }
 

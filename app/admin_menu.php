@@ -28,6 +28,7 @@ return [
     [
         'label' => 'menu.group.system',
         'items' => [
+            ['key' => 'settings', 'label' => 'menu.settings', 'url' => '/settings', 'icon' => 'gear', 'role' => 'owner', 'testid' => 'nav-settings'],
             ['key' => 'users', 'label' => 'menu.users', 'url' => '/users', 'icon' => 'key', 'role' => 'owner', 'testid' => 'nav-users'],
         ],
     ],

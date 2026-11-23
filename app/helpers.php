@@ -23,6 +23,13 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('setting')) {
+    function setting(string $key, mixed $default = null): mixed
+    {
+        return \App\Models\Settings::get($key, $default);
+    }
+}
+
 if (!function_exists('t')) {
     function t(string $key, array $replace = []): string
     {
