@@ -505,3 +505,39 @@ html.js .editor__source{display:none}
 .video-progress__text{font-size:14px;color:var(--muted)}
 .video-progress__actions{display:flex;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){.video-progress__bar--busy>div{animation:none}}
+
+/* Главная (фича 08) */
+.dash{max-width:1120px;display:flex;flex-direction:column;gap:24px}
+.dash__cols{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.dash__check{flex:2 1 480px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.dash__side{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:24px}
+.dash .card h2{margin:0;font-size:18px}
+.dash__check h2,.dash [data-testid="dashboard-news"] h2{font-size:20px}
+.dash__row-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px}
+.dash__row-head--center{align-items:center;margin-bottom:8px}
+.dash__row-head b{font-size:20px;color:var(--text)}
+.dash__muted{color:var(--muted)}
+.dash__small{font-size:14px}.dash__tiny{font-size:13px}
+.dash__link{font-weight:600;text-decoration:none}
+.dash__box{display:flex;flex-direction:column;gap:12px}
+.dash__title{display:flex;align-items:center;gap:10px}
+.dash__box p{margin:0}
+.bar{height:10px;border-radius:999px;background:#E9ECF1;overflow:hidden}
+.bar--sm{height:8px}
+.bar__fill{height:100%;background:var(--accent);border-radius:999px}
+.bar__fill--kk{background:#C26A00}
+.dash__list{display:flex;flex-direction:column}
+.dash__item{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #EEF0F3}
+.dash__item:last-child{border-bottom:0}
+.dash__item-title{flex:1 1 220px;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.dash__news-title{flex-basis:260px;color:var(--text);text-decoration:none}
+.dash__news-title:hover{color:var(--accent)}
+.dash__date{font-size:14px;min-width:110px}
+.dash__pill{align-items:center;gap:6px}
+.dash__item-gap{min-width:96px}
+.dash__actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dash__action{display:flex;flex-direction:column;gap:10px;padding:16px;min-height:96px;border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px}
+.dash__action:hover{background:var(--bg);color:var(--text)}
+.dash__empty{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:8px 0}
+.dash__empty p{margin:0}
+@media (max-width:599px){.dash__check,.dash .card{padding:18px}.dash__item-gap{display:none}.dash__date{min-width:0}}
