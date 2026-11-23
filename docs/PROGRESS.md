@@ -5,7 +5,7 @@
 
 ## Текущее состояние
 - Ветка разработки: `claude/sharp-galileo-xzk77w`
-- Следующая фича: **10** (см. `docs/ROADMAP.md`)
+- Следующая фича: **11** (см. `docs/ROADMAP.md`)
 - Как продолжить: `/build-feature next`
 
 ## 00. Подготовка — ✅ 2026-11-19
@@ -83,3 +83,12 @@
 - Для фичи 11: `Page::published($slug)` (у rezhim есть `schedule`), `Staff::published()` (+photo), `Group::published()` (+teachers), `Achievement::published()` (+photo), `Review::published()`; все по порядку, только `is_published=1`. Медиа: FK RESTRICT + провайдер (удаление используемого фото запрещено, I-02).
 - Проверено: php -l, PHPUnit 480 зелёный, ручной прогон php -S (создать/изменить/порядок/показ/удалить во всех разделах, ошибки валидации, фото + запрет удаления) — без 500.
 - К исправлению на этапе тестирования (09): нет E2E pages-/staff-/groups-/achievements-/reviews-*; JS режима дня и мобильная ширина в браузере не проверены; сведения о саде (миссия/контакты) — фича 10; «сброс кэша сайта» не вызывается (кэша нет до 11); ҚАЗ-статус только для страниц; сид только страниц и режима дня (группы/педагоги/достижения/отзывы из index.html не засеяны).
+
+## 10. Настройки — ✅ 2026-11-23 (без ревью, E2E не писались)
+- Сделано: экран «Настройки» (только owner, меню «Система»): вкладки «Основное» (названия RU/ҚАЗ, site_name, руководитель, год, мощность, языки обучения, режим, лицензия, БИН, лимит диска), «Оформление и языки» (3 темы, 6 цветов + свой hex, логотип и картинка главной из медиатеки, ҚАЗ вкл/выкл, язык по умолчанию, кнопка для слабовидящих), «Контакты и карта» (адреса, телефоны построчно, email, WhatsApp, соцсети с проверкой URL, карта). Вкладки переключает `settings.js`; одна форма, кнопка «Сохранить» в шапке (атрибут `form`).
+- Файлы: `app/Models/Settings.php` (get/set/setMany, кэш на запрос, привязан к соединению), helper `setting()`, `app/Core/{SettingsValidator,SiteCache}.php`, `app/Media/SettingsUsageProvider.php`, `app/Controllers/Admin/SettingsController.php`, `admin-views/settings/index.php`, `public/assets/admin/settings.js`, стили `.settings*`/`.theme-*`/`.swatch*`. Миграция не нужна (ключи в `settings`).
+- Решения: карта хранится как `map_src` — только https и домены 2gis.kz/.ru, yandex.kz/.ru, google.com/maps; разбирается только `<iframe src>`, иное (script и др.) отклоняется; лимит диска: Settings → config → disk_total_space; `site_name` везде через `setting()`; логотип/картинка защищены от удаления через провайдер (I-02).
+- Для фичи 11: ключи `site_name, full_name(_kk), director(_kk), founded_year, capacity, teach_langs, work_hours, license_*, bin, theme, color, logo_media_id, hero_media_id, kk_enabled, default_lang, a11y_enabled, address(_kk), phones[], email, whatsapp, instagram, facebook, telegram, twogis, map_src`; `SiteCache::flush()` вызывается при сохранении (кэш — фича 11).
+- Проверено: php -l, PHPUnit 480 зелёный, ручной прогон php -S: сохранение, неверные цвет/URL/телефон/БИН/год/карта (script, чужой домен) — 422 с текстом, без 500; без CSRF — 400.
+- К исправлению на этапе тестирования (10): нет E2E settings-*; JS вкладок и мобильная ширина в браузере не проверены; вкладка «Резервные копии» — фича 12; темы пока только хранятся (CSS-переменные — фича 11); kk_enabled не сверяется с долей переводов; `disk_quota_mb` не влияет на лимит загрузки.
+
