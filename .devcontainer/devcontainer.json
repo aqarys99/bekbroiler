@@ -1,0 +1,10 @@
+{
+  "name": "bekbroiler — PHP 8.3 (GD+WebP, zip)",
+  "image": "mcr.microsoft.com/devcontainers/php:1-8.3-bookworm",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postAttachCommand": "php -d upload_max_filesize=25M -d post_max_size=30M -S 0.0.0.0:8080 -t public public/index.php",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "Сайт и админка", "onAutoForward": "openBrowser" }
+  }
+}
