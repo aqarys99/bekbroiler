@@ -25,7 +25,8 @@ final class NewsController extends BaseController
         $this->needDom();
         $q = News::cleanQuery($_GET['q'] ?? '');
         $status = News::normalizeState($_GET['status'] ?? 'all');
-        $list = News::list($q, $status, self::intParam($_GET['page'] ?? 1));
+        $kkMissing = ($_GET['kk'] ?? '') === 'missing';
+        $list = News::list($q, $status, self::intParam($_GET['page'] ?? 1), null, $kkMissing);
         $tz = Clock::timezone();
         foreach ($list['items'] as &$r) {
             $r['meta_date'] = match ($r['state']) {
@@ -56,7 +57,8 @@ final class NewsController extends BaseController
             'from'      => $from,
             'to'        => $to,
             'pageList'  => self::pageList($list['page'], $list['pages']),
-            'hasFilter' => $q !== '' || $status !== 'all',
+            'hasFilter' => $q !== '' || $status !== 'all' || $kkMissing,
+            'kkMissing' => $kkMissing,
             'noneAtAll' => News::counts('')['all'] === 0,
             'createUrl' => admin_url('/news/new'),
             'timezone'  => $tz->getName(),

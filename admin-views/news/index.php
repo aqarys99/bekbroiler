@@ -2,11 +2,11 @@
 /**
  * Список новостей.
  * @var array $items @var array $counts @var string $q @var string $status @var int $page @var int $pages @var int $total
- * @var int $from @var int $to @var array $pageList @var bool $hasFilter @var bool $noneAtAll @var string $createUrl
+ * @var int $from @var int $to @var array $pageList @var bool $hasFilter @var bool $noneAtAll @var bool $kkMissing @var string $createUrl
  */
 $base = admin_url('/news');
-$qs = static function (array $extra) use ($q, $status): string {
-    $p = $extra + ['q' => $q, 'status' => $status];
+$qs = static function (array $extra) use ($q, $status, $kkMissing): string {
+    $p = $extra + ['q' => $q, 'status' => $status, 'kk' => $kkMissing ? 'missing' : ''];
     $p = array_filter($p, static fn($v) => $v !== '' && $v !== 'all' && $v !== 1);
     return $p ? '?' . http_build_query($p) : '';
 };
@@ -26,6 +26,7 @@ $plus = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="cur
 <div class="news-toolbar">
   <form class="news-search" method="get" action="<?= e($base) ?>" role="search">
     <?php if ($status !== 'all'): ?><input type="hidden" name="status" value="<?= e($status) ?>"><?php endif; ?>
+    <?php if ($kkMissing): ?><input type="hidden" name="kk" value="missing"><?php endif; ?>
     <label class="news-search__box" for="news-q">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6372" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
       <input type="search" id="news-q" name="q" maxlength="100" value="<?= e($q) ?>" placeholder="<?= e(t('news.search')) ?>" aria-label="<?= e(t('news.search')) ?>" data-testid="news-search">
@@ -34,6 +35,9 @@ $plus = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="cur
     <a class="btn btn--md btn--ghost" href="<?= e($base . $qs(['q' => ''])) ?>" data-testid="news-search-reset"><?= e(t('news.search_reset')) ?></a>
     <?php endif; ?>
   </form>
+  <?php if ($kkMissing): ?>
+  <a class="btn btn--md btn--ghost" href="<?= e($base . $qs(['kk' => ''])) ?>" data-testid="news-kk-reset"><?= e(t('news.kk_missing_reset')) ?></a>
+  <?php endif; ?>
   <div class="news-filters" role="tablist" aria-label="<?= e(t('news.filter.label')) ?>">
     <?php foreach ($filters as $f): ?>
     <a class="news-filter" role="tab" href="<?= e($base . $qs(['status' => $f, 'page' => 1])) ?>" aria-selected="<?= $status === $f ? 'true' : 'false' ?>" data-testid="news-filter-<?= e($f) ?>"><?= e(t('news.filter.' . $f)) ?> <span class="news-filter__n"><?= (int)$counts[$f] ?></span></a>

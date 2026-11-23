@@ -16,6 +16,18 @@ final class DiskUsage
         ];
     }
 
+    /** @return array{image:int,video:int,file:int} байты по типам */
+    public static function byType(): array
+    {
+        $out = ['image' => 0, 'video' => 0, 'file' => 0];
+        foreach (Database::fetchAll('SELECT type, COALESCE(SUM(size), 0) AS s FROM media GROUP BY type') as $r) {
+            if (isset($out[$r['type']])) {
+                $out[$r['type']] = (int)$r['s'];
+            }
+        }
+        return $out;
+    }
+
     private static function total(): ?int
     {
         $quota = config('disk_quota_mb');

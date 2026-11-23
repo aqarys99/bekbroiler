@@ -81,7 +81,7 @@ final class News
     }
 
     /** @return array{0:string,1:array} where-часть и параметры для поиска/состояния */
-    private static function filter(string $q, string $state, string $now): array
+    private static function filter(string $q, string $state, string $now, bool $kkMissing = false): array
     {
         $where = [];
         $params = [];
@@ -105,6 +105,9 @@ final class News
                 $where[] = "n.status = 'draft'";
                 break;
         }
+        if ($kkMissing) {
+            $where[] = 'NOT ' . self::TRANSLATED_SQL;
+        }
         return [$where ? 'WHERE ' . implode(' AND ', $where) : '', $params];
     }
 
@@ -113,12 +116,12 @@ final class News
         LEFT JOIN users u ON u.id = n.author_id";
 
     /** @return array{items:array<int,array>,total:int,page:int,pages:int,per_page:int} */
-    public static function list(string $q = '', string $state = 'all', int $page = 1, ?int $perPage = null): array
+    public static function list(string $q = '', string $state = 'all', int $page = 1, ?int $perPage = null, bool $kkMissing = false): array
     {
         $perPage ??= max(1, (int)config('news.per_page', 20));
         $q = self::cleanQuery($q);
         $now = Clock::nowUtc();
-        [$w, $params] = self::filter($q, self::normalizeState($state), $now->format(Clock::FORMAT));
+        [$w, $params] = self::filter($q, self::normalizeState($state), $now->format(Clock::FORMAT), $kkMissing);
         $total = (int)Database::fetchValue("SELECT COUNT(*) " . self::FROM . " $w", $params);
         $pages = max(1, (int)ceil($total / $perPage));
         $page = max(1, min($page, $pages));

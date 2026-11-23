@@ -9,7 +9,7 @@ use App\Core\Database;
 final class Checklist
 {
     /**
-     * По каждому пункту: ok | warn (срок < 30 дней или истёк) | missing, плюс итог.
+     * По каждому пункту: ok | warn (срок < 30 дней) | expired (срок истёк, не засчитан) | missing, плюс итог.
      * Учитываются только опубликованные документы с файлом; лучший по статусу документ определяет пункт.
      * @return array{items:array<int,array>,done:int,total:int,missing:array<int,string>}
      */
@@ -21,12 +21,12 @@ final class Checklist
             'SELECT d.id, d.checklist_key, d.valid_until FROM documents d JOIN media m ON m.id = d.media_id
              WHERE d.is_published = 1 AND d.checklist_key IS NOT NULL ORDER BY d.id'
         );
-        $rank = ['ok' => 2, 'warn' => 1, 'expired' => 1];
+        $rank = ['ok' => 2, 'warn' => 1, 'expired' => 0];
         foreach ($rows as $r) {
             $s = Document::statusOf($r, $today);
             $k = (string)$r['checklist_key'];
             if (!isset($best[$k]) || $rank[$s['state']] > $rank[$best[$k]['state']]) {
-                $best[$k] = ['document_id' => (int)$r['id'], 'state' => $s['state'], 'days_left' => $s['days_left']];
+                $best[$k] = ['document_id' => (int)$r['id'], 'state' => $s['state'], 'days_left' => $s['days_left'], 'valid_until' => (string)($r['valid_until'] ?? '')];
             }
         }
         $items = [];
@@ -37,16 +37,16 @@ final class Checklist
                 continue;
             }
             $b = $best[$c['key']] ?? null;
-            $state = $b === null ? 'missing' : ($b['state'] === 'ok' ? 'ok' : 'warn');
-            if ($b === null) {
-                $missing[] = (string)$c['title'];
+            $state = $b === null ? 'missing' : $b['state'];
+            if ($state === 'missing' || $state === 'expired') {
+                $missing[] = (string)$c['title']; // истёкший документ не засчитывается
             } else {
                 $done++;
             }
             $items[] = [
                 'key' => (string)$c['key'], 'title' => (string)$c['title'], 'title_kk' => (string)$c['title_kk'],
-                'state' => $state, 'document_id' => $b['document_id'] ?? null, 'days_left' => $b['days_left'] ?? null,
-                'expired' => $b !== null && $b['state'] === 'expired',
+                'state' => $state, 'document_id' => $b['document_id'] ?? null, 'days_left' => $b['days_left'] ?? null, 'valid_until' => $b['valid_until'] ?? '',
+                'expired' => $state === 'expired',
             ];
         }
         return ['items' => $items, 'done' => $done, 'total' => count($items), 'missing' => $missing];
