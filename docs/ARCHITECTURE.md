@@ -115,7 +115,7 @@ sadik/
 | `pages` | id, slug, title, body, sort, is_published | Статичные разделы: «О нас», «Программа», «Режим дня», «Питание», «Условия» |
 | `news` | id, slug, title, excerpt, body, cover_media_id, status (`draft`/`published`), published_at, author_id | Новости и объявления |
 | `news_media` | news_id, media_id, sort | Фото внутри новости |
-| `media` | id, type (`image`/`video`/`file`), original_name, path, mime, size, width, height, variants (JSON), alt, status (`ready`/`processing`/`failed`) | Единая медиатека |
+| `media` | id, type (`image`/`video`/`file`), original_name, path, mime, size (сумма байтов всех файлов), source_size (байты, пришедшие на сервер), width, height, variants (JSON), alt, alt_kk, status (`ready`/`processing`/`failed`), uploaded_by | Единая медиатека |
 | `albums` | id, slug, title, description, cover_media_id, event_date, is_published | Фотоальбомы (праздники, занятия) |
 | `album_media` | album_id, media_id, sort | Фото в альбоме |
 | `videos` | id, title, source (`youtube`/`upload`), url, media_id, poster_media_id, is_published | Видео |

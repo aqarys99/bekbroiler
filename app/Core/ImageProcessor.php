@@ -31,6 +31,9 @@ final class ImageProcessor
         $data = $blob ?? (string)file_get_contents($path);
         $orientation = (!$isHeic && $mime === 'image/jpeg') ? self::readOrientation($data) : 1;
 
+        if ($mime === 'image/jpeg' && !self::jpegComplete($data)) {
+            throw new UploadException('broken', 422);
+        }
         $im = self::decode($data, $mime === 'image/jpeg');
         unset($data, $blob);
         $im = self::orient($im, $orientation);
@@ -57,9 +60,6 @@ final class ImageProcessor
                 'webp' => self::encodeWebp($cur),
                 'jpg' => self::encodeJpeg($cur),
             ];
-            if ($cur !== $prev && $prev !== $im) {
-                unset($prev);
-            }
             $prev = $cur;
         }
         return $out;
@@ -81,6 +81,52 @@ final class ImageProcessor
             ]);
         }
         return [$w, $h];
+    }
+
+    /** false, если данные JPEG обрываются до маркера EOI (обрезанный файл). GD такое молча «дочитывает». */
+    public static function jpegComplete(string $d): bool
+    {
+        $len = strlen($d);
+        $pos = 2;
+        while ($pos + 2 <= $len) {
+            if ($d[$pos] !== "\xFF") {
+                return true; // странная структура — решает декодер
+            }
+            $m = ord($d[$pos + 1]);
+            if ($m === 0xFF) {
+                $pos++;
+                continue;
+            }
+            if ($m === 0xD9) {
+                return true;
+            }
+            if ($m === 0x00 || ($m >= 0xD0 && $m <= 0xD8) || $m === 0x01) {
+                $pos += 2;
+                continue;
+            }
+            if ($pos + 4 > $len) {
+                return false;
+            }
+            $segLen = (ord($d[$pos + 2]) << 8) | ord($d[$pos + 3]);
+            $pos += 2 + $segLen;
+            if ($m === 0xDA) {
+                // энтропийные данные до следующего маркера
+                while (true) {
+                    $f = strpos($d, "\xFF", $pos);
+                    if ($f === false || $f + 1 >= $len) {
+                        return false;
+                    }
+                    $n = ord($d[$f + 1]);
+                    if ($n === 0x00 || ($n >= 0xD0 && $n <= 0xD7)) {
+                        $pos = $f + 2;
+                        continue;
+                    }
+                    $pos = $f;
+                    break;
+                }
+            }
+        }
+        return false;
     }
 
     private static function freeMemory(): float
