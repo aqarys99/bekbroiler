@@ -12,7 +12,7 @@ use DOMNode;
 final class HtmlSanitizer
 {
     private const ALLOWED = ['p', 'br', 'strong', 'em', 'h2', 'ul', 'ol', 'li', 'a', 'img'];
-    private const RENAME = ['b' => 'strong', 'i' => 'em', 'div' => 'p', 'h1' => 'h2', 'h3' => 'h2', 'h4' => 'h2', 'h5' => 'h2', 'h6' => 'h2'];
+    private const RENAME = ['b' => 'strong', 'i' => 'em', 'h1' => 'h2', 'h3' => 'h2', 'h4' => 'h2', 'h5' => 'h2', 'h6' => 'h2'];
     private const DROP = ['script', 'style', 'iframe', 'object', 'embed', 'video', 'audio', 'form', 'input', 'textarea',
         'select', 'button', 'svg', 'math', 'template', 'noscript', 'head', 'title', 'meta', 'link'];
 
@@ -87,6 +87,15 @@ final class HtmlSanitizer
                 $node->removeChild($child);
                 continue;
             }
+            if ($name === 'div') {
+                if ($child->getElementsByTagName('*')->length > 0 && $this->hasBlock($child)) {
+                    $this->walk($child);
+                    $this->unwrap($child);
+                    continue;
+                }
+                $child = $this->rename($child, 'p');
+                $name = 'p';
+            }
             if (isset(self::RENAME[$name])) {
                 $child = $this->rename($child, self::RENAME[$name]);
                 $name = $child->nodeName;
@@ -127,6 +136,16 @@ final class HtmlSanitizer
                 $this->walk($child);
             }
         }
+    }
+
+    private function hasBlock(DOMElement $el): bool
+    {
+        foreach (['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li'] as $t) {
+            if ($el->getElementsByTagName($t)->length > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function rename(DOMElement $el, string $to): DOMElement

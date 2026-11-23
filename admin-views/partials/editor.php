@@ -23,5 +23,5 @@ $svg = static fn(string $d): string => '<svg width="18" height="18" viewBox="0 0
   </div>
   <div class="editor__area" id="<?= e($ed['labelId']) ?>-area" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="<?= e($ed['labelId']) ?>"
     data-placeholder="<?= e($ed['placeholder'] ?? '') ?>" data-testid="<?= e($ed['testid']) ?>" spellcheck="true"><?= $ed['html'] ?></div>
-  <textarea class="editor__source" name="<?= e($ed['name']) ?>" rows="8" aria-labelledby="<?= e($ed['labelId']) ?>"><?= e($ed['html']) ?></textarea>
+  <textarea class="editor__source" data-testid="<?= e($ed['testid']) ?>-source" name="<?= e($ed['name']) ?>" rows="8" aria-labelledby="<?= e($ed['labelId']) ?>"><?= e($ed['html']) ?></textarea>
 </div>

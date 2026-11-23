@@ -522,7 +522,7 @@ final class News
                     }
                 }
 
-                $nowStr = gmdate(Clock::FORMAT);
+                $nowStr = Clock::nowUtc()->format(Clock::FORMAT);
                 $before = $current !== null ? self::state($current) : null;
                 $cols = [
                     'slug' => $slug, 'title' => $data['title'], 'excerpt' => $data['excerpt'], 'body' => $data['body'],

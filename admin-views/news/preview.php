@@ -20,7 +20,7 @@
 <body class="pv">
 <div class="pv-banner" role="status">
   <span><?= e($banner) ?></span>
-  <a href="<?= e($backUrl) ?>"><?= e(t('news.preview.back')) ?></a>
+  <a href="<?= e($backUrl) ?>" data-testid="news-preview-back"><?= e(t('news.preview.back')) ?></a>
 </div>
 <main class="pv-page" data-testid="news-preview-page">
   <div class="pv-tabs" role="tablist" aria-label="<?= e(t('news.form.lang_tabs')) ?>">

@@ -89,7 +89,7 @@ $pubOpts = [
   <?php if ($conflict): ?>
   <div class="alert alert--danger news-conflict" role="alert" data-testid="news-conflict">
     <span><?= e(t('news.conflict')) ?></span>
-    <a href="<?= e($conflictUrl) ?>"><?= e(t('news.conflict.reload')) ?></a>
+    <a href="<?= e($conflictUrl) ?>" data-testid="news-conflict-open"><?= e(t('news.conflict.reload')) ?></a>
   </div>
   <?php endif; ?>
   <?php if ($errors): ?>
@@ -109,7 +109,7 @@ $pubOpts = [
         <div class="news-panel" id="panel-ru" role="tabpanel" aria-labelledby="tab-ru" data-panel="ru" data-testid="news-panel-ru">
           <div class="field" data-field="title_ru">
             <label for="f-title_ru"><?= e(t('news.field.title')) ?> <span class="req-star" aria-hidden="true">*</span></label>
-            <input class="input input--title" type="text" id="f-title_ru" name="title_ru" maxlength="120" value="<?= e($fv['title_ru']) ?>" autocomplete="off"
+            <input class="input input--title" type="text" id="f-title_ru" name="title_ru" maxlength="120" value="<?= e($fv['title_ru']) ?>" autocomplete="off"<?= $id === null ? ' autofocus' : '' ?>
               data-testid="news-title-ru"<?= $inv('title_ru') ?><?= $desc('title_ru', 'title-ru-counter') ?>>
             <span class="field__hint" id="title-ru-counter" data-testid="news-title-ru-counter"><?= e(t('news.field.title_counter', ['n' => $titleRuLen])) ?></span>
             <?= $errFor('title_ru') ?>
@@ -177,7 +177,7 @@ $pubOpts = [
             <span class="news-pub__text"><b><?= e($label) ?></b><span><?= e($hint) ?></span></span>
           </label>
           <?php endforeach; ?>
-          <div class="news-pub__when" data-when<?= $mode === 'later' ? '' : ' hidden' ?>>
+          <div class="news-pub__when" data-when>
             <div class="news-pub__row">
               <label class="news-pub__f"><?= e(t('news.pub.date')) ?>
                 <input class="input" type="date" name="publish_date" min="<?= e($minDate) ?>" value="<?= e($fv['publish_date']) ?>" data-testid="news-pub-date"<?= $inv('publish_date') ?><?= $desc('publish_date', 'news-pub-tz') ?>></label>
@@ -220,7 +220,7 @@ $pubOpts = [
 <template id="news-conflict-tpl">
   <div class="alert alert--danger news-conflict" role="alert" data-testid="news-conflict">
     <span><?= e(t('news.conflict')) ?></span>
-    <a href="<?= e($conflictUrl) ?>"><?= e(t('news.conflict.reload')) ?></a>
+    <a href="<?= e($conflictUrl) ?>" data-testid="news-conflict-open"><?= e(t('news.conflict.reload')) ?></a>
   </div>
 </template>
 
