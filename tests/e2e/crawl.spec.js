@@ -2,6 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const { resetApp, login, trackPageErrors, expectNoPageErrors } = require('./helpers');
 const { OWNER, EDITOR, createUserUI, OWNER_ONLY_URLS } = require('./auth-helpers');
+const { upload, seed, setUsages } = require('./media-helpers');
 
 test.afterEach(() => expectNoPageErrors());
 
@@ -49,6 +50,7 @@ async function crawl(page, { expect403 = [] } = {}) {
     const btns = page.locator('button[type=button]');
     const n = await btns.count();
     for (let i = 0; i < n; i++) {
+      if (!(await btns.nth(i).isVisible())) continue;
       await btns.nth(i).click();
       expect(new URL(page.url()).pathname + new URL(page.url()).search, `кнопка #${i} на ${url} увела со страницы`).toBe(url);
     }
@@ -62,8 +64,12 @@ test('crawl: owner обходит все ссылки и кнопки админ
   await login(page, OWNER);
   await createUserUI(page, { name: 'Третий Сотрудник', login: 'third' });
   await createUserUI(page, { name: 'Четвёртый Сотрудник', login: 'fourth' });
+  // медиатека: 49 файлов (две страницы), один «используется»
+  const ids = await seed(page, 49);
+  await setUsages(page, { [ids[0]]: [{ label: 'Новость «Тест»', url: '/admin/media' }] });
   const visited = await crawl(page);
-  for (const p of ['/admin', '/admin/users', '/admin/users/new', '/admin/profile']) expect(visited).toContain(p);
+  for (const p of ['/admin', '/admin/users', '/admin/users/new', '/admin/profile', '/admin/media', '/admin/media?page=2']) expect(visited).toContain(p);
+  expect(visited.filter((u) => /^\/admin\/media\/\d+/.test(u)).length).toBeGreaterThan(0);
   expect(visited.filter((u) => /\/edit$/.test(u))).toHaveLength(4);
   expect(visited.filter((u) => /\/password$/.test(u))).toHaveLength(3);
 });
@@ -72,7 +78,8 @@ test('crawl: editor обходит админку; owner-разделы -> 403 �
   resetApp({ installed: true, withEditor: true });
   trackPageErrors(page, { ignoreConsole: /status of 4\d\d/ });
   await login(page, EDITOR);
+  const m = await upload(page);
   const visited = await crawl(page, { expect403: OWNER_ONLY_URLS });
-  for (const p of ['/admin', '/admin/profile']) expect(visited).toContain(p);
+  for (const p of ['/admin', '/admin/profile', '/admin/media', '/admin/media/' + m.id]) expect(visited.some((u) => u.startsWith(p))).toBe(true);
   expect(visited.some((u) => u.startsWith('/admin/users'))).toBe(false);
 });

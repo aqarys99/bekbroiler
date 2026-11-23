@@ -24,6 +24,13 @@ final class HelpersTest extends TestCase
         $this->assertStringContainsString('Ваш логин: a.', t('install.done.text', ['login' => 'a']));
     }
 
+    public function testTranslatePlaceholderPrefixes(): void
+    {
+        $this->assertSame('Страница 1 из 3', t('media.page.info', ['page' => 1, 'pages' => 3]));
+        $this->assertSame('Страница 2 из 5', t('media.page.info', ['pages' => 5, 'page' => 2]));
+        $this->assertSame('Пользователь Аня добавлен', t('users.created', ['name' => 'Аня', 'names' => 'X']));
+    }
+
     public function testUrlAndAssetAndAdminUrl(): void
     {
         Config::set(['base_path' => '']);

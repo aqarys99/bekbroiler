@@ -103,6 +103,7 @@ put($dir, 'broken.jpg', static function () {
     $j = ImageFixtures::jpegBytes(ImageFixtures::marker(800, 600, 50));
     return substr($j, 0, (int)(strlen($j) * 0.4));
 }, $force);
+put($dir, 'broken-header.jpg', static fn() => "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00" . random_bytes(300), $force);
 put($dir, 'sample.heic', static fn() => "\0\0\0\x18ftypheic\0\0\0\0mif1heic" . random_bytes(512), $force);
 
 echo "OK\n";

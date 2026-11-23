@@ -39,10 +39,12 @@ if (!function_exists('t')) {
             return $key;
         }
         $text = (string)$cache[$locale][$key];
+        $pairs = [];
         foreach ($replace as $name => $value) {
-            $text = str_replace(':' . $name, (string)$value, $text);
+            $pairs[':' . $name] = (string)$value;
         }
-        return $text;
+        // один проход, самое длинное совпадение первым: :page не затрагивает :pages
+        return $pairs ? strtr($text, $pairs) : $text;
     }
 }
 

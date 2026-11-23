@@ -122,7 +122,19 @@ async function waitQueueIdle(page, scope = page) {
   await expect(scope.getByTestId('media-queue-clear')).toBeEnabled({ timeout: 90000 });
 }
 
+/** Как format_bytes() на сервере. */
+function formatBytes(b) {
+  if (b < 1024) return `${Math.max(0, b)} Б`;
+  const kb = Math.round(b / 1024);
+  if (kb < 1024) return `${kb} КБ`;
+  return `${(b / 1048576).toFixed(1).replace('.', ',')} МБ`;
+}
+
+/** Сумма media.size из БД. */
+const usedBytes = () => Number(dbQuery('SELECT COALESCE(SUM(size),0) AS s FROM media')[0].s);
+
 module.exports = {
+  formatBytes, usedBytes,
   FX, UPLOADS, fx, csrf, apiUpload, upload, seed, setUsages, setUsagesFailing, mediaRows, mediaCount, mediaRow,
   filesOnDisk, variantFiles, readUpload, hasMetadata, gotoMedia, uploadViaUI, waitQueueIdle,
 };
