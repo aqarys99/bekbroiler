@@ -34,7 +34,7 @@ final class ProfileController extends BaseController
         } else {
             // отдельный счётчик попыток текущего пароля: 5 за 15 минут
             try {
-                [$left, $slot] = LoginThrottle::reserve('profile:' . $id, 'password');
+                [$left, $slot] = LoginThrottle::reserve((string)$id, 'password', 'profile');
             } catch (\PDOException $e) {
                 if (!Database::isBusy($e)) {
                     throw $e;
@@ -45,7 +45,7 @@ final class ProfileController extends BaseController
                 return $this->render(429, [], t('profile.error.locked', ['minutes' => (int)ceil($left / 60)]));
             }
             if (!password_verify($current, (string)$fresh['password_hash'])) {
-                $left = LoginThrottle::lockedFor('profile:' . $id, 'password');
+                $left = LoginThrottle::lockedFor((string)$id, 'password', 'profile');
                 if ($left > 0) {
                     return $this->render(429, [], t('profile.error.locked', ['minutes' => (int)ceil($left / 60)]));
                 }

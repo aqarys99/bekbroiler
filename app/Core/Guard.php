@@ -67,6 +67,9 @@ final class Guard
                     throw new HttpException(400);
                 }
             }
+            if ($isRead && !$json) {
+                Backup::maybeAuto(); // автокопия базы раз в сутки (без cron)
+            }
             if (!$isRead) {
                 // любое сохранение в админке сбрасывает кэш сайта (I-13), даже если обработчик завершится redirect()/exit
                 register_shutdown_function([SiteCache::class, 'flush']);

@@ -2,7 +2,9 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AchievementsController;
+use App\Controllers\Admin\AuditController;
 use App\Controllers\Admin\AuthController;
+use App\Controllers\Admin\BackupsController;
 use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\DocumentsController;
 use App\Controllers\Admin\GalleryController;
@@ -161,6 +163,13 @@ return static function (Router $r): void {
     $r->post($a . '/users/{id:\d+}/unblock', Guard::wrap([UsersController::class, 'unblock'], 'owner'));
     $r->get($a . '/users/{id:\d+}/password', Guard::wrap([UsersController::class, 'passwordForm'], 'owner'));
     $r->post($a . '/users/{id:\d+}/password', Guard::wrap([UsersController::class, 'resetPassword'], 'owner'));
+
+    $r->get($a . '/backups', Guard::wrap([BackupsController::class, 'index'], 'owner'));
+    $r->post($a . '/backups/archive', Guard::wrap([BackupsController::class, 'archive'], 'owner'));
+    $r->post($a . '/backups/create', Guard::wrap([BackupsController::class, 'create'], 'owner'));
+    $r->get($a . '/backups/download/{name:[A-Za-z0-9._-]+}', Guard::wrap([BackupsController::class, 'download'], 'owner'));
+    $r->post($a . '/backups/delete/{name:[A-Za-z0-9._-]+}', Guard::wrap([BackupsController::class, 'delete'], 'owner'));
+    $r->get($a . '/audit', Guard::wrap([AuditController::class, 'index'], 'owner'));
 
     if (getenv('APP_ENV') === 'testing') {
         $r->get('/__test/error', [ErrorController::class, 'throw']);

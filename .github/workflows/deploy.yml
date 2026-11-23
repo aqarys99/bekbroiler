@@ -1,32 +1,73 @@
 name: Deploy to PS.kz
 
-# Запуск вручную: GitHub → Actions → "Deploy to PS.kz" → Run workflow.
-# Нужны секреты репозитория (Settings → Secrets and variables → Actions):
-#   FTP_SERVER   — адрес FTP из письма/панели PS.kz (например ftp.ваш-домен.kz)
-#   FTP_USERNAME — FTP-логин
-#   FTP_PASSWORD — FTP-пароль
-# И переменная (вкладка Variables), если папка сайта не public_html:
-#   FTP_SERVER_DIR — например public_html/  (обязательно со слешем в конце)
+# Запуск ТОЛЬКО вручную: GitHub -> Actions -> "Deploy to PS.kz" -> Run workflow.
+# Подробности и откат: docs/DEPLOY.md.
+#
+# Секреты репозитория (Settings -> Secrets and variables -> Actions -> Secrets):
+#   FTP_SERVER   - адрес FTP из письма/панели PS.kz (например ftp.ваш-домен.kz)
+#   FTP_USERNAME - FTP-логин
+#   FTP_PASSWORD - FTP-пароль
+# Переменная (вкладка Variables), если папка сайта не public_html:
+#   FTP_SERVER_DIR - например public_html/ или sadik/ (обязательно со слешем в конце)
+#
+# Данные сайта на сервере НЕ перезаписываются и не удаляются:
+#   storage/ (база, копии, кэш, логи), config/config.php, public/uploads/ (фото, видео, документы).
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Пробный запуск: показать, что будет загружено, ничего не менять на сервере"
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy-ps-kz
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Собрать файлы для выкладки
-        run: |
-          mkdir -p dist
-          # Сейчас на хостинг идёт только лендинг.
-          # Когда будет готова админка (фича 01+), здесь будет копироваться приложение.
-          cp index.html dist/
-          ls -la dist
+      - name: PHP 8.1 (версия хостинга) для проверки синтаксиса
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
 
-      - name: Выложить по FTPS
+      - name: Собрать dist/ из приложения
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          mkdir dist
+          rsync -a ./ dist/ \
+            --exclude='/dist' --exclude='/.git' --exclude='/.github' --exclude='/.claude' --exclude='/.devcontainer' \
+            --exclude='/.gitignore' --exclude='/.phpunit*' --exclude='/node_modules' --exclude='/vendor' \
+            --exclude='/tests' --exclude='/docs' --exclude='/test-results' --exclude='/playwright*' \
+            --exclude='/package*.json' --exclude='/composer.*' --exclude='/phpunit.xml' \
+            --exclude='/index.html' --exclude='/CLAUDE.md'
+          # данные сайта в сборку не попадают: оставляем только служебные .htaccess и .gitkeep
+          find dist/storage dist/public/uploads -type f ! -name '.htaccess' ! -name '.gitkeep' -delete
+          rm -f dist/config/config.php
+          find dist -name '.DS_Store' -delete
+
+      - name: Проверить сборку
+        run: |
+          set -euo pipefail
+          test -f dist/public/index.php
+          test -f dist/public/install.php
+          test -f dist/.htaccess
+          test -d dist/migrations
+          bad=$(find dist \( -name '*.sqlite*' -o -name 'config.php' -o -path 'dist/tests' -o -path 'dist/docs' \
+                 -o -path 'dist/vendor' -o -path 'dist/node_modules' -o -path 'dist/.claude' -o -path 'dist/.github' \) -print)
+          if [ -n "$bad" ]; then echo "В сборке лишнее:"; echo "$bad"; exit 1; fi
+          find dist -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+          echo "Файлов в сборке: $(find dist -type f | wc -l)"
+          du -sh dist
+
+      - name: Выложить по FTPS (storage/, config.php и uploads на сервере не трогаем)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -36,3 +77,18 @@ jobs:
           local-dir: ./dist/
           server-dir: ${{ vars.FTP_SERVER_DIR || 'public_html/' }}
           dangerous-clean-slate: false
+          dry-run: ${{ inputs.dry_run }}
+          exclude: |
+            config/config.php
+            storage/*.sqlite
+            storage/*.sqlite-wal
+            storage/*.sqlite-shm
+            storage/install.lock*
+            storage/backups/**
+            storage/cache/**
+            storage/logs/**
+            storage/sessions/**
+            storage/testing/**
+            public/uploads/images/**
+            public/uploads/videos/**
+            public/uploads/docs/**

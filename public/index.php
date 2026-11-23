@@ -42,6 +42,8 @@ if (!is_file(\App\Core\Config::dbPath())) {
 
 (new Migrator())->migrate();
 
+\App\Core\SecurityHeaders::send();
+
 $router = new Router();
 (require ROOT . '/app/routes.php')($router);
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

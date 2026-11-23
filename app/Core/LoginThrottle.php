@@ -16,12 +16,13 @@ final class LoginThrottle
         return mb_substr(mb_strtolower(trim($login)), 0, 100);
     }
 
-    public static function fail(string $ip, string $login): void
+    public static function fail(string $ip, string $login, string $scope = 'login'): void
     {
         $now = time();
         Database::insert('login_attempts', [
             'ip'         => $ip,
             'login'      => self::normalize($login),
+            'scope'      => $scope,
             'created_at' => gmdate('Y-m-d H:i:s', $now),
         ]);
         Database::query('DELETE FROM login_attempts WHERE created_at < ?', [gmdate('Y-m-d H:i:s', $now - 86400)]);
@@ -32,14 +33,14 @@ final class LoginThrottle
      * поэтому параллельные запросы не обходят лимит).
      * @return array{0:int,1:?int} [секунд до разблокировки, id строки-резерва (null, если заблокировано)]
      */
-    public static function reserve(string $ip, string $login): array
+    public static function reserve(string $ip, string $login, string $scope = 'login'): array
     {
-        return Database::immediate(static function () use ($ip, $login): array {
-            $left = self::lockedFor($ip, $login);
+        return Database::immediate(static function () use ($ip, $login, $scope): array {
+            $left = self::lockedFor($ip, $login, $scope);
             if ($left > 0) {
                 return [$left, null];
             }
-            self::fail($ip, $login);
+            self::fail($ip, $login, $scope);
             return [0, (int)Database::connection()->lastInsertId()];
         });
     }
@@ -51,17 +52,17 @@ final class LoginThrottle
     }
 
     /** Секунды до разблокировки (0 — свободно). */
-    public static function lockedFor(string $ip, string $login): int
+    public static function lockedFor(string $ip, string $login, string $scope = 'login'): int
     {
         $login = self::normalize($login);
-        $a = self::remaining('ip = ? AND login = ?', [$ip, $login], self::MAX_PER_LOGIN);
-        $b = self::remaining('ip = ?', [$ip], self::MAX_PER_IP);
+        $a = self::remaining('scope = ? AND ip = ? AND login = ?', [$scope, $ip, $login], self::MAX_PER_LOGIN);
+        $b = self::remaining('scope = ? AND ip = ?', [$scope, $ip], self::MAX_PER_IP);
         return max($a, $b);
     }
 
-    public static function clear(string $ip, string $login): void
+    public static function clear(string $ip, string $login, string $scope = 'login'): void
     {
-        Database::query('DELETE FROM login_attempts WHERE ip = ? AND login = ?', [$ip, self::normalize($login)]);
+        Database::query('DELETE FROM login_attempts WHERE scope = ? AND ip = ? AND login = ?', [$scope, $ip, self::normalize($login)]);
     }
 
     private static function remaining(string $where, array $params, int $limit): int

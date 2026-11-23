@@ -30,6 +30,8 @@ return [
         'items' => [
             ['key' => 'settings', 'label' => 'menu.settings', 'url' => '/settings', 'icon' => 'gear', 'role' => 'owner', 'testid' => 'nav-settings'],
             ['key' => 'users', 'label' => 'menu.users', 'url' => '/users', 'icon' => 'key', 'role' => 'owner', 'testid' => 'nav-users'],
+            ['key' => 'backups', 'label' => 'menu.backups', 'url' => '/backups', 'icon' => 'save', 'role' => 'owner', 'testid' => 'nav-backups'],
+            ['key' => 'audit', 'label' => 'menu.audit', 'url' => '/audit', 'icon' => 'log', 'role' => 'owner', 'testid' => 'nav-audit'],
         ],
     ],
 ];

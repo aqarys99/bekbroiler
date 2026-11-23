@@ -203,7 +203,7 @@ final class UsersControllerTest extends AuthTestCase
         (new ProfileController())->changePassword();
         $this->assertSame(422, http_response_code());
         $this->assertSame([], $this->audit());
-        $this->assertSame(0, (int)Database::fetchValue("SELECT COUNT(*) FROM login_attempts WHERE ip NOT LIKE 'profile:%'"));
+        $this->assertSame(0, (int)Database::fetchValue("SELECT COUNT(*) FROM login_attempts WHERE scope = 'login'"));
 
         $this->nextRequest();
         $this->post(['current_password' => 'Editor-pass-2026', 'new_password' => 'Editor-pass-2026', 'new_password_confirm' => 'Editor-pass-2026']);

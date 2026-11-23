@@ -86,4 +86,24 @@ final class LoginThrottleTest extends TestCase
         LoginThrottle::fail('1.1.1.1', str_repeat('Я', 300));
         $this->assertSame(100, mb_strlen((string)Database::fetchValue('SELECT login FROM login_attempts')));
     }
+
+    public function testProfileScopeIsSeparateFromLogin(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            LoginThrottle::fail('7', 'password', 'profile');
+        }
+        $this->assertGreaterThan(0, LoginThrottle::lockedFor('7', 'password', 'profile'));
+        $this->assertSame(0, LoginThrottle::lockedFor('7', 'password'));
+        $this->assertSame(5, (int)Database::fetchValue("SELECT COUNT(*) FROM login_attempts WHERE scope = 'profile' AND ip = '7'"));
+        $this->assertSame(0, (int)Database::fetchValue("SELECT COUNT(*) FROM login_attempts WHERE scope = 'login'"));
+    }
+
+    public function testMigrationMovesProfileRows(): void
+    {
+        $pdo = new \PDO('sqlite::memory:');
+        $pdo->exec("CREATE TABLE login_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT NOT NULL, login TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT '')");
+        $pdo->exec("INSERT INTO login_attempts (ip, login) VALUES ('profile:12','password'), ('1.2.3.4','owner')");
+        $pdo->exec((string)file_get_contents(ROOT . '/migrations/010_login_attempts_scope.sql'));
+        $this->assertSame(['profile|12', 'login|1.2.3.4'], array_map(fn($r) => $r[0] . '|' . $r[1], $pdo->query('SELECT scope, ip FROM login_attempts ORDER BY id')->fetchAll(\PDO::FETCH_NUM)));
+    }
 }

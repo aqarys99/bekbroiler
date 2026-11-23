@@ -5,8 +5,7 @@
 
 ## Текущее состояние
 - Ветка разработки: `claude/sharp-galileo-xzk77w`
-- Следующая фича: **12** (см. `docs/ROADMAP.md`)
-- Как продолжить: `/build-feature next`
+- Все фичи 01–12 сделаны; дальше — этап тестирования (E2E, ревью, список «К исправлению» по фичам)
 
 ## 00. Подготовка — ✅ 2026-11-19
 - Сделано: лендинг `index.html`, архитектура `docs/ARCHITECTURE.md`, дизайн 8 экранов админки `docs/design/`, агенты `.claude/agents/`, цикл `/build-feature`, CI `.github/workflows/ci.yml`.
@@ -100,3 +99,12 @@
 - I-09: кнопка «Видео» в `editor.js` (список `Video::published()`), `<div data-video-id>` в HtmlSanitizer, `News::renderBody` -> `video_embed` или заглушка; потребитель медиа не нужен (мягкая связь, удаление видео разрешено).
 - Проверено: php -l, PHPUnit 480 зелёный, php -S: все страницы RU/KK 390 и 1280 без 500 и горизонтального скролла, смена темы/цвета, скрытый альбом/черновик/будущая новость не видны, сброс кэша при сохранении в админке; тесты 01/02/I-19 переведены на testid `site-name`/`site-logo` (не запускались).
 - К исправлению на этапе тестирования (11): нет E2E site-*; E2E 01/02 про бывшую заглушку «/» не прогонялись; `default_lang=kk` не перенаправляет с `/`; сайт в подпапке (base_path) и `.htaccess` на живом Apache не проверены; `bin/process-videos.php` не сбрасывает кэш (спасает TTL 5 мин); в теме нет склонения «Стаж: N л.»; редактор: блок видео не проверен в браузере; Playwright-прогон кнопки «Видео».
+
+## 12. Надёжность — ✅ 2026-11-23 (без ревью, E2E не писались)
+- Сделано: «Резервные копии» (owner): архив zip (БД через VACUUM INTO + `public/uploads` + `config.php` + README, потоковая отдача, без zip — только БД), автокопия БД раз в сутки при первом заходе в админку (`storage/backups`, 14 последних, ручное создание/скачивание/удаление), восстановление только по инструкции в DEPLOY.md. «Журнал» (owner): фильтры сотрудник/раздел/период, пагинация 30, подписи `audit.*`.
+- Файлы: `app/Core/{Backup,SecurityHeaders}.php`, `app/Controllers/Admin/{Backups,Audit}Controller.php`, `admin-views/{backups,audit}/index.php`, `migrations/010_login_attempts_scope.sql`, `public/assets/video-embed.js`, `.github/workflows/deploy.yml`, `docs/DEPLOY.md`, тесты `tests/Feature/BackupTest.php`.
+- Долг 02 закрыт: `login_attempts.scope` ('login'|'profile'), в `ip` для профиля только id пользователя; `LoginThrottle::{fail,reserve,lockedFor,clear}($ip,$login,$scope)`.
+- Заголовки: CSP (script-src 'self', style 'unsafe-inline' из-за style="", frame-src youtube-nocookie + хост карты из настроек, img youtube), XFO DENY для /admin и SAMEORIGIN для сайта, nosniff, Referrer-Policy, Permissions-Policy, HSTS только при HTTPS. Inline-скрипт `video_embed` вынесен в `video-embed.js`. Проверено Playwright (74 страницы админки и сайта, клик по видео, карта): нарушений CSP нет.
+- Самопроверка: `echo` без `e()` — только доверенные HTML-хелперы и санитизированный HTML; SQL — конкатенируются только константы/имена колонок; POST без Guard — только `/login` (CSRF внутри) и `/__test/*` (только APP_ENV=testing); owner-маршруты обёрнуты `Guard::wrap(...,'owner')`. Нарушений кроме inline-скрипта не найдено.
+- Проверено: php -l, PHPUnit 488 зелёный (1 skip), ручной прогон архива/копий/журнала в браузере. Workflow deploy.yml: YAML валиден, сборка dist локально не гонялась (нет rsync), живой FTPS не проверялся.
+- К исправлению на этапе тестирования (12): нет E2E backups-*/audit-*; сам workflow и .htaccess на живом PS.kz не проверены; в журнале нет детали «над чем» (только раздел и id); аудит не пишется для автокопии; `style-src 'unsafe-inline'` (убрать — нужно вынести style="" в классы); CSP для карт — только хост из `map_src`; архив больших сайтов собирается во временный файл в `storage/backups` (нужно свободное место, проверка есть).

@@ -254,10 +254,7 @@ if (!function_exists('video_embed')) {
                 . '<span aria-hidden="true" style="position:absolute;inset:0;margin:auto;width:68px;height:48px;border-radius:12px;background:rgba(0,0,0,.7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">&#9654;</span>'
                 . '</button></div>';
             if (once('video-embed-script')) {
-                $html .= '<script>document.addEventListener("click",function(e){var b=e.target.closest("[data-video-yt]");if(!b){return;}'
-                    . 'var f=document.createElement("iframe");f.src="https://www.youtube-nocookie.com/embed/"+b.getAttribute("data-video-yt")+"?autoplay=1&rel=0";'
-                    . 'f.title=b.getAttribute("data-title")||"";f.allow="autoplay; encrypted-media; picture-in-picture";f.allowFullscreen=true;'
-                    . 'f.style.cssText="position:absolute;inset:0;width:100%;height:100%;border:0";b.replaceWith(f);});</script>';
+                $html .= '<script src="' . e(asset('video-embed.js')) . '" defer></script>';
             }
             return $html;
         }
