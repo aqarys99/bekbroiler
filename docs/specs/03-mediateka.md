@@ -312,7 +312,7 @@ audit.media.delete => 'Удалил файл'
 ## Разделение работы
 **backend-builder**
 - `migrations/004_media.sql`; ключи в `config/config.example.php`.
-- `app/Core/ImageProcessor.php` (GD/Imagick, поворот, `readOrientation()`, варианты, проверка пикселей и памяти), `app/Core/Uploader.php` (проверки upload, `finfo`, лимиты, `post_max_size`, атомарная запись, уборка), `app/Core/DiskUsage.php`.
+- `app/Core/ImageProcessor.php` (GD с WebP — обязательно; Imagick — только для HEIC, поворот, `readOrientation()`, варианты, проверка пикселей и памяти), `app/Core/Uploader.php` (проверки upload, `finfo`, лимиты, `post_max_size`, атомарная запись, уборка), `app/Core/DiskUsage.php`.
 - `app/Models/Media.php` (`find`, `list(q,type,page)`, `create`, `updateAlt`, `delete`, `usages`, `usageCounts`, `maxUploadBytes`), `app/Media/UsageProvider.php`, `app/Media/MediaInUseException.php`, `app/Media/TestUsageProvider.php`, `app/media_usages.php`.
 - `app/Controllers/Admin/MediaController.php` (index, upload, show, update, delete, picker), `app/Controllers/Testing/{MediaPickerController,MediaUsageController}.php`, маршруты в `app/routes.php`.
 - `Guard`: JSON-режим (401/400/403 JSON, CSRF из `X-CSRF-Token`).

@@ -5,7 +5,7 @@
 
 ## Текущее состояние
 - Ветка разработки: `claude/sharp-galileo-xzk77w`
-- Следующая фича: **03. Медиатека и сжатие фото** (см. `docs/ROADMAP.md`)
+- Следующая фича: **04. Новости** (см. `docs/ROADMAP.md`)
 - Как продолжить: `/build-feature next`
 
 ## 00. Подготовка — ✅ 2026-11-19
@@ -26,3 +26,10 @@
 - Решения: пункт меню добавляет каждая фича в `app/admin_menu.php`; переключатель ҚАЗ скрыт до 13; удаления пользователей нет, только блокировка; owner задаёт пароль вручную; `freshOwner()` перечитывает актора в `immediate`; BUSY → 503 `error.busy`; профильные попытки в `login_attempts` с `ip='profile:<id>'`; `redirect()` в CLI бросает `RedirectException`.
 - Тесты: PHPUnit 156 (1 skip root), E2E 134 (вкл. crawl owner/editor); testid 53/53; связи I-14, I-15, I-18, I-19, I-22, I-23, I-24.
 - Долги: колонка `login_attempts.ip` хранит не только IP — в фиче 12 при просмотре попыток добавить `scope`; в параллельной серии несколько записей `login_locked` (косметика).
+
+## 03. Медиатека и сжатие фото — ✅ 2026-11-23
+- Сделано: таблица `media`, загрузка XHR по одному с очередью, сжатие в браузере (canvas, ≤2560, EXIF-ориентация) + сервер (GD: поворот, удаление метаданных перекодированием, 400/1200/1920 WebP+JPEG, лимит пикселей, gif→статичный), экран «Медиатека» (сетка, поиск, фильтр, карточка, alt, «где используется», удаление), пикер «выбрать/загрузить», место на диске, мобильное меню-гамбургер.
+- Ключевые файлы: `app/Core/{ImageProcessor,Uploader,DiskUsage,Json}.php`, `app/Models/Media.php`, `app/Media/*`, `app/media_usages.php` (реестр потребителей), `app/Controllers/Admin/MediaController.php`, `admin-views/media/*`, `admin-views/partials/media-field.php`, `public/assets/admin/{uploader,media-picker,boot}.js`, `migrations/004_media.sql`.
+- Решения: требуется GD с WebP (иначе 503 `image_unsupported`, установка не проходит), Imagick — опция для HEIC; оригиналы не храним; фильтр показывает только доступные типы; потребитель медиа = провайдер в `app/media_usages.php` + FK `ON DELETE RESTRICT`; фото выводятся только через `media_picture()`; JSON-режим Guard (CSRF в `X-CSRF-Token`); пикер подключается partial'ом `media-field.php`, скрипты один раз через `once()`.
+- Тесты: PHPUnit 212 (1 skip root), E2E 213 (вкл. crawl); testid 45/45; связи I-01, I-02, I-07, I-16, I-23–I-27 (через тестовый провайдер `/__test/media-usage`).
+- Долги: **в фиче 06** — `uploader.js:123` фильтр реестра выкидывает простаивающий загрузчик страницы (beforeunload не сработает на странице альбома с пикером): удалять только загрузчики вне DOM; HEIC через Imagick не проверен (нет Imagick в среде); webServer Playwright с `-d upload_max_filesize=25M`.
