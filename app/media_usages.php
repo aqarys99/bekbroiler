@@ -8,6 +8,7 @@ $providers = [
     \App\Media\DocumentUsageProvider::class,
     \App\Media\AlbumUsageProvider::class,
     \App\Media\VideoUsageProvider::class,
+    \App\Media\SectionsUsageProvider::class,
 ];
 
 if (getenv('APP_ENV') === 'testing') {
