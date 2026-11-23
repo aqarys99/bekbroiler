@@ -11,6 +11,7 @@ final class Document
     public const TITLE_MAX = 200;
     public const WARN_DAYS = 30;
     public const ATTESTATION_CATEGORY = 1;
+    public const VIEW_MODES = ['reader', 'book'];
 
     public static function today(): string
     {
@@ -64,7 +65,7 @@ final class Document
 
     private static function baseSql(): string
     {
-        return 'SELECT d.*, c.title AS category_title, m.path AS file_path, m.original_name AS file_name, m.size AS file_size, m.mime AS file_mime
+        return 'SELECT d.*, c.title AS category_title, c.title_kk AS category_title_kk, m.path AS file_path, m.original_name AS file_name, m.size AS file_size, m.mime AS file_mime
                 FROM documents d JOIN document_categories c ON c.id = d.category_id JOIN media m ON m.id = d.media_id';
     }
 
@@ -134,7 +135,9 @@ final class Document
         if (!isset($errors['doc_date']) && !isset($errors['valid_until']) && $dates['doc_date'] !== '' && $dates['valid_until'] !== '' && $dates['valid_until'] < $dates['doc_date']) {
             $errors['valid_until'] = t('documents.error.valid_before');
         }
+        $mode = $s('view_mode');
         return ['errors' => $errors, 'data' => [
+            'view_mode' => in_array($mode, self::VIEW_MODES, true) ? $mode : 'reader',
             'title' => $title, 'title_kk' => $titleKk, 'category_id' => $cat,
             'checklist_key' => $key !== '' ? $key : null,
             'doc_date' => $dates['doc_date'] !== '' ? $dates['doc_date'] : null,
@@ -153,6 +156,31 @@ final class Document
                 'created_at' => $now, 'updated_at' => $now,
             ]);
         });
+    }
+
+    /** Изменить поля документа (без файла и порядка). */
+    public static function update(int $id, array $data, bool $published): bool
+    {
+        $data['is_published'] = $published ? 1 : 0;
+        $data['updated_at'] = gmdate('Y-m-d H:i:s');
+        $sets = implode(', ', array_map(static fn(string $k): string => $k . ' = ?', array_keys($data)));
+        return Database::query('UPDATE documents SET ' . $sets . ' WHERE id = ?', array_merge(array_values($data), [$id]))->rowCount() > 0;
+    }
+
+    public static function isPdf(array $row): bool
+    {
+        return self::ext($row) === 'PDF';
+    }
+
+    /** Опубликованный PDF для страницы просмотра (иначе null). */
+    public static function findPublishedPdf(int $id): ?array
+    {
+        $row = self::find($id);
+        if ($row === null || (int)$row['is_published'] !== 1 || !self::isPdf($row)) {
+            return null;
+        }
+        $row['url'] = self::fileUrl($row);
+        return $row;
     }
 
     /** Подменить файл; возвращает id старого media (его удаляет вызывающий). */

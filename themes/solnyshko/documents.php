@@ -9,8 +9,8 @@
         <?php foreach ($g['documents'] as $d):
             $isPdf = $d['ext'] === 'PDF';
             $img = in_array($d['ext'], ['JPG', 'JPEG', 'PNG'], true); ?>
-          <a class="card doc" href="<?= e($d['url']) ?>" data-testid="documents-item"
-             <?= ($isPdf || $img) ? 'target="_blank" rel="noopener"' : 'download' ?>>
+          <a class="card doc" href="<?= e($isPdf ? surl('/dokumenty/' . (int)$d['id']) : $d['url']) ?>" data-testid="documents-item"
+             <?= $isPdf ? '' : ($img ? 'target="_blank" rel="noopener"' : 'download') ?>>
             <span class="icon i-y ext" aria-hidden="true"><?= e($d['ext']) ?></span>
             <span>
               <b><?= e(loc($d, 'title')) ?></b>

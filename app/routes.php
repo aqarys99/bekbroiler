@@ -48,6 +48,7 @@ return static function (Router $r): void {
         $r->get($pre . '/fotogalereya/{slug:[A-Za-z0-9_-]+}', $site('album'));
         $r->get($pre . '/video', $site('videos'));
         $r->get($pre . '/dokumenty', $site('documents'));
+        $r->get($pre . '/dokumenty/{id:\d+}', $site('documentView'));
         $r->get($pre . '/dostizheniya', $site('achievements'));
         $r->get($pre . '/otzyvy', $site('reviews'));
         $r->get($pre . '/kontakty', $site('contacts'));
@@ -97,6 +98,8 @@ return static function (Router $r): void {
 
     $r->get($a . '/documents', Guard::wrap([DocumentsController::class, 'index']));
     $r->post($a . '/documents', Guard::wrap([DocumentsController::class, 'store']));
+    $r->get($a . '/documents/{id:\d+}/edit', Guard::wrap([DocumentsController::class, 'edit']));
+    $r->post($a . '/documents/{id:\d+}', Guard::wrap([DocumentsController::class, 'update']));
     $r->post($a . '/documents/{id:\d+}/replace', Guard::wrap([DocumentsController::class, 'replace']));
     $r->post($a . '/documents/{id:\d+}/delete', Guard::wrap([DocumentsController::class, 'delete']));
     $r->post($a . '/documents/{id:\d+}/move', Guard::wrap([DocumentsController::class, 'move']));

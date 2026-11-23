@@ -7,6 +7,13 @@ DirectoryIndex index.php
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
+# PDF.js: модули и wasm должны отдаваться с правильным типом (модульные скрипты это проверяют)
+<IfModule mod_mime.c>
+    AddType application/javascript .mjs
+    AddType application/wasm .wasm
+    AddType application/octet-stream .bcmap .pfb
+</IfModule>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 

@@ -7,7 +7,7 @@ namespace App\Core;
 final class SecurityHeaders
 {
     /** Заголовки для запроса: админка — строже (нельзя встраивать, ни в какие рамки). */
-    public static function build(bool $admin, bool $https, ?string $mapHost = null): array
+    public static function build(bool $admin, bool $https, ?string $mapHost = null, bool $pdfViewer = false): array
     {
         $frames = ["'self'", 'https://www.youtube-nocookie.com'];
         if ($mapHost !== null && $mapHost !== '') {
@@ -28,6 +28,12 @@ final class SecurityHeaders
             "form-action 'self'",
             $admin ? "frame-ancestors 'none'" : "frame-ancestors 'self'",
         ];
+        if ($pdfViewer) {
+            // Страница просмотра PDF (PDF.js с нашего домена): воркер, декодеры изображений (wasm). Только здесь.
+            $i = array_search("script-src 'self'", $csp, true);
+            $csp[$i] = "script-src 'self' 'wasm-unsafe-eval'";
+            $csp[] = "worker-src 'self' blob:";
+        }
         $h = [
             'Content-Security-Policy' => implode('; ', $csp),
             'X-Frame-Options' => $admin ? 'DENY' : 'SAMEORIGIN',
@@ -39,6 +45,13 @@ final class SecurityHeaders
             $h['Strict-Transport-Security'] = 'max-age=15552000';
         }
         return $h;
+    }
+
+    /** /dokumenty/{id} и /kk/dokumenty/{id} (с учётом base_path). */
+    public static function isPdfViewerPath(string $path): bool
+    {
+        $base = preg_quote(rtrim((string)config('base_path', ''), '/'), '~');
+        return preg_match('~^' . $base . '(/kk)?/dokumenty/\d+/?$~', $path) === 1;
     }
 
     public static function isHttps(): bool
@@ -68,7 +81,8 @@ final class SecurityHeaders
                 $host = null;
             }
         }
-        foreach (self::build($admin, self::isHttps(), $host) as $k => $v) {
+        $pdfViewer = !$admin && self::isPdfViewerPath($path);
+        foreach (self::build($admin, self::isHttps(), $host, $pdfViewer) as $k => $v) {
             header($k . ': ' . $v);
         }
     }

@@ -50,6 +50,50 @@ final class DocumentsController extends BaseController
         redirect(admin_url('/documents') . '?cat=' . (int)$prep['data']['category_id']);
     }
 
+    public function edit(array $params): string
+    {
+        $doc = $this->mustFind($params);
+        return $this->renderEdit($doc, [
+            'title' => (string)$doc['title'], 'title_kk' => (string)$doc['title_kk'], 'category_id' => (int)$doc['category_id'],
+            'checklist_key' => (string)($doc['checklist_key'] ?? ''), 'doc_date' => (string)($doc['doc_date'] ?? ''),
+            'valid_until' => (string)($doc['valid_until'] ?? ''), 'is_published' => (int)$doc['is_published'] === 1,
+            'view_mode' => (string)$doc['view_mode'],
+        ], []);
+    }
+
+    public function update(array $params): string
+    {
+        $user = $this->currentUser();
+        $doc = $this->mustFind($params);
+        $prep = Document::prepare($_POST, false);
+        $published = self::post('is_published') === '1';
+        if ($prep['errors']) {
+            $values = $this->values() + ['is_published' => $published];
+            return $this->renderEdit($doc, $values, $prep['errors'], 422);
+        }
+        $data = $prep['data'];
+        if (!Document::isPdf($doc)) {
+            unset($data['view_mode']);
+        }
+        Document::update((int)$doc['id'], $data, $published);
+        Audit::log((int)$user['id'], 'documents.update', 'documents', (int)$doc['id']);
+        Flash::set('success', 'documents.flash.updated');
+        redirect(admin_url('/documents') . '?cat=' . (int)$data['category_id']);
+    }
+
+    private function renderEdit(array $doc, array $values, array $errors, int $status = 200): string
+    {
+        return $this->page('documents/edit', t('documents.edit.title'), [
+            $this->home(),
+            ['label' => t('documents.title'), 'url' => admin_url('/documents')],
+            ['label' => t('documents.edit.title'), 'url' => null],
+        ], [
+            'doc' => $doc, 'isPdf' => Document::isPdf($doc), 'values' => $values, 'errors' => $errors,
+            'cats' => Document::categories(), 'checkItems' => Document::checklistItems(),
+            'action' => admin_url('/documents/' . (int)$doc['id']), 'back' => admin_url('/documents') . '?cat=' . (int)$doc['category_id'],
+        ], $status);
+    }
+
     public function replace(array $params): string
     {
         $user = $this->currentUser();
@@ -178,7 +222,7 @@ final class DocumentsController extends BaseController
     /** Значения формы по умолчанию (в т.ч. «Загрузить» у пустого пункта чек-листа). */
     private function prefill(): array
     {
-        $v = ['title' => '', 'title_kk' => '', 'category_id' => 0, 'checklist_key' => '', 'doc_date' => '', 'valid_until' => ''];
+        $v = ['title' => '', 'title_kk' => '', 'category_id' => 0, 'checklist_key' => '', 'doc_date' => '', 'valid_until' => '', 'view_mode' => 'reader'];
         $key = is_string($_GET['checklist'] ?? null) ? $_GET['checklist'] : '';
         foreach (Document::checklistItems() as $c) {
             if ($c['key'] === $key) {
@@ -198,7 +242,7 @@ final class DocumentsController extends BaseController
     private function values(): array
     {
         $v = [];
-        foreach (['title', 'title_kk', 'checklist_key', 'doc_date', 'valid_until'] as $k) {
+        foreach (['title', 'title_kk', 'checklist_key', 'doc_date', 'valid_until', 'view_mode'] as $k) {
             $v[$k] = self::post($k);
         }
         $v['category_id'] = (int)self::post('category_id');

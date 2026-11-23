@@ -19,6 +19,7 @@ $pUp = '<path d="m6 15 6-6 6 6"/>';
 $pDown = '<path d="m6 9 6 6 6-6"/>';
 $pSwap = '<path d="M4 7h13l-3-3M20 17H7l3 3"/>';
 $pDel = '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>';
+$pEdit = '<path d="M4 20h4L19 9l-4-4L4 16v4zM13 7l4 4"/>';
 $pUpload = '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>';
 ?>
 <div class="page-head">
@@ -61,6 +62,7 @@ $pUpload = '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>';
         <?php $pill = ['ok' => 'pill-state--published', 'warn' => 'pill-state--warn', 'expired' => 'pill-state--danger'][$d['state']]; ?>
         <span class="pill-state <?= $pill ?>" data-testid="documents-row-status"><?= e($d['status_label']) ?></span>
         <div class="doc-row__actions">
+          <a class="icon-btn" href="<?= e($base . '/' . $id . '/edit') ?>" aria-label="<?= e(t('documents.action.edit')) ?>" title="<?= e(t('documents.action.edit')) ?>" data-testid="documents-row-edit"><?= $icon($pEdit) ?></a>
           <form method="post" action="<?= e($base . '/' . $id . '/move') ?>" data-once>
             <?= csrf_field() ?><input type="hidden" name="dir" value="up"><input type="hidden" name="back_cat" value="<?= (int)$backCat ?>">
             <button type="submit" class="icon-btn" aria-label="<?= e(t('documents.action.up')) ?>" title="<?= e(t('documents.action.up')) ?>"<?= $d['first'] ? ' disabled' : '' ?> data-testid="documents-row-up"><?= $icon($pUp) ?></button>
@@ -148,6 +150,14 @@ $pUpload = '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>';
       </div>
     </div>
     <span class="field__hint"><?= e(t('documents.form.valid_hint')) ?></span>
+    <div class="field">
+      <label for="documents-view-mode"><?= e(t('documents.form.view_mode')) ?></label>
+      <select class="input select" id="documents-view-mode" name="view_mode" data-testid="documents-view-mode">
+        <option value="reader"<?= ($values['view_mode'] ?? 'reader') !== 'book' ? ' selected' : '' ?>><?= e(t('documents.view.reader')) ?></option>
+        <option value="book"<?= ($values['view_mode'] ?? '') === 'book' ? ' selected' : '' ?>><?= e(t('documents.view.book')) ?></option>
+      </select>
+      <span class="field__hint"><?= e(t('documents.view.hint')) ?></span>
+    </div>
     <button type="submit" class="btn btn--md" data-testid="documents-save"><?= e(t('documents.form.save')) ?></button>
   </form>
 </div>

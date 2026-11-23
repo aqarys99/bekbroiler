@@ -24,6 +24,8 @@ use App\Site\Theme;
 final class SiteController
 {
     public const NEWS_PER_PAGE = 9;
+    public const PDFJS_VERSION = '6.5.438';
+    public const PAGEFLIP_VERSION = '2.0.7';
     public const PAGES = ['o-nas', 'programma', 'rezhim', 'pitanie', 'usloviya'];
 
     public function __construct(private readonly string $lang)
@@ -215,6 +217,29 @@ final class SiteController
     {
         return $this->page('documents', ['groups' => Document::publishedByCategory()], [
             'key' => 'dokumenty', 'path' => '/dokumenty', 'title' => tt('nav.documents'), 'description' => tt('documents.lead'),
+        ]);
+    }
+
+    protected function documentView(array $p): string
+    {
+        $doc = Document::findPublishedPdf((int)($p['id'] ?? 0));
+        if ($doc === null) {
+            throw new HttpException(404);
+        }
+        $title = loc($doc, 'title');
+        $cat = loc($doc, 'category_title', 'category_title_kk', false);
+        return $this->page('document-view', [
+            'doc' => $doc, 'heading' => $title, 'category' => $cat,
+            'date' => !empty($doc['doc_date']) ? date('d.m.Y', (int)strtotime((string)$doc['doc_date'])) : '',
+            'mode' => (string)$doc['view_mode'] === 'book' ? 'book' : 'reader',
+            'vendor' => [
+                'pdfjs' => url('/assets/vendor/pdfjs/' . self::PDFJS_VERSION . '/'),
+                'pageflip' => url('/assets/vendor/page-flip/' . self::PAGEFLIP_VERSION . '/page-flip.browser.js'),
+            ],
+            'listUrl' => surl('/dokumenty'),
+        ], [
+            'key' => 'dokumenty', 'path' => '/dokumenty/' . (int)$doc['id'], 'title' => $title,
+            'description' => tt('docview.description', ['title' => $title]),
         ]);
     }
 
