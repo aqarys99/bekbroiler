@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Controllers\Admin\AuthController;
 use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\DocumentsController;
+use App\Controllers\Admin\GalleryController;
 use App\Controllers\Admin\MediaController;
 use App\Controllers\Admin\NewsController;
 use App\Controllers\Admin\ProfileController;
@@ -48,6 +49,17 @@ return static function (Router $r): void {
     $r->get($a . '/news/{id:\d+}/preview', Guard::wrap([NewsController::class, 'preview']));
     $r->post($a . '/news/{id:\d+}', Guard::wrap([NewsController::class, 'update']));
     $r->post($a . '/news/{id:\d+}/delete', Guard::wrap([NewsController::class, 'delete']));
+
+    $r->get($a . '/gallery', Guard::wrap([GalleryController::class, 'index']));
+    $r->get($a . '/gallery/new', Guard::wrap([GalleryController::class, 'create']));
+    $r->post($a . '/gallery', Guard::wrap([GalleryController::class, 'store']));
+    $r->get($a . '/gallery/{id:\d+}', Guard::wrap([GalleryController::class, 'show']));
+    $r->post($a . '/gallery/{id:\d+}', Guard::wrap([GalleryController::class, 'update']));
+    $r->post($a . '/gallery/{id:\d+}/publish', Guard::wrap([GalleryController::class, 'publish']));
+    $r->post($a . '/gallery/{id:\d+}/delete', Guard::wrap([GalleryController::class, 'delete']));
+    $r->post($a . '/gallery/{id:\d+}/photos', Guard::wrap([GalleryController::class, 'addPhotos']));
+    $r->post($a . '/gallery/{id:\d+}/order', Guard::wrap([GalleryController::class, 'order']));
+    $r->post($a . '/gallery/{id:\d+}/photo/{mid:\d+}/{act:move|cover|remove|caption}', Guard::wrap([GalleryController::class, 'photoAction']));
 
     $r->get($a . '/documents', Guard::wrap([DocumentsController::class, 'index']));
     $r->post($a . '/documents', Guard::wrap([DocumentsController::class, 'store']));

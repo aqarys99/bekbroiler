@@ -120,7 +120,9 @@
     var running = false;
     var halted = false;
 
-    registry = registry.filter(function (u) { return u.isBusy(); });
+    // Забываем только загрузчики, чья очередь уже убрана из страницы (закрытое окно выбора);
+    // простаивающий загрузчик страницы остаётся в реестре, чтобы beforeunload видел его работу.
+    registry = registry.filter(function (u) { return u.queueRoot && document.contains(u.queueRoot); });
     leaveText = t.leave;
 
     function active(it) { return it.status === 'wait' || it.status === 'compress' || it.status === 'upload'; }
@@ -298,7 +300,7 @@
       refresh();
     });
     refresh();
-    var api = { add: add, isBusy: isBusy };
+    var api = { add: add, isBusy: isBusy, queueRoot: q.root };
     registry.push(api);
     return api;
   }

@@ -6,6 +6,7 @@ declare(strict_types=1);
 $providers = [
     \App\Media\NewsUsageProvider::class,
     \App\Media\DocumentUsageProvider::class,
+    \App\Media\AlbumUsageProvider::class,
 ];
 
 if (getenv('APP_ENV') === 'testing') {
