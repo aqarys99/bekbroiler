@@ -69,6 +69,21 @@ function writeTestConfig(string $file, bool $debug): void
 
 Database::setConnection(null);
 rrmdirContents($storage);
+// загруженные в тестах фото: public/uploads/images/* кроме .gitkeep и .htaccess
+$imagesDir = ROOT . '/public/uploads/images';
+if (is_dir($imagesDir)) {
+    foreach (new DirectoryIterator($imagesDir) as $entry) {
+        if ($entry->isDot() || in_array($entry->getFilename(), ['.gitkeep', '.htaccess'], true)) {
+            continue;
+        }
+        if ($entry->isDir() && !$entry->isLink()) {
+            rrmdirContents($entry->getPathname());
+            rmdir($entry->getPathname());
+        } else {
+            unlink($entry->getPathname());
+        }
+    }
+}
 if (is_file($configFile)) {
     unlink($configFile);
 }

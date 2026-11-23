@@ -26,3 +26,5 @@
 /storage/testing/
 .phpunit.cache/
 /storage/sessions/
+/tests/fixtures/media/photo-exif-gps.jpg
+/tests/fixtures/media/big.gif
