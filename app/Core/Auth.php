@@ -91,6 +91,15 @@ final class Auth
         self::$user = $user;
         self::$resolved = true;
         self::$endReason = null;
+        $picked = $_COOKIE[Locale::COOKIE] ?? null;
+        if (Locale::valid($picked) && $picked !== ($user['locale'] ?? 'ru')) {
+            // язык, выбранный на экране входа, сохраняем в профиле
+            Database::query('UPDATE users SET locale = ? WHERE id = ?', [$picked, $id]);
+            $user['locale'] = $picked;
+            self::$user = $user;
+        }
+        Locale::forUser($user);
+        Locale::remember(Locale::current());
     }
 
     public static function user(): ?array
@@ -116,6 +125,7 @@ final class Auth
                     self::$endReason = 'version';
                 } else {
                     $_SESSION['_last_activity'] = time();
+                    Locale::forUser($user);
                     return self::$user = $user;
                 }
                 return null;

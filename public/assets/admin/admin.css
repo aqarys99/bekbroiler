@@ -589,3 +589,12 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .editor__videobox label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;flex:1;min-width:200px}
 .editor__videobox select{height:38px;border:1px solid #E2E5EA;border-radius:8px;padding:0 8px;font:inherit}
 .editor__area [data-video-id]{margin:0 0 10px;padding:14px 16px;border:1px dashed #1F5BD8;border-radius:10px;background:#EEF3FD;color:#1F5BD8;font-weight:600;user-select:none}
+
+/* переключатель языка интерфейса */
+.langsw{display:flex;padding:3px;background:#F0F2F5;border-radius:10px;margin:0}
+.langsw button{min-height:38px;padding:0 14px;border:0;border-radius:8px;background:transparent;font:inherit;font-weight:500;color:#5B6372;cursor:pointer}
+.langsw button[aria-pressed="true"]{background:#fff;font-weight:600;color:#1C2230;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.auth__lang{display:flex;justify-content:flex-end;margin-bottom:12px}
+.auth__lang .langsw{background:#E9ECF1}
+.langsw a{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:8px;color:#5B6372;font-weight:500;text-decoration:none}
+.langsw a[aria-pressed="true"]{background:#fff;font-weight:600;color:#1C2230;box-shadow:0 1px 2px rgba(0,0,0,.08)}

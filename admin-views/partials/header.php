@@ -8,6 +8,7 @@
       <?php endforeach; ?>
     </ol>
   </nav>
+  <?php include __DIR__ . '/lang-switch.php'; ?>
   <a class="btn btn--outline" href="<?= e(url('/')) ?>" target="_blank" rel="noopener" data-testid="header-open-site"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><?= e(t('admin.open_site')) ?></a>
   <?php if (!empty($headerAction)): ?><button type="submit" form="<?= e($headerAction['form']) ?>" class="btn btn--md" data-testid="<?= e($headerAction['testid']) ?>"><?= e($headerAction['label']) ?></button><?php endif; ?>
 </header>

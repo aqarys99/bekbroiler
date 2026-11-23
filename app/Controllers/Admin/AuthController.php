@@ -27,6 +27,24 @@ final class AuthController extends BaseController
         return $this->form(200, [], [], null, $flash['text'] ?? null, $this->nextValue($_GET['next'] ?? null));
     }
 
+    /** Переключатель языка интерфейса: профиль (если вошли) + cookie. */
+    public function setLang(array $params = []): string
+    {
+        $lang = self::post('lang');
+        $back = $this->nextValue($_POST['next'] ?? null);
+        if (!csrf_verify(self::post('_csrf')) || !\App\Core\Locale::valid($lang)) {
+            redirect($back !== '' ? $back : admin_url());
+        }
+        $user = Auth::user();
+        if ($user !== null) {
+            Database::query('UPDATE users SET locale = ? WHERE id = ?', [$lang, (int)$user['id']]);
+            \App\Core\Audit::log((int)$user['id'], 'user.locale', 'user', (int)$user['id']);
+        }
+        \App\Core\Locale::set($lang);
+        \App\Core\Locale::remember($lang);
+        redirect($back !== '' ? $back : ($user !== null ? admin_url() : admin_url('/login')));
+    }
+
     public function login(array $params = []): string
     {
         $login = trim(self::post('login'));

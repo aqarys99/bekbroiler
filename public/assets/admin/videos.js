@@ -12,7 +12,7 @@
   var csrf = root.getAttribute('data-csrf');
   var state = null; // { file, id, chunkSize, chunks, received:{}, aborted }
 
-  function fmt(b) { return (b / 1048576).toFixed(1).replace('.', ',') + ' МБ'; }
+  function fmt(b) { return (b / 1048576).toFixed(1).replace('.', ',') + ' ' + (document.documentElement.getAttribute('data-units') || 'Б|КБ|МБ|ГБ').split('|')[2]; }
   function showError(msg) { errEl.textContent = msg; errEl.hidden = !msg; }
   function setProgress(done, total) {
     var pct = total ? Math.round(done / total * 100) : 0;

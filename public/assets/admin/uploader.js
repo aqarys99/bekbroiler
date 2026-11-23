@@ -10,14 +10,15 @@
   var EXT_HEIC = /\.(heic|heif)$/i;
   var NON_RETRY = { not_image: 1, too_large: 1, heic_unsupported: 1, broken: 1, too_many_pixels: 1, no_file: 1, disk_full: 1, session: 1, image_unsupported: 1 };
 
+  var U = (document.documentElement.getAttribute('data-units') || 'Б|КБ|МБ|ГБ').split('|');
   function fmt(b) {
     b = Math.max(0, Math.round(b));
-    if (b < 1024) { return b + ' Б'; }
+    if (b < 1024) { return b + ' ' + U[0]; }
     var kb = Math.round(b / 1024);
-    if (kb < 1024) { return kb + ' КБ'; }
+    if (kb < 1024) { return kb + ' ' + U[1]; }
     var mb = b / 1048576;
-    if (Math.round(mb * 10) / 10 < 1024) { return mb.toFixed(1).replace('.', ',') + ' МБ'; }
-    return (b / 1073741824).toFixed(1).replace('.', ',') + ' ГБ';
+    if (Math.round(mb * 10) / 10 < 1024) { return mb.toFixed(1).replace('.', ',') + ' ' + U[2]; }
+    return (b / 1073741824).toFixed(1).replace('.', ',') + ' ' + U[3];
   }
   function tpl(s, vars) {
     return String(s).replace(/:(\w+)/g, function (m, k) { return vars && k in vars ? vars[k] : m; });

@@ -45,7 +45,7 @@ final class Requirements
         foreach (['upload_max_filesize', 'post_max_size'] as $ini) {
             $bytes = self::toBytes((string)ini_get($ini));
             $ok = $bytes === 0 || $bytes >= self::MIN_BYTES;
-            $add($ini, $ok, $bytes === 0 ? '∞' : (string)round($bytes / 1048576) . ' МБ', 'warn', 'install.hint.limit');
+            $add($ini, $ok, $bytes === 0 ? '∞' : (string)round($bytes / 1048576) . ' ' . t('unit.mb'), 'warn', 'install.hint.limit');
         }
 
         $okStorage = self::ensureWritable($storage);

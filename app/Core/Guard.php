@@ -22,6 +22,9 @@ final class Guard
     {
         $fn = static function (array $params = []) use ($handler, $role) {
             $user = Auth::user();
+            if ($user !== null) {
+                Locale::forUser($user);
+            }
             $isRead = in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true);
             $json = Json::wanted();
             if ($user === null) {

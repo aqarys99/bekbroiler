@@ -60,6 +60,7 @@ return static function (Router $r): void {
     $r->get($a . '/login', [AuthController::class, 'showLogin']);
     $r->post($a . '/login', [AuthController::class, 'login']);
 
+    $r->post($a . '/lang', [AuthController::class, 'setLang']);
     $r->post($a . '/logout', Guard::wrap([AuthController::class, 'logout']));
     $r->get($a, Guard::wrap([DashboardController::class, 'index']));
     $r->get($a . '/profile', Guard::wrap([ProfileController::class, 'show']));

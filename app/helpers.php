@@ -34,7 +34,7 @@ if (!function_exists('t')) {
     function t(string $key, array $replace = []): string
     {
         static $cache = [];
-        $locale = preg_replace('/[^a-z]/', '', (string)config('locale', 'ru')) ?: 'ru';
+        $locale = \App\Core\Locale::current();
         if (!isset($cache[$locale])) {
             $file = dirname(__DIR__) . '/app/lang/' . $locale . '.php';
             $cache[$locale] = is_file($file) ? (array)require $file : [];
@@ -149,17 +149,17 @@ if (!function_exists('format_bytes')) {
     function format_bytes(int $b): string
     {
         if ($b < 1024) {
-            return max(0, $b) . ' Б';
+            return max(0, $b) . ' ' . t('unit.b');
         }
         $kb = (int)round($b / 1024);
         if ($kb < 1024) {
-            return $kb . ' КБ';
+            return $kb . ' ' . t('unit.kb');
         }
         $mb = $b / 1048576;
         if (round($mb, 1) < 1024) {
-            return str_replace('.', ',', number_format($mb, 1, '.', '')) . ' МБ';
+            return str_replace('.', ',', number_format($mb, 1, '.', '')) . ' ' . t('unit.mb');
         }
-        return str_replace('.', ',', number_format($b / 1073741824, 1, '.', '')) . ' ГБ';
+        return str_replace('.', ',', number_format($b / 1073741824, 1, '.', '')) . ' ' . t('unit.gb');
     }
 }
 

@@ -1,7 +1,7 @@
 <?php
 /** @var string $content @var string $title @var array $menu @var array $user @var array $breadcrumbs @var ?array $flash @var string $siteName */
 ?><!doctype html>
-<html lang="ru">
+<html lang="<?= e(\App\Core\Locale::current()) ?>" data-units="<?= e(t('unit.b') . '|' . t('unit.kb') . '|' . t('unit.mb') . '|' . t('unit.gb')) ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

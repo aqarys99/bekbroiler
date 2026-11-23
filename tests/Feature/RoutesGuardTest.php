@@ -21,7 +21,7 @@ final class RoutesGuardTest extends TestCase
             }
             $admin++;
             $role = Guard::roleOf($route['handler']);
-            if ($p === '/admin/login') {
+            if ($p === '/admin/login' || $p === '/admin/lang') {
                 $this->assertNull($role, "{$route['method']} $p не должен быть под Guard");
                 continue;
             }

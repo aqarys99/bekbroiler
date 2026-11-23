@@ -950,4 +950,11 @@ return [
     'audit.backup.delete' => 'Удалил копию базы',
     'audit.backup.download' => 'Скачал архив сайта',
     'audit.backup.download_db' => 'Скачал копию базы',
+    // Фича 13: язык интерфейса
+    'admin.lang' => 'Язык интерфейса',
+    'unit.b' => 'Б',
+    'unit.kb' => 'КБ',
+    'unit.mb' => 'МБ',
+    'unit.gb' => 'ГБ',
+    'audit.user.locale' => 'Изменил язык интерфейса',
 ];
