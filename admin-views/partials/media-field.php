@@ -30,7 +30,7 @@ $fid = 'mf-' . preg_replace('/[^a-z0-9_-]/i', '', (string)$mf['name']);
   <div data-role="inputs"></div>
   <button type="button" class="btn btn--md btn--ghost" data-role="open" data-testid="media-picker-open"><?= e(t('picker.open')) ?></button>
 </div>
-<?php static $mfScriptsDone = false; if (!$mfScriptsDone): $mfScriptsDone = true; ?>
+<?php if (once('media-field-scripts')): ?>
 <script src="<?= e(asset('admin/uploader.js')) ?>" defer></script>
 <script src="<?= e(asset('admin/media-picker.js')) ?>" defer></script>
 <?php endif; ?>

@@ -38,6 +38,15 @@ final class HtaccessTest extends TestCase
         $this->assertStringNotContainsString('php_flag', (string)$stripped);
     }
 
+    public function testUploadsHtaccessWebpNosniffAndNoHandler(): void
+    {
+        $c = (string)file_get_contents(ROOT . '/public/uploads/.htaccess');
+        $this->assertStringContainsString('AddType image/webp .webp', $c);
+        $this->assertMatchesRegularExpression('~Header set X-Content-Type-Options "nosniff"~', $c);
+        $this->assertStringContainsString('RemoveHandler .php', $c);
+        $this->assertStringContainsString('SetHandler none', $c);
+    }
+
     public function testPublicHtaccess(): void
     {
         $c = (string)file_get_contents(ROOT . '/public/.htaccess');

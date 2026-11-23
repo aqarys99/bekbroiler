@@ -7,9 +7,10 @@ const { OWNER, EDITOR, csrfOf } = require('./auth-helpers');
 const M = require('./media-helpers');
 const { fx, upload, seed, setUsages, setUsagesFailing, mediaCount, mediaRow, filesOnDisk, variantFiles, formatBytes, usedBytes, gotoMedia, uploadViaUI, waitQueueIdle } = M;
 
+let tracker;
 test.beforeEach(({ page }) => {
   resetApp({ installed: true, withEditor: true });
-  trackPageErrors(page, { ignoreConsole: /status of 4\d\d|net::ERR_FAILED/ });
+  tracker = trackPageErrors(page, { ignoreConsole: /status of 4\d\d|net::ERR_FAILED/ });
 });
 test.afterEach(() => expectNoPageErrors());
 
@@ -1095,4 +1096,61 @@ test.describe('конвейер загрузки', () => {
     expect(mediaCount()).toBe(1);
     void csrfOf;
   });
+});
+
+// ---------------------------------------------------------------- ревью: дополнительные проверки
+test('media-picker-open: на странице с двумя полями клик открывает ровно одно окно; скрипты подключены по одному разу', async ({ page }) => {
+  await login(page, OWNER);
+  await page.goto(PICK);
+  const html = await page.content();
+  expect(html.match(/uploader\.js/g) || []).toHaveLength(1);
+  expect(html.match(/media-picker\.js/g) || []).toHaveLength(1);
+  await cover(page).getByTestId('media-picker-open').click();
+  await expect(modal(page)).toHaveCount(1);
+  await page.keyboard.press('Escape');
+  await expect(modal(page)).toHaveCount(0);
+  await photos(page).getByTestId('media-picker-open').click();
+  await expect(modal(page)).toHaveCount(1);
+});
+
+test('media-queue-item: 413 с не-JSON телом -> текст too_large без «Повторить»; 503 image_unsupported -> message без «Повторить»', async ({ page }) => {
+  tracker.options.allow500 = true; // 503 подменяется через page.route
+  tracker.options.ignoreConsole = /status of \d{3}|net::ERR_FAILED/;
+  await login(page, OWNER);
+  await gotoMedia(page);
+  await page.route('**/admin/media/upload', (route) => route.fulfill({ status: 413, contentType: 'text/html', body: '<h1>Request Entity Too Large</h1>' }));
+  await uploadViaUI(page, fx('small.jpg'));
+  await expect(queueItems(page).first()).toContainText('Ошибка');
+  await expect(queueItems(page).first()).toContainText('Файл больше');
+  await expect(queueItems(page).first().getByTestId('media-queue-retry')).toBeHidden();
+  await page.unroute('**/admin/media/upload');
+  await page.route('**/admin/media/upload', (route) => route.fulfill({
+    status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false, code: 'image_unsupported', message: 'Сервер не поддерживает обработку фото.' }),
+  }));
+  await uploadViaUI(page, fx('small2.jpg'));
+  await expect(queueItems(page).nth(1)).toContainText('Сервер не поддерживает обработку фото.');
+  await expect(queueItems(page).nth(1).getByTestId('media-queue-retry')).toBeHidden();
+});
+
+test('media-picker-close: Esc во время загрузки — нет ошибок, файл попадает в медиатеку, beforeunload после завершения не мешает', async ({ page }) => {
+  await login(page, OWNER);
+  await page.goto(PICK);
+  let beforeUnloadDialogs = 0;
+  page.on('dialog', (d) => { if (d.type() === 'beforeunload') beforeUnloadDialogs++; return d.accept(); });
+  for (let i = 0; i < 2; i++) {
+    await cover(page).getByTestId('media-picker-open').click();
+    await page.keyboard.press('Escape');
+    await expect(modal(page)).toHaveCount(0);
+  }
+  await delayUploads(page, 1000);
+  await cover(page).getByTestId('media-picker-open').click();
+  await page.getByTestId('media-picker-tab-upload').click();
+  await page.getByTestId('media-file-input').setInputFiles(fx('small.jpg'));
+  await page.keyboard.press('Escape');
+  await expect(modal(page)).toHaveCount(0);
+  await expect.poll(() => mediaCount(), { timeout: 20000 }).toBe(1);
+  await page.unroute('**/admin/media/upload');
+  await page.goto('/admin/media', { waitUntil: 'load' });
+  await expect(page.getByTestId('media-item')).toHaveCount(1);
+  expect(beforeUnloadDialogs).toBe(0);
 });

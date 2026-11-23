@@ -7,7 +7,7 @@ const {
   fillInstall, installViaUI, csrfFromInstallPage, validPost,
 } = require('./helpers');
 
-const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'zip',
+const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'heic', 'zip',
   'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads', 'writable_sessions'];
 const usersCount = () => Number(dbQuery('SELECT COUNT(*) AS c FROM users')[0].c);
 // reset.php при --debug=0 кладёт тестовый config.php, поэтому «ничего не создано» = нет БД и lock
@@ -38,7 +38,7 @@ test.describe('до установки', () => {
     expect(inst.status()).toBe(200);
   });
 
-  test('install-requirements: блок показывает все 12 строк с data-status', async ({ page }) => {
+  test('install-requirements: блок показывает все строки требований с data-status', async ({ page }) => {
     await page.goto('/install.php');
     await expect(page.getByTestId('install-requirements')).toBeVisible();
     for (const k of KEYS) {
@@ -46,7 +46,7 @@ test.describe('до установки', () => {
     }
   });
 
-  test('install-req-{key}: название, значение, статус и подсказка у каждой из 12 строк', async ({ page }) => {
+  test('install-req-{key}: название, значение, статус и подсказка у каждой строки требований', async ({ page }) => {
     await resetApp({ fail: ['pdo_sqlite', 'zip:warn'] });
     await page.goto('/install.php');
     for (const k of KEYS) {

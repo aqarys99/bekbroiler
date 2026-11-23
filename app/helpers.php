@@ -124,6 +124,19 @@ if (!function_exists('redirect')) {
     }
 }
 
+if (!function_exists('once')) {
+    /** true только при первом вызове с этим ключом за запрос (например, подключить скрипт один раз). */
+    function once(string $key): bool
+    {
+        static $seen = [];
+        if (isset($seen[$key])) {
+            return false;
+        }
+        $seen[$key] = true;
+        return true;
+    }
+}
+
 if (!function_exists('format_bytes')) {
     /** 0 Б, 312 КБ, 9,8 МБ, 1,2 ГБ (основание 1024). */
     function format_bytes(int $b): string
