@@ -43,4 +43,6 @@ $mediaI18nJson = json_encode([
     'pNone' => t('picker.none'),
     'pDeleted' => t('picker.deleted'),
     'pSelected' => t('picker.selected'),
+    'pMovePrev' => t('picker.move_prev'),
+    'pMoveNext' => t('picker.move_next'),
 ], JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP);
