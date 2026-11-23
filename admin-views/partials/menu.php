@@ -5,7 +5,7 @@ foreach (array_slice(array_filter($words, 'strlen'), 0, 2) as $w) {
     $initials .= mb_strtoupper(mb_substr($w, 0, 1));
 }
 ?>
-<nav class="nav" aria-label="<?= e(t('admin.menu')) ?>">
+<nav class="nav" id="admin-nav" data-admin-nav aria-label="<?= e(t('admin.menu')) ?>">
   <a class="nav__brand" href="<?= e(admin_url()) ?>" data-testid="nav-brand">
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FDF0E1"/><circle cx="18" cy="18" r="8" fill="#F2A516"/></svg>
     <span class="nav__brand-text"><b class="nav__brand-name"><?= e($siteName) ?></b><span class="nav__brand-sub"><?= e(t('admin.panel')) ?></span></span>
@@ -27,3 +27,4 @@ foreach (array_slice(array_filter($words, 'strlen'), 0, 2) as $w) {
     </form>
   </div>
 </nav>
+<div class="nav-backdrop" data-testid="nav-backdrop" data-nav-backdrop hidden></div>

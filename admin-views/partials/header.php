@@ -1,5 +1,6 @@
 <?php /** @var array $breadcrumbs */ ?>
 <header class="topbar">
+  <button type="button" class="nav-toggle" data-testid="nav-toggle" aria-controls="admin-nav" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span><?= e(t('admin.menu_toggle')) ?></span></button>
   <nav class="crumbs" aria-label="<?= e(t('admin.breadcrumbs')) ?>" data-testid="header-breadcrumbs">
     <ol>
       <?php foreach ($breadcrumbs as $i => $c): $last = $i === count($breadcrumbs) - 1; ?>
