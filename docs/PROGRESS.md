@@ -5,7 +5,7 @@
 
 ## Текущее состояние
 - Ветка разработки: `claude/sharp-galileo-xzk77w`
-- Следующая фича: **09** (см. `docs/ROADMAP.md`)
+- Следующая фича: **10** (см. `docs/ROADMAP.md`)
 - Как продолжить: `/build-feature next`
 
 ## 00. Подготовка — ✅ 2026-11-19
@@ -76,3 +76,10 @@
 - Правило «не переведено» для документов/альбомов/видео: `title_kk` пусто или равно `title`.
 - Проверено: php -l, PHPUnit 480 зелёный; php -S под owner и editor на пустом сайте и с данными — 200, без 500.
 - К исправлению на этапе тестирования (08): нет E2E dashboard-*; мобильная ширина 390px не проверена в браузере; приветствие без времени суток; «Открыть сайт» в шапке и блок «Добавить педагога» из дизайна не сделаны (нет фич); фильтр kk=missing только у новостей; документы без `is_published` в UI.
+
+## 09. Разделы сайта — ✅ 2026-11-23 (без ревью, E2E не писались)
+- Сделано: меню-группа «Разделы сайта» (Страницы, Педагоги, Группы, Достижения, Отзывы). Страницы: 5 фиксированных (o-nas, programma, rezhim, pitanie, usloviya), предзаполнены из index.html, RU/ҚАЗ на `editor.js` (без кнопки фото) + HtmlSanitizer, показ вкл/выкл; «Режим дня» — строки время/занятие/ҚАЗ (добавить, удалить, ↑/↓, шаблон `<template>`, `sections.js`). Педагоги (категории, стаж, фото из медиатеки), группы (возраст, детей, число групп, воспитатели из staff), достижения (год, фото), отзывы; везде порядок ↑/↓, «На сайте/Скрыто», удаление.
+- Файлы: `migrations/009_sections.sql` (pages, schedule_items, staff, groups, group_teachers, achievements, reviews), `app/Models/{SectionModel,Page,Staff,Group,Achievement,Review}.php`, `app/Controllers/Admin/{SectionController,Pages,Staff,Groups,Achievements,Reviews}Controller.php`, `app/Media/SectionsUsageProvider.php`, `admin-views/{pages,staff,groups,achievements,reviews}/*`, partials `section-*.php`, `public/assets/admin/sections.js`.
+- Для фичи 11: `Page::published($slug)` (у rezhim есть `schedule`), `Staff::published()` (+photo), `Group::published()` (+teachers), `Achievement::published()` (+photo), `Review::published()`; все по порядку, только `is_published=1`. Медиа: FK RESTRICT + провайдер (удаление используемого фото запрещено, I-02).
+- Проверено: php -l, PHPUnit 480 зелёный, ручной прогон php -S (создать/изменить/порядок/показ/удалить во всех разделах, ошибки валидации, фото + запрет удаления) — без 500.
+- К исправлению на этапе тестирования (09): нет E2E pages-/staff-/groups-/achievements-/reviews-*; JS режима дня и мобильная ширина в браузере не проверены; сведения о саде (миссия/контакты) — фича 10; «сброс кэша сайта» не вызывается (кэша нет до 11); ҚАЗ-статус только для страниц; сид только страниц и режима дня (группы/педагоги/достижения/отзывы из index.html не засеяны).
