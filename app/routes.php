@@ -4,9 +4,11 @@ declare(strict_types=1);
 use App\Controllers\Admin\AuthController;
 use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\MediaController;
+use App\Controllers\Admin\NewsController;
 use App\Controllers\Admin\ProfileController;
 use App\Controllers\Admin\UsersController;
 use App\Controllers\StubController;
+use App\Controllers\Testing\ClockController;
 use App\Controllers\Testing\ErrorController;
 use App\Controllers\Testing\MediaPickerController;
 use App\Controllers\Testing\MediaUsageController;
@@ -35,6 +37,17 @@ return static function (Router $r): void {
     $r->post($a . '/media/{id:\d+}', Guard::wrap([MediaController::class, 'update']));
     $r->post($a . '/media/{id:\d+}/delete', Guard::wrap([MediaController::class, 'delete']));
 
+    $r->get($a . '/news', Guard::wrap([NewsController::class, 'index']));
+    $r->get($a . '/news/new', Guard::wrap([NewsController::class, 'create']));
+    $r->post($a . '/news', Guard::wrap([NewsController::class, 'store']));
+    $r->post($a . '/news/autosave', Guard::wrap([NewsController::class, 'autosave']));
+    $r->post($a . '/news/preview', Guard::wrap([NewsController::class, 'previewDraft']));
+    $r->get($a . '/news/slug', Guard::wrap([NewsController::class, 'slug']));
+    $r->get($a . '/news/{id:\d+}/edit', Guard::wrap([NewsController::class, 'edit']));
+    $r->get($a . '/news/{id:\d+}/preview', Guard::wrap([NewsController::class, 'preview']));
+    $r->post($a . '/news/{id:\d+}', Guard::wrap([NewsController::class, 'update']));
+    $r->post($a . '/news/{id:\d+}/delete', Guard::wrap([NewsController::class, 'delete']));
+
     $r->get($a . '/users', Guard::wrap([UsersController::class, 'index'], 'owner'));
     $r->get($a . '/users/new', Guard::wrap([UsersController::class, 'create'], 'owner'));
     $r->post($a . '/users', Guard::wrap([UsersController::class, 'store'], 'owner'));
@@ -50,6 +63,7 @@ return static function (Router $r): void {
         $r->get('/__test/session-age', [SessionController::class, 'age']);
         $r->get('/__test/media-picker', Guard::wrap([MediaPickerController::class, 'show']));
         $r->post('/__test/media-picker', Guard::wrap([MediaPickerController::class, 'echo']));
+        $r->post('/__test/clock', [ClockController::class, 'set']);
         $r->post('/__test/media-usage', [MediaUsageController::class, 'set']);
     }
 };

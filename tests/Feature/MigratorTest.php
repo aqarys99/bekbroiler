@@ -19,14 +19,19 @@ final class MigratorTest extends TestCase
     {
         $pdo = Database::open($this->tempDir() . '/m.sqlite');
         $m = new Migrator($pdo);
-        $this->assertSame(['001_core.sql', '002_auth.sql', '003_remember_rotation.sql', '004_media.sql'], $m->pending());
-        $this->assertSame(['001_core.sql', '002_auth.sql', '003_remember_rotation.sql', '004_media.sql'], $m->migrate());
+        $expected = array_map('basename', glob(ROOT . '/migrations/*.sql'));
+        sort($expected);
+        $this->assertSame($expected, $m->pending());
+        $this->assertSame($expected, $m->migrate());
         foreach (['users', 'login_attempts', 'settings', 'audit_log', 'schema_migrations'] as $t) {
             $this->assertContains($t, $this->tables($pdo));
         }
         $this->assertSame([], $m->migrate());
         $this->assertSame([], $m->pending());
-        $this->assertSame(['001', '002', '003', '004'], $pdo->query('SELECT version FROM schema_migrations')->fetchAll(PDO::FETCH_COLUMN));
+        $this->assertSame(
+            array_map(static fn(string $f): string => substr($f, 0, 3), $expected),
+            $pdo->query('SELECT version FROM schema_migrations ORDER BY version')->fetchAll(PDO::FETCH_COLUMN)
+        );
     }
 
     /** I-17 */

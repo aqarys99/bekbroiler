@@ -8,6 +8,7 @@ return [
         'label' => 'menu.group.content',
         'items' => [
             ['key' => 'dashboard', 'label' => 'menu.dashboard', 'url' => '', 'icon' => 'home', 'role' => 'editor', 'testid' => 'nav-dashboard'],
+            ['key' => 'news', 'label' => 'menu.news', 'url' => '/news', 'icon' => 'news', 'role' => 'editor', 'testid' => 'nav-news'],
             ['key' => 'media', 'label' => 'menu.media', 'url' => '/media', 'icon' => 'image', 'role' => 'editor', 'testid' => 'nav-media'],
         ],
     ],
