@@ -16,6 +16,16 @@ return [
         ],
     ],
     [
+        'label' => 'menu.group.sections',
+        'items' => [
+            ['key' => 'pages', 'label' => 'menu.pages', 'url' => '/pages', 'icon' => 'page', 'role' => 'editor', 'testid' => 'nav-pages'],
+            ['key' => 'staff', 'label' => 'menu.staff', 'url' => '/staff', 'icon' => 'people', 'role' => 'editor', 'testid' => 'nav-staff'],
+            ['key' => 'groups', 'label' => 'menu.groups', 'url' => '/groups', 'icon' => 'people', 'role' => 'editor', 'testid' => 'nav-groups'],
+            ['key' => 'achievements', 'label' => 'menu.achievements', 'url' => '/achievements', 'icon' => 'star', 'role' => 'editor', 'testid' => 'nav-achievements'],
+            ['key' => 'reviews', 'label' => 'menu.reviews', 'url' => '/reviews', 'icon' => 'chat', 'role' => 'editor', 'testid' => 'nav-reviews'],
+        ],
+    ],
+    [
         'label' => 'menu.group.system',
         'items' => [
             ['key' => 'users', 'label' => 'menu.users', 'url' => '/users', 'icon' => 'key', 'role' => 'owner', 'testid' => 'nav-users'],

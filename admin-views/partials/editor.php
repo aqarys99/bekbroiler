@@ -2,7 +2,7 @@
 /**
  * Текстовый редактор (WYSIWYG на contenteditable, public/assets/admin/editor.js).
  * Ожидает $ed: name (имя скрытой textarea), labelId (id подписи), testid, html (уже санитизированный HTML), [placeholder].
- * Без JS виден обычный textarea. Кнопки видео нет (фича 07).
+ * Без JS виден обычный textarea. Кнопки видео нет. [nophoto] — без кнопки фото.
  *
  * @var array $ed
  */
@@ -19,7 +19,7 @@ $svg = static fn(string $d): string => '<svg width="18" height="18" viewBox="0 0
     <?= $btn('heading', 'news-tb-heading', t('news.tb.heading'), '<b aria-hidden="true">H</b>') ?>
     <?= $btn('list', 'news-tb-list', t('news.tb.list'), $svg('<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>')) ?>
     <?= $btn('link', 'news-tb-link', t('news.tb.link'), $svg('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'), false) ?>
-    <?= $btn('photo', 'news-tb-photo', t('news.tb.photo'), $svg('<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/>'), false) ?>
+    <?php if (empty($ed['nophoto'])): ?><?= $btn('photo', 'news-tb-photo', t('news.tb.photo'), $svg('<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/>'), false) ?><?php endif; ?>
   </div>
   <div class="editor__area" id="<?= e($ed['labelId']) ?>-area" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="<?= e($ed['labelId']) ?>"
     data-placeholder="<?= e($ed['placeholder'] ?? '') ?>" data-testid="<?= e($ed['testid']) ?>" spellcheck="true"><?= $ed['html'] ?></div>

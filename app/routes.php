@@ -1,13 +1,18 @@
 <?php
 declare(strict_types=1);
 
+use App\Controllers\Admin\AchievementsController;
 use App\Controllers\Admin\AuthController;
 use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\DocumentsController;
 use App\Controllers\Admin\GalleryController;
+use App\Controllers\Admin\GroupsController;
 use App\Controllers\Admin\MediaController;
 use App\Controllers\Admin\NewsController;
+use App\Controllers\Admin\PagesController;
 use App\Controllers\Admin\ProfileController;
+use App\Controllers\Admin\ReviewsController;
+use App\Controllers\Admin\StaffController;
 use App\Controllers\Admin\UsersController;
 use App\Controllers\Admin\VideosController;
 use App\Controllers\StubController;
@@ -78,6 +83,47 @@ return static function (Router $r): void {
     $r->post($a . '/videos/{id:\d+}/publish', Guard::wrap([VideosController::class, 'publish']));
     $r->post($a . '/videos/{id:\d+}/move', Guard::wrap([VideosController::class, 'move']));
     $r->post($a . '/videos/{id:\d+}/delete', Guard::wrap([VideosController::class, 'delete']));
+
+    $r->get($a . '/pages', Guard::wrap([PagesController::class, 'index']));
+    $r->get($a . '/pages/{id:\d+}', Guard::wrap([PagesController::class, 'edit']));
+    $r->post($a . '/pages/{id:\d+}', Guard::wrap([PagesController::class, 'update']));
+    $r->post($a . '/pages/{id:\d+}/publish', Guard::wrap([PagesController::class, 'publish']));
+
+    $r->get($a . '/staff', Guard::wrap([StaffController::class, 'index']));
+    $r->get($a . '/staff/new', Guard::wrap([StaffController::class, 'create']));
+    $r->post($a . '/staff', Guard::wrap([StaffController::class, 'store']));
+    $r->get($a . '/staff/{id:\d+}', Guard::wrap([StaffController::class, 'edit']));
+    $r->post($a . '/staff/{id:\d+}', Guard::wrap([StaffController::class, 'update']));
+    $r->post($a . '/staff/{id:\d+}/publish', Guard::wrap([StaffController::class, 'publish']));
+    $r->post($a . '/staff/{id:\d+}/move', Guard::wrap([StaffController::class, 'move']));
+    $r->post($a . '/staff/{id:\d+}/delete', Guard::wrap([StaffController::class, 'delete']));
+
+    $r->get($a . '/groups', Guard::wrap([GroupsController::class, 'index']));
+    $r->get($a . '/groups/new', Guard::wrap([GroupsController::class, 'create']));
+    $r->post($a . '/groups', Guard::wrap([GroupsController::class, 'store']));
+    $r->get($a . '/groups/{id:\d+}', Guard::wrap([GroupsController::class, 'edit']));
+    $r->post($a . '/groups/{id:\d+}', Guard::wrap([GroupsController::class, 'update']));
+    $r->post($a . '/groups/{id:\d+}/publish', Guard::wrap([GroupsController::class, 'publish']));
+    $r->post($a . '/groups/{id:\d+}/move', Guard::wrap([GroupsController::class, 'move']));
+    $r->post($a . '/groups/{id:\d+}/delete', Guard::wrap([GroupsController::class, 'delete']));
+
+    $r->get($a . '/achievements', Guard::wrap([AchievementsController::class, 'index']));
+    $r->get($a . '/achievements/new', Guard::wrap([AchievementsController::class, 'create']));
+    $r->post($a . '/achievements', Guard::wrap([AchievementsController::class, 'store']));
+    $r->get($a . '/achievements/{id:\d+}', Guard::wrap([AchievementsController::class, 'edit']));
+    $r->post($a . '/achievements/{id:\d+}', Guard::wrap([AchievementsController::class, 'update']));
+    $r->post($a . '/achievements/{id:\d+}/publish', Guard::wrap([AchievementsController::class, 'publish']));
+    $r->post($a . '/achievements/{id:\d+}/move', Guard::wrap([AchievementsController::class, 'move']));
+    $r->post($a . '/achievements/{id:\d+}/delete', Guard::wrap([AchievementsController::class, 'delete']));
+
+    $r->get($a . '/reviews', Guard::wrap([ReviewsController::class, 'index']));
+    $r->get($a . '/reviews/new', Guard::wrap([ReviewsController::class, 'create']));
+    $r->post($a . '/reviews', Guard::wrap([ReviewsController::class, 'store']));
+    $r->get($a . '/reviews/{id:\d+}', Guard::wrap([ReviewsController::class, 'edit']));
+    $r->post($a . '/reviews/{id:\d+}', Guard::wrap([ReviewsController::class, 'update']));
+    $r->post($a . '/reviews/{id:\d+}/publish', Guard::wrap([ReviewsController::class, 'publish']));
+    $r->post($a . '/reviews/{id:\d+}/move', Guard::wrap([ReviewsController::class, 'move']));
+    $r->post($a . '/reviews/{id:\d+}/delete', Guard::wrap([ReviewsController::class, 'delete']));
 
     $r->get($a . '/users', Guard::wrap([UsersController::class, 'index'], 'owner'));
     $r->get($a . '/users/new', Guard::wrap([UsersController::class, 'create'], 'owner'));
