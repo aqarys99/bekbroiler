@@ -72,7 +72,7 @@ $backQuery = '?back=' . rawurlencode($base . $backParam);
     <?php foreach ($items as $row): $id = (int)$row['id']; ?>
     <li>
       <a class="media-item" href="<?= e(admin_url('/media/' . $id) . $backQuery) ?>" data-testid="media-item" title="<?= e($row['original_name']) ?>">
-        <span class="media-item__img"><?php if ($row['type'] === 'file'): ?><span class="doc-badge doc-badge--other"><?= e(strtoupper(pathinfo((string)$row['path'], PATHINFO_EXTENSION))) ?></span><?php else: ?><?= media_picture($row, 'thumb', ['sizes' => '200px']) ?><?php endif; ?></span>
+        <span class="media-item__img"><?php if (in_array($row['type'], ['file', 'video'], true)): ?><span class="doc-badge doc-badge--other"><?= e(strtoupper(pathinfo((string)$row['path'], PATHINFO_EXTENSION))) ?></span><?php else: ?><?= media_picture($row, 'thumb', ['sizes' => '200px']) ?><?php endif; ?></span>
         <span class="media-item__name"><?= e($row['original_name']) ?></span>
         <span class="media-item__meta"><?= $row['width'] !== null ? e((int)$row['width'] . ' × ' . (int)$row['height'] . ' px') : e(format_bytes((int)$row['size'])) ?></span>
         <?php if (($counts[$id] ?? 0) > 0): ?><span class="media-item__used" data-testid="media-item-used"><?= e(t('media.used_badge')) ?></span><?php endif; ?>

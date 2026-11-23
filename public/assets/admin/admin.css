@@ -478,3 +478,30 @@ html.js .editor__source{display:none}
 .btn--icon{width:44px;height:44px;border:1px solid #D5D9E0;border-radius:8px;background:#fff;font:inherit;font-size:18px;cursor:pointer;color:var(--text)}
 .btn--icon:disabled{color:#9AA1AE;cursor:not-allowed}
 .btn--text.is-danger{color:var(--danger)}
+
+/* Видео (07) */
+.video-add{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.video-add__head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.video-add__head h2,.video-add .card h2{margin:0}
+.video-add__row{display:flex;gap:10px;flex-wrap:wrap}
+.video-add__row .input{flex:1 1 220px;width:auto}
+.video-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #EEF0F3}
+.video-row--edit{flex-direction:column;align-items:stretch;padding:20px;background:#FAFBFC}
+.video-row__edit-actions{display:flex;gap:10px;flex-wrap:wrap}
+.video-row__main{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.video-row__title{overflow-wrap:anywhere}
+.video-row__meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.video-thumb{width:96px;height:54px;border-radius:8px;background:#F0F2F5;color:var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 auto}
+.video-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.src-tag{display:inline-flex;padding:1px 8px;border-radius:6px;font-weight:600;font-size:13px;background:#F0F2F5;color:#4A5160}
+.src-tag--youtube{background:var(--danger-bg);color:var(--danger)}
+.pill-state--btn{border:0;cursor:pointer;font-family:inherit;min-height:32px}
+.video-progress{display:flex;flex-direction:column;gap:8px}
+.video-progress__name{font-weight:600;overflow-wrap:anywhere}
+.video-progress__bar{height:8px;background:#E8EBF0;border-radius:999px;overflow:hidden}
+.video-progress__bar>div{height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .2s}
+.video-progress__bar--busy>div{width:40%;animation:video-busy 1.4s ease-in-out infinite alternate}
+@keyframes video-busy{from{margin-left:0}to{margin-left:60%}}
+.video-progress__text{font-size:14px;color:var(--muted)}
+.video-progress__actions{display:flex;gap:8px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){.video-progress__bar--busy>div{animation:none}}

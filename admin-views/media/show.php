@@ -23,12 +23,12 @@ $formAction = admin_url('/media/' . $id);
         <?php if ($missingFiles): ?>
         <span><?= e(t('media.missing_file')) ?></span>
         <?php else: ?>
-        <?php if ($media['type'] === 'file'): ?><span class="doc-badge doc-badge--other"><?= e(strtoupper(pathinfo((string)$media['path'], PATHINFO_EXTENSION))) ?></span><?php else: ?>
+        <?php if (in_array($media['type'], ['file', 'video'], true)): ?><span class="doc-badge doc-badge--other"><?= e(strtoupper(pathinfo((string)$media['path'], PATHINFO_EXTENSION))) ?></span><?php else: ?>
         <?= media_picture($media, 'medium', ['sizes' => '(min-width: 900px) 600px, 100vw']) ?>
         <?php endif; ?>
         <?php endif; ?>
       </div>
-      <?php if ($media['type'] === 'file'): ?>
+      <?php if (in_array($media['type'], ['file', 'video'], true)): ?>
       <a class="btn btn--md btn--ghost" href="<?= e(url('/uploads/' . $media['path'])) ?>" target="_blank" rel="noopener" data-testid="media-open"><?= e(t('media.open')) ?></a>
       <?php elseif (media_url($media, 'large') !== ''): ?>
       <a class="btn btn--md btn--ghost" href="<?= e(media_url($media, 'large')) ?>" target="_blank" rel="noopener" data-testid="media-open"><?= e(t('media.open')) ?></a>

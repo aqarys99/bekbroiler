@@ -65,11 +65,7 @@ final class Media
      */
     public static function availableTypes(): array
     {
-        $present = array_column(Database::fetchAll('SELECT DISTINCT type FROM media'), 'type');
-        $types = ['all', 'image'];
-        if (in_array('video', $present, true)) {
-            $types[] = 'video';
-        }
+        $types = ['all', 'image', 'video']; // «Видео» — с фичи 07
         $types[] = 'file'; // «Документы» — с фичи 05
         return $types;
     }
@@ -253,7 +249,7 @@ final class Media
     public static function filePaths(array $row): array
     {
         $paths = [];
-        if (($row['type'] ?? '') === 'file') {
+        if (in_array($row['type'] ?? '', ['file', 'video'], true)) {
             $p = (string)($row['path'] ?? '');
             return $p !== '' && !str_contains($p, '..') && $p[0] !== '/' && !str_contains($p, "\0") ? [$p] : [];
         }

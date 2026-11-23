@@ -11,6 +11,7 @@ return [
             ['key' => 'news', 'label' => 'menu.news', 'url' => '/news', 'icon' => 'news', 'role' => 'editor', 'testid' => 'nav-news'],
             ['key' => 'documents', 'label' => 'menu.documents', 'url' => '/documents', 'icon' => 'doc', 'role' => 'editor', 'testid' => 'nav-documents'],
             ['key' => 'gallery', 'label' => 'menu.gallery', 'url' => '/gallery', 'icon' => 'image', 'role' => 'editor', 'testid' => 'nav-gallery'],
+            ['key' => 'videos', 'label' => 'menu.videos', 'url' => '/videos', 'icon' => 'video', 'role' => 'editor', 'testid' => 'nav-videos'],
             ['key' => 'media', 'label' => 'menu.media', 'url' => '/media', 'icon' => 'image', 'role' => 'editor', 'testid' => 'nav-media'],
         ],
     ],

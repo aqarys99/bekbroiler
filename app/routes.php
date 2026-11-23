@@ -9,6 +9,7 @@ use App\Controllers\Admin\MediaController;
 use App\Controllers\Admin\NewsController;
 use App\Controllers\Admin\ProfileController;
 use App\Controllers\Admin\UsersController;
+use App\Controllers\Admin\VideosController;
 use App\Controllers\StubController;
 use App\Controllers\Testing\ClockController;
 use App\Controllers\Testing\ErrorController;
@@ -66,6 +67,17 @@ return static function (Router $r): void {
     $r->post($a . '/documents/{id:\d+}/replace', Guard::wrap([DocumentsController::class, 'replace']));
     $r->post($a . '/documents/{id:\d+}/delete', Guard::wrap([DocumentsController::class, 'delete']));
     $r->post($a . '/documents/{id:\d+}/move', Guard::wrap([DocumentsController::class, 'move']));
+
+    $r->get($a . '/videos', Guard::wrap([VideosController::class, 'index']));
+    $r->post($a . '/videos/youtube', Guard::wrap([VideosController::class, 'youtube']));
+    $r->post($a . '/videos/upload/init', Guard::wrap([VideosController::class, 'uploadInit']));
+    $r->post($a . '/videos/upload/status', Guard::wrap([VideosController::class, 'uploadStatus']));
+    $r->post($a . '/videos/upload/chunk', Guard::wrap([VideosController::class, 'uploadChunk']));
+    $r->post($a . '/videos/upload/finish', Guard::wrap([VideosController::class, 'uploadFinish']));
+    $r->post($a . '/videos/{id:\d+}', Guard::wrap([VideosController::class, 'update']));
+    $r->post($a . '/videos/{id:\d+}/publish', Guard::wrap([VideosController::class, 'publish']));
+    $r->post($a . '/videos/{id:\d+}/move', Guard::wrap([VideosController::class, 'move']));
+    $r->post($a . '/videos/{id:\d+}/delete', Guard::wrap([VideosController::class, 'delete']));
 
     $r->get($a . '/users', Guard::wrap([UsersController::class, 'index'], 'owner'));
     $r->get($a . '/users/new', Guard::wrap([UsersController::class, 'create'], 'owner'));

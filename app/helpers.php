@@ -227,3 +227,38 @@ if (!function_exists('media_picture')) {
         return $html . '></picture>';
     }
 }
+
+if (!function_exists('video_embed')) {
+    /**
+     * HTML плеера видео (из модели Video): YouTube — обложка и iframe youtube-nocookie только по клику;
+     * файл — <video preload="none" controls>. Пустая строка, если данных для показа нет.
+     */
+    function video_embed(array $video): string
+    {
+        $title = (string)($video['title'] ?? '');
+        $poster = (string)($video['poster_url'] ?? \App\Models\Video::posterUrl($video));
+        $wrap = 'position:relative;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;max-width:100%';
+        if (($video['source'] ?? '') === 'youtube' && \App\Core\YouTube::validId((string)($video['youtube_id'] ?? ''))) {
+            $id = (string)$video['youtube_id'];
+            $html = '<div class="video-embed video-embed--yt" style="' . $wrap . '">'
+                . '<button type="button" class="video-embed__play" data-video-yt="' . e($id) . '" data-title="' . e($title) . '" aria-label="' . e(t('videos.play', ['title' => $title])) . '"'
+                . ' style="all:unset;cursor:pointer;display:block;width:100%;height:100%;position:relative">'
+                . ($poster !== '' ? '<img src="' . e($poster) . '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">' : '')
+                . '<span aria-hidden="true" style="position:absolute;inset:0;margin:auto;width:68px;height:48px;border-radius:12px;background:rgba(0,0,0,.7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px">&#9654;</span>'
+                . '</button></div>';
+            if (once('video-embed-script')) {
+                $html .= '<script>document.addEventListener("click",function(e){var b=e.target.closest("[data-video-yt]");if(!b){return;}'
+                    . 'var f=document.createElement("iframe");f.src="https://www.youtube-nocookie.com/embed/"+b.getAttribute("data-video-yt")+"?autoplay=1&rel=0";'
+                    . 'f.title=b.getAttribute("data-title")||"";f.allow="autoplay; encrypted-media; picture-in-picture";f.allowFullscreen=true;'
+                    . 'f.style.cssText="position:absolute;inset:0;width:100%;height:100%;border:0";b.replaceWith(f);});</script>';
+            }
+            return $html;
+        }
+        $src = (string)($video['file_url'] ?? '');
+        if (($video['source'] ?? '') === 'upload' && $src !== '') {
+            return '<video class="video-embed video-embed--file" preload="none" controls playsinline src="' . e($src) . '"'
+                . ($poster !== '' ? ' poster="' . e($poster) . '"' : '') . ' aria-label="' . e($title) . '" style="width:100%;max-width:100%;border-radius:12px;background:#000"></video>';
+        }
+        return '';
+    }
+}
