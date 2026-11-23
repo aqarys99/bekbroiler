@@ -35,6 +35,12 @@ final class Page
         return $p;
     }
 
+    /** Для сайта: показанные страницы (slug, title, title_kk) по порядку — меню и карта сайта. */
+    public static function publishedList(): array
+    {
+        return Database::fetchAll('SELECT slug, title, title_kk, updated_at FROM pages WHERE is_published = 1 ORDER BY sort, id');
+    }
+
     public static function schedule(): array
     {
         return Database::fetchAll('SELECT * FROM schedule_items ORDER BY sort, id');

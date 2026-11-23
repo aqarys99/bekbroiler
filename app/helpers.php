@@ -269,3 +269,27 @@ if (!function_exists('video_embed')) {
         return '';
     }
 }
+
+if (!function_exists('tt')) {
+    /** Строка интерфейса темы сайта на текущем языке (themes/<тема>/lang). */
+    function tt(string $key, array $replace = []): string
+    {
+        return \App\Site\Theme::string($key, $replace);
+    }
+}
+
+if (!function_exists('surl')) {
+    /** Адрес страницы публичного сайта с префиксом языка (/kk/...). */
+    function surl(string $path = '/', array $query = []): string
+    {
+        return \App\Site\Ctx::url($path, $query);
+    }
+}
+
+if (!function_exists('loc')) {
+    /** Текст поля на языке сайта; нет казахского — русский (и пометка «Аударма жоқ» на странице). */
+    function loc(array $row, string $field, ?string $kkKey = null, bool $flag = true): string
+    {
+        return \App\Site\Ctx::pick($row, $field, $kkKey, $flag);
+    }
+}

@@ -583,3 +583,9 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .pill{display:inline-flex;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600}
 .pill--ok{background:var(--ok-bg);color:var(--ok)}
 @media (max-width:599px){.settings__sec{padding:18px}.input--short{max-width:none}}
+
+/* Вставка видео в текст (I-09) */
+.editor__videobox{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:12px 16px;border-bottom:1px solid var(--border,#E2E5EA);background:#F4F5F7}
+.editor__videobox label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;flex:1;min-width:200px}
+.editor__videobox select{height:38px;border:1px solid #E2E5EA;border-radius:8px;padding:0 8px;font:inherit}
+.editor__area [data-video-id]{margin:0 0 10px;padding:14px 16px;border:1px dashed #1F5BD8;border-radius:10px;background:#EEF3FD;color:#1F5BD8;font-weight:600;user-select:none}

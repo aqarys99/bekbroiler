@@ -295,24 +295,55 @@ final class News
         return array_values($ids);
     }
 
-    /** Санитизированный HTML -> HTML страницы: img -> media_picture (I-30). */
-    public static function renderBody(string $html, string $size = 'medium'): string
+    /** id видео из <div data-video-id> в порядке появления (I-09). @return int[] */
+    public static function bodyVideoIds(string ...$bodies): array
+    {
+        $ids = [];
+        foreach ($bodies as $html) {
+            if (preg_match_all('/<div\b[^>]*\bdata-video-id="(\d+)"/i', $html, $m)) {
+                foreach ($m[1] as $id) {
+                    $ids[(int)$id] = (int)$id;
+                }
+            }
+        }
+        return array_values($ids);
+    }
+
+    /**
+     * Санитизированный HTML -> HTML страницы: img -> media_picture (I-30), div[data-video-id] -> video_embed (I-09).
+     * Видео удалено или скрыто — вместо плеера аккуратная заглушка с текстом $videoMissing.
+     */
+    public static function renderBody(string $html, string $size = 'medium', ?string $videoMissing = null): string
     {
         $ids = self::bodyMediaIds($html);
-        if (!$ids) {
-            return $html;
+        if ($ids) {
+            $rows = Media::findMany($ids);
+            $html = (string)preg_replace_callback(
+                '/<img\b[^>]*\bdata-media-id="(\d+)"[^>]*>/i',
+                static fn(array $m): string => media_picture($rows[(int)$m[1]] ?? null, $size),
+                $html
+            );
         }
-        $rows = Media::findMany($ids);
-        return (string)preg_replace_callback(
-            '/<img\b[^>]*\bdata-media-id="(\d+)"[^>]*>/i',
-            static fn(array $m): string => media_picture($rows[(int)$m[1]] ?? null, $size),
-            $html
-        );
+        if (self::bodyVideoIds($html)) {
+            $videoMissing ??= t('news.video_missing');
+            $html = (string)preg_replace_callback(
+                '/<div\b[^>]*\bdata-video-id="(\d+)"[^>]*>\s*<\/div>/i',
+                static function (array $m) use ($videoMissing): string {
+                    $v = Video::findPublished((int)$m[1]);
+                    $embed = $v !== null ? video_embed($v) : '';
+                    return $embed !== '' ? '<div class="body-video">' . $embed . '</div>'
+                        : '<div class="body-video body-video--missing" role="note">' . e($videoMissing) . '</div>';
+                },
+                $html
+            );
+        }
+        return $html;
     }
 
     /** HTML для редактора: у img добавляются src (medium JPEG) и alt. */
     public static function bodyForEditor(string $html): string
     {
+        $html = self::videosForEditor($html);
         $ids = self::bodyMediaIds($html);
         if (!$ids) {
             return $html;
@@ -327,6 +358,23 @@ final class News
                 }
                 $src = media_url($r, 'medium', 'jpg') ?: media_url($r, 'thumb', 'jpg');
                 return '<img data-media-id="' . (int)$m[1] . '" src="' . e($src) . '" alt="' . e((string)$r['alt']) . '">';
+            },
+            $html
+        );
+    }
+
+    /** div[data-video-id] -> блок с названием видео (в редакторе не редактируется). */
+    private static function videosForEditor(string $html): string
+    {
+        if (!self::bodyVideoIds($html)) {
+            return $html;
+        }
+        return (string)preg_replace_callback(
+            '/<div\b[^>]*\bdata-video-id="(\d+)"[^>]*>\s*<\/div>/i',
+            static function (array $m): string {
+                $v = Video::find((int)$m[1]);
+                $label = $v !== null ? (string)$v['title'] : t('news.video_missing');
+                return '<div data-video-id="' . (int)$m[1] . '" contenteditable="false">' . e('▶ ' . $label) . '</div>';
             },
             $html
         );

@@ -12,7 +12,7 @@ test('I-19: название из установщика лежит в settings.
   await expect(page.getByTestId('install-done')).toBeVisible();
   expect(JSON.parse(dbQuery("SELECT value FROM settings WHERE key='site_name'")[0].value)).toBe(name);
   await page.goto('/');
-  await expect(page.getByTestId('stub-site-name')).toHaveText(name);
+  await expect(page.getByTestId('site-name')).toHaveText(name);
   await page.goto('/admin/login');
   await expect(page.getByTestId('login-site-name')).toHaveText(name);
   await expect(page).toHaveTitle(`Вход в админку — ${name}`);

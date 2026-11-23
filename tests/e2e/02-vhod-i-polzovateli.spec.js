@@ -438,7 +438,7 @@ test('header-open-site: новая вкладка с /, rel=noopener', async ({ 
   const [popup] = await Promise.all([page.context().waitForEvent('page'), btn.click()]);
   await popup.waitForLoadState();
   expect(new URL(popup.url()).pathname).toBe('/');
-  await expect(popup.getByTestId('stub-site-name')).toBeVisible();
+  await expect(popup.getByTestId('site-name')).toBeVisible();
 });
 
 test('user-card: инициалы, имя, роль, переход в профиль; одно слово; XSS', async ({ page }) => {
@@ -991,7 +991,7 @@ test('error-403-home: ссылка ведёт на /', async ({ page }) => {
   await page.goto('/admin/users');
   await page.getByTestId('error-403-home').click();
   await expect(page).toHaveURL(/127\.0\.0\.1:8080\/$/);
-  await expect(page.getByTestId('stub-site-name')).toBeVisible();
+  await expect(page.getByTestId('site-name')).toBeVisible();
 });
 
 test('error-400: POST админки без/с неверным _csrf -> 400, данные не изменены', async ({ page }) => {
@@ -1019,7 +1019,7 @@ test('error-400-home: ссылка ведёт на /', async ({ page }) => {
   });
   await expect(page.getByTestId('error-400')).toHaveText('Сессия устарела');
   await page.getByTestId('error-400-home').click();
-  await expect(page.getByTestId('stub-site-name')).toBeVisible();
+  await expect(page.getByTestId('site-name')).toBeVisible();
 });
 
 test('layout: на 360px нет горизонтальной прокрутки на ключевых экранах', async ({ page }) => {

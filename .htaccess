@@ -13,7 +13,7 @@ DirectoryIndex index.php
     </IfModule>
 </FilesMatch>
 RedirectMatch 404 ^/(\.git|\.claude|\.github)(/|$)
-RedirectMatch 404 ^/(docs|tests|vendor|node_modules|storage|config|app|migrations|admin-views|bin)(/|$)
+RedirectMatch 404 ^/(docs|tests|vendor|node_modules|storage|config|app|migrations|admin-views|bin|themes)(/|$)
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -22,7 +22,7 @@ RedirectMatch 404 ^/(docs|tests|vendor|node_modules|storage|config|app|migration
     RewriteRule (^|/)\.(?!well-known) - [F,L]
 
     # Служебные папки
-    RewriteRule ^(app|storage|config|migrations|admin-views|bin|tests|vendor|node_modules|docs|themes/[^/]+/[^/]+\.php)(/|$) - [F,L]
+    RewriteRule ^(app|storage|config|migrations|admin-views|bin|tests|vendor|node_modules|docs|themes)(/|$) - [F,L]
 
     # Служебные файлы в корне проекта
     RewriteCond %{REQUEST_FILENAME} -f

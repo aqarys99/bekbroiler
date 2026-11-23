@@ -1,5 +1,5 @@
 /* Минимальный редактор текста на contenteditable (фича 04). Разметка — admin-views/partials/editor.php.
-   Кнопки: Ж, К, заголовок раздела (h2), список, ссылка, фото из медиатеки. Видео нет (фича 07).
+   Кнопки: Ж, К, заголовок раздела (h2), список, ссылка, фото из медиатеки, видео из раздела «Видео» (I-09).
    Источник данных для сервера — скрытая textarea[name]; HTML чистит сервер (HtmlSanitizer), клиент ничего не доверяет себе.
    API: root.__editor = { getHtml(), setHtml(html), isEmpty(), focus() }. Изменения шлют bubbling-событие input. */
 (function () {
@@ -167,24 +167,26 @@
     }
 
     function insertPhotos(items) {
-      if (!items.length) { return; }
-      var r = saved && inArea(saved.startContainer) ? saved : null;
-      var ref = null;
-      if (r) {
-        ref = topBlock(r.endContainer);
-      }
-      var frag = document.createDocumentFragment();
-      var last = null;
-      items.forEach(function (it) {
+      insertBlocks(items.map(function (it) {
         var p = document.createElement('p');
         var img = document.createElement('img');
         img.setAttribute('data-media-id', String(it.id));
         img.setAttribute('src', it.thumb_jpg || it.thumb_webp || '');
         img.setAttribute('alt', it.alt || '');
         p.appendChild(img);
-        frag.appendChild(p);
-        last = p;
-      });
+        return p;
+      }));
+    }
+
+    function insertBlocks(nodes) {
+      if (!nodes.length) { return; }
+      var r = saved && inArea(saved.startContainer) ? saved : null;
+      var ref = null;
+      if (r) {
+        ref = topBlock(r.endContainer);
+      }
+      var frag = document.createDocumentFragment();
+      nodes.forEach(function (n) { frag.appendChild(n); });
       var tail = document.createElement('p'); tail.appendChild(document.createElement('br'));
       frag.appendChild(tail);
       var empty = ref && ref.nodeName === 'P' && ref.textContent.replace(/[​\s]/g, '') === '' && !ref.querySelector('img');
@@ -210,13 +212,72 @@
       });
     }
 
+    function insertVideo(v) {
+      var d = document.createElement('div');
+      d.setAttribute('data-video-id', String(v.id));
+      d.setAttribute('contenteditable', 'false');
+      d.textContent = '\u25B6 ' + v.title;
+      insertBlocks([d]);
+    }
+
+    function doVideo() {
+      remember();
+      var list = [];
+      var tx = {};
+      try { list = JSON.parse(root.getAttribute('data-videos') || '[]'); } catch (e) { list = []; }
+      try { tx = JSON.parse(root.getAttribute('data-video-texts') || '{}'); } catch (e) { tx = {}; }
+      var box = document.createElement('div');
+      box.className = 'editor__videobox';
+      box.setAttribute('role', 'group');
+      box.setAttribute('data-testid', 'news-video-box');
+      if (!list.length) {
+        var none = document.createElement('p');
+        none.textContent = tx.none || '';
+        box.appendChild(none);
+      } else {
+        var lab = document.createElement('label');
+        lab.textContent = tx.pick || '';
+        var sel = document.createElement('select');
+        sel.setAttribute('data-testid', 'news-video-select');
+        list.forEach(function (v) {
+          var o = document.createElement('option');
+          o.value = String(v.id);
+          o.textContent = v.title;
+          sel.appendChild(o);
+        });
+        lab.appendChild(sel);
+        box.appendChild(lab);
+        var ok = document.createElement('button');
+        ok.type = 'button';
+        ok.className = 'btn btn--primary';
+        ok.setAttribute('data-testid', 'news-video-insert');
+        ok.textContent = tx.insert || 'OK';
+        ok.addEventListener('click', function () {
+          var id = parseInt(sel.value, 10);
+          var v = list.filter(function (x) { return x.id === id; })[0];
+          box.remove();
+          if (v) { insertVideo(v); }
+        });
+        box.appendChild(ok);
+      }
+      var cancel = document.createElement('button');
+      cancel.type = 'button';
+      cancel.className = 'btn btn--outline';
+      cancel.setAttribute('data-testid', 'news-video-cancel');
+      cancel.textContent = tx.cancel || 'Cancel';
+      cancel.addEventListener('click', function () { box.remove(); area.focus(); });
+      box.appendChild(cancel);
+      tb.parentNode.insertBefore(box, area);
+    }
+
     var actions = {
       bold: function () { exec('bold'); },
       italic: function () { exec('italic'); },
       heading: doHeading,
       list: function () { restore(); ensureParagraph(); exec('insertUnorderedList'); },
       link: doLink,
-      photo: doPhoto
+      photo: doPhoto,
+      video: doVideo
     };
 
     tb.addEventListener('mousedown', function (ev) {

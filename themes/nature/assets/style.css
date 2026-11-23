@@ -1,0 +1,14 @@
+/* Тема «Зелёная»: те же шаблоны, другой стиль. */
+:root {
+  --bg: #f6fbf5; --soft: #e8f4e6; --text: #1f3326; --muted: #4c6354;
+  --border: #cfe5cf; --radius: 28px; --shadow: 0 8px 24px rgba(46, 139, 87, .10);
+  --font: Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #14201a; --surface: #1b2a22; --soft: #213329; --text: #e9f3ec; --muted: #b3c9ba; --border: #2f4a3a; }
+}
+h1, h2, h3, .menu a, .btn, .logo, .eyebrow, .tag, .lang a, .a11y-btn, .stat b { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+.hero { background: radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--primary) 28%, transparent), transparent 50%), var(--bg); }
+.hero-art { border-radius: 40px; }
+.hero-photo { border-radius: 28px; }
+.site-footer { background: color-mix(in srgb, var(--primary) 14%, var(--bg)); }

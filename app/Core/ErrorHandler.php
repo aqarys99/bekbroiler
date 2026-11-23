@@ -76,6 +76,13 @@ final class ErrorHandler
         $titleKey = 'error.' . $code . '.title';
         $title = t($titleKey);
         $text = t('error.' . $code . '.text');
+        if ($code === 404 && self::isPublicPath()) {
+            try {
+                return \App\Controllers\Site\SiteController::notFound();
+            } catch (\Throwable) {
+                // падаем на обычную страницу ошибки
+            }
+        }
         try {
             $tpl = 'errors/' . $code;
             if (!View::exists($tpl)) {
@@ -91,6 +98,21 @@ final class ErrorHandler
         } catch (\Throwable) {
             return self::fallback($code, $title, $text, $debug ? $e : null);
         }
+    }
+
+    /** GET-адрес публичного сайта (не админка, не установщик, не служебные тестовые маршруты). */
+    private static function isPublicPath(): bool
+    {
+        if (!in_array($_SERVER['REQUEST_METHOD'] ?? '', ['GET', 'HEAD'], true) || !Installer::isInstalled()) {
+            return false;
+        }
+        $path = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+        $base = rtrim((string)config('base_path', ''), '/');
+        if ($base !== '' && str_starts_with($path, $base)) {
+            $path = substr($path, strlen($base));
+        }
+        $a = '/' . trim((string)config('admin_path', 'admin'), '/');
+        return !($path === $a || str_starts_with($path, $a . '/') || str_starts_with($path, '/install.php') || str_starts_with($path, '/__test'));
     }
 
     private static function fallback(int $code, string $title, string $text, ?\Throwable $e): string

@@ -16,7 +16,8 @@ use App\Controllers\Admin\SettingsController;
 use App\Controllers\Admin\StaffController;
 use App\Controllers\Admin\UsersController;
 use App\Controllers\Admin\VideosController;
-use App\Controllers\StubController;
+use App\Controllers\Site\SeoController;
+use App\Controllers\Site\SiteController;
 use App\Controllers\Testing\ClockController;
 use App\Controllers\Testing\ErrorController;
 use App\Controllers\Testing\MediaPickerController;
@@ -28,7 +29,30 @@ use App\Core\Router;
 return static function (Router $r): void {
     $a = '/' . trim((string)config('admin_path', 'admin'), '/');
 
-    $r->get('/', [StubController::class, 'index']);
+    // Публичный сайт: каждая страница на / и на /kk (казахская версия, если включена в настройках)
+    foreach (['ru', 'kk'] as $lang) {
+        $pre = $lang === 'kk' ? '/kk' : '';
+        $site = static fn(string $action, array $fixed = []): \Closure
+            => static fn(array $p = []) => (new SiteController($lang))->dispatch($action, $fixed + $p);
+        $r->get($lang === 'kk' ? '/kk' : '/', $site('home'));
+        foreach (SiteController::PAGES as $slug) {
+            $r->get($pre . '/' . $slug, $site('staticPage', ['slug' => $slug]));
+        }
+        $r->get($pre . '/pedagogi', $site('staff'));
+        $r->get($pre . '/gruppy', $site('groups'));
+        $r->get($pre . '/novosti', $site('newsList'));
+        $r->get($pre . '/novosti/{slug:[A-Za-z0-9_-]+}', $site('newsItem'));
+        $r->get($pre . '/fotogalereya', $site('gallery'));
+        $r->get($pre . '/fotogalereya/{slug:[A-Za-z0-9_-]+}', $site('album'));
+        $r->get($pre . '/video', $site('videos'));
+        $r->get($pre . '/dokumenty', $site('documents'));
+        $r->get($pre . '/dostizheniya', $site('achievements'));
+        $r->get($pre . '/otzyvy', $site('reviews'));
+        $r->get($pre . '/kontakty', $site('contacts'));
+    }
+    $r->get('/sitemap.xml', [SeoController::class, 'sitemap']);
+    $r->get('/robots.txt', [SeoController::class, 'robots']);
+    $r->get('/theme/{theme:[a-z0-9_-]+}/{file:[A-Za-z0-9_./-]+}', [SeoController::class, 'asset']);
 
     // Вход: единственные маршруты админки без Guard
     $r->get($a . '/login', [AuthController::class, 'showLogin']);

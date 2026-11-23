@@ -67,6 +67,10 @@ final class Guard
                     throw new HttpException(400);
                 }
             }
+            if (!$isRead) {
+                // любое сохранение в админке сбрасывает кэш сайта (I-13), даже если обработчик завершится redirect()/exit
+                register_shutdown_function([SiteCache::class, 'flush']);
+            }
             if ($handler instanceof Closure) {
                 return $handler($params);
             }

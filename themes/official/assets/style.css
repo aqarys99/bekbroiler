@@ -1,0 +1,23 @@
+/* Тема «Строгая»: те же шаблоны, другой стиль. */
+:root {
+  --bg: #f5f6f8; --surface: #fff; --soft: #eceff4; --text: #1c2230; --muted: #4a5163;
+  --border: #d5dae3; --shadow: none; --radius: 6px;
+  --font: "Segoe UI", Roboto, Arial, "Helvetica Neue", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #14171f; --surface: #1c202b; --soft: #232836; --text: #eef0f5; --muted: #b6bccb; --border: #343a4b; }
+}
+body { font-size: 16px; }
+h1, h2, h3 { letter-spacing: -.01em; }
+h1, h2 { font-weight: 700; }
+.eyebrow { letter-spacing: .12em; }
+.btn { border-radius: 4px; padding: 11px 22px; }
+.hero { background: var(--surface); border-bottom: 1px solid var(--border); }
+.hero-art { border-radius: 8px; padding: 12px; }
+.hero-photo { border-radius: 4px; }
+.icon { border-radius: 8px; }
+.avatar { border-radius: 8px; }
+.tag, .lang, .lang a, .pager a, .a11y-btn { border-radius: 4px; }
+.ph, .album-cover, .news-hero, .achv-photo, .prose picture, .prose img { border-radius: 4px; }
+.site-header { background: var(--surface); backdrop-filter: none; }
+.stat b { color: var(--primary); }

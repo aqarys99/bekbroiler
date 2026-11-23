@@ -128,7 +128,7 @@ test.describe('до установки', () => {
     await expect(page.getByTestId('install-done')).toBeVisible();
     expect(JSON.parse(dbQuery("SELECT value FROM settings WHERE key='site_name'")[0].value)).toBe('<b>x</b>');
     await page.goto('/');
-    await expect(page.getByTestId('stub-site-name')).toHaveText('<b>x</b>');
+    await expect(page.getByTestId('site-name')).toHaveText('<b>x</b>');
   });
 
   test('install-owner-name: пусто, >100, схлопывание пробелов', async ({ page }) => {
@@ -263,7 +263,7 @@ test.describe('до установки', () => {
     expect(cfg).toMatch(/'base_path' => ''/);
     const res = await page.goto('/');
     expect(res.status()).toBe(200);
-    await expect(page.getByTestId('stub-site-name')).toBeVisible();
+    await expect(page.getByTestId('site-name')).toBeVisible();
     for (const h of await page.locator('a').evaluateAll((els) => els.map((e) => e.getAttribute('href')))) {
       expect(h || '').not.toContain('evil.example');
     }
@@ -340,28 +340,28 @@ test.describe('после установки', () => {
     await expect(page.getByTestId('login-form')).toBeVisible();
   });
 
-  test('stub-site-name: название из settings, <script> выводится текстом', async ({ page }) => {
+  test('site-name: название из settings, <script> выводится текстом', async ({ page }) => {
     resetApp();
     let dialog = false;
     page.on('dialog', (d) => { dialog = true; d.dismiss(); });
     await installViaUI(page, { siteName: '<script>alert(1)</script>' });
     await expect(page.getByTestId('install-done')).toBeVisible();
     await page.goto('/');
-    await expect(page.getByTestId('stub-site-name')).toHaveText('<script>alert(1)</script>');
+    await expect(page.getByTestId('site-name')).toHaveText('<script>alert(1)</script>');
     await page.goto('/admin/login');
     await expect(page.getByTestId('login-site-name')).toHaveText('<script>alert(1)</script>');
     expect(dialog).toBe(false);
   });
 
-  test('stub-site-name: обычное название садика на / ', async ({ page }) => {
+  test('site-name: обычное название садика на / ', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByTestId('stub-site-name')).toHaveText('Детский сад «Солнышко»');
+    await expect(page.getByTestId('site-name')).toHaveText('Детский сад «Солнышко»');
   });
 
-  test('stub-message: / — 200, /admin требует вход, /admin/ — 301, HEAD / пустой, POST / — 405', async ({ page }) => {
+  test('site-logo: / — 200, /admin требует вход, /admin/ — 301, HEAD / пустой, POST / — 405', async ({ page }) => {
     const res = await page.goto('/');
     expect(res.status()).toBe(200);
-    await expect(page.getByTestId('stub-message')).toHaveText('Сайт скоро откроется.');
+    await expect(page.getByTestId('site-logo')).toBeVisible();
     const adm = await page.request.get('/admin', { maxRedirects: 0 });
     expect(adm.status()).toBe(302);
     const slash = await page.request.get('/admin/', { maxRedirects: 0 });
@@ -387,7 +387,7 @@ test.describe('после установки', () => {
     await page.goto('/net-takoy-stranicy');
     await page.getByTestId('error-404-home').click();
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByTestId('stub-site-name')).toBeVisible();
+    await expect(page.getByTestId('site-name')).toBeVisible();
   });
 
   async function open405(page) {
@@ -413,7 +413,7 @@ test.describe('после установки', () => {
   test('error-405-home: ссылка «На главную» ведёт на /', async ({ page }) => {
     await open405(page);
     await page.getByTestId('error-405-home').click();
-    await expect(page.getByTestId('stub-site-name')).toBeVisible();
+    await expect(page.getByTestId('site-name')).toBeVisible();
   });
 
   test('error-500: без деталей при debug=false, запись в логе', async ({ page }) => {
@@ -453,6 +453,6 @@ test.describe('после установки', () => {
   test('error-500-home: ссылка «На главную» ведёт на /', async ({ page }) => {
     await page.goto('/__test/error');
     await page.getByTestId('error-500-home').click();
-    await expect(page.getByTestId('stub-site-name')).toBeVisible();
+    await expect(page.getByTestId('site-name')).toBeVisible();
   });
 });

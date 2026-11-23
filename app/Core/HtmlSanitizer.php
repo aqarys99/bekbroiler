@@ -63,7 +63,7 @@ final class HtmlSanitizer
         }
         $out = trim($out);
         // тело без текста и без img -> ''
-        if (!preg_match('/<img\b/i', $out) && trim(html_entity_decode(strip_tags($out), ENT_QUOTES | ENT_HTML5, 'UTF-8'), " \t\n\r\0\x0B\xC2\xA0") === '') {
+        if (!preg_match('/<img\b|data-video-id=/i', $out) && trim(html_entity_decode(strip_tags($out), ENT_QUOTES | ENT_HTML5, 'UTF-8'), " \t\n\r\0\x0B\xC2\xA0") === '') {
             return '';
         }
         return $out;
@@ -85,6 +85,20 @@ final class HtmlSanitizer
             $name = strtolower($child->nodeName);
             if (in_array($name, self::DROP, true)) {
                 $node->removeChild($child);
+                continue;
+            }
+            if ($name === 'div' && $child->hasAttribute('data-video-id')) {
+                // вставка видео (I-09): только <div data-video-id="N"></div> и только существующее видео
+                $vid = ctype_digit(trim($child->getAttribute('data-video-id'))) ? (int)trim($child->getAttribute('data-video-id')) : 0;
+                if ($vid <= 0 || \App\Models\Video::find($vid) === null) {
+                    $node->removeChild($child);
+                    continue;
+                }
+                while ($child->firstChild !== null) {
+                    $child->removeChild($child->firstChild);
+                }
+                $this->stripAttrs($child, []);
+                $child->setAttribute('data-video-id', (string)$vid);
                 continue;
             }
             if ($name === 'div') {

@@ -1,0 +1,7 @@
+{
+  "name": "Зелёная",
+  "version": "1.0",
+  "extends": "solnyshko",
+  "description": "Спокойная зелёная тема с крупными скруглениями.",
+  "colors": { "primary": "#2E8B57" }
+}
