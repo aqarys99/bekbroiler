@@ -101,7 +101,7 @@ final class Media
             $params[] = $type;
         }
         if ($q !== '') {
-            self::registerLower();
+            Database::registerLower();
             $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], mb_strtolower($q, 'UTF-8')) . '%';
             $where[] = "(php_lower(original_name) LIKE ? ESCAPE '\\' OR php_lower(alt) LIKE ? ESCAPE '\\')";
             $params[] = $like;
@@ -116,12 +116,6 @@ final class Media
             $params
         );
         return ['items' => $items, 'total' => $total, 'page' => $page, 'pages' => $pages, 'per_page' => $perPage];
-    }
-
-    private static function registerLower(): void
-    {
-        $pdo = Database::connection();
-        $pdo->sqliteCreateFunction('php_lower', static fn($s) => mb_strtolower((string)$s, 'UTF-8'), 1);
     }
 
     /** @param array<string,mixed> $data */

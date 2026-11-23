@@ -31,7 +31,7 @@ final class Requirements
         $wr = static fn(bool $b): string => t($b ? 'install.req.writable' : 'install.req.not_writable');
 
         $add('php', version_compare(PHP_VERSION, '8.1.0', '>='), PHP_VERSION, 'fail', 'install.hint.php');
-        foreach (['pdo_sqlite', 'fileinfo', 'mbstring'] as $ext) {
+        foreach (['pdo_sqlite', 'fileinfo', 'mbstring', 'dom'] as $ext) {
             $has = extension_loaded($ext);
             $add($ext, $has, $yn($has), 'fail', 'install.hint.extension');
         }

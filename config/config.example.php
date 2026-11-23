@@ -22,5 +22,9 @@ return [
         'jpeg_quality'    => 82,
         'per_page'        => 48,
     ],
+    'news' => [
+        'per_page'   => 20,
+        'max_photos' => 50,
+    ],
     'disk_quota_mb' => null,       // объём тарифа; null — disk_total_space()
 ];

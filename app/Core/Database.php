@@ -49,6 +49,12 @@ final class Database
         return $pdo;
     }
 
+    /** SQL-функция php_lower() для поиска без учёта регистра (кириллица, казахские буквы). */
+    public static function registerLower(): void
+    {
+        self::connection()->sqliteCreateFunction('php_lower', static fn($s) => mb_strtolower((string)$s, 'UTF-8'), 1);
+    }
+
     public static function query(string $sql, array $params = []): PDOStatement
     {
         $st = self::connection()->prepare($sql);

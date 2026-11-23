@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 final class RequirementsTest extends TestCase
 {
-    private const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'heic', 'zip',
+    private const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'dom', 'image', 'heic', 'zip',
         'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads', 'writable_sessions'];
 
     private function paths(): array

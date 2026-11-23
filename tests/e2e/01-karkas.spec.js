@@ -7,7 +7,7 @@ const {
   fillInstall, installViaUI, csrfFromInstallPage, validPost,
 } = require('./helpers');
 
-const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'heic', 'zip',
+const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'dom', 'image', 'heic', 'zip',
   'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads', 'writable_sessions'];
 const usersCount = () => Number(dbQuery('SELECT COUNT(*) AS c FROM users')[0].c);
 // reset.php при --debug=0 кладёт тестовый config.php, поэтому «ничего не создано» = нет БД и lock
