@@ -12,13 +12,14 @@ test.afterEach(() => expectNoPageErrors());
 
 test('I-23: в меню owner только существующие разделы, каждая ссылка открывается', async ({ page }) => {
   await login(page, OWNER);
+  await expect(page.getByTestId('nav-news')).toBeVisible();
   const hrefs = await page.locator('nav.nav a.nav__item').evaluateAll((els) => els.map((e) => e.getAttribute('href')));
   expect(hrefs.length).toBeGreaterThanOrEqual(2);
   for (const h of hrefs) {
     const r = await page.goto(h);
     expect(r.status(), h).toBe(200);
   }
-  await expect(page.getByText(/Новости|Документы|Фотогалерея|Видео|Педагоги|Резервная копия/)).toHaveCount(0);
+  await expect(page.getByText(/Документы|Фотогалерея|Видео|Педагоги|Резервная копия/)).toHaveCount(0);
 });
 
 test('I-23: в меню editor нет разделов owner, остальные ссылки открываются', async ({ page }) => {
