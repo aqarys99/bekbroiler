@@ -9,6 +9,7 @@ return [
         'items' => [
             ['key' => 'dashboard', 'label' => 'menu.dashboard', 'url' => '', 'icon' => 'home', 'role' => 'editor', 'testid' => 'nav-dashboard'],
             ['key' => 'news', 'label' => 'menu.news', 'url' => '/news', 'icon' => 'news', 'role' => 'editor', 'testid' => 'nav-news'],
+            ['key' => 'documents', 'label' => 'menu.documents', 'url' => '/documents', 'icon' => 'doc', 'role' => 'editor', 'testid' => 'nav-documents'],
             ['key' => 'media', 'label' => 'menu.media', 'url' => '/media', 'icon' => 'image', 'role' => 'editor', 'testid' => 'nav-media'],
         ],
     ],

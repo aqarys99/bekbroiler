@@ -67,11 +67,10 @@ final class Media
     {
         $present = array_column(Database::fetchAll('SELECT DISTINCT type FROM media'), 'type');
         $types = ['all', 'image'];
-        foreach (self::TYPES as $t) {
-            if ($t !== 'image' && in_array($t, $present, true)) {
-                $types[] = $t;
-            }
+        if (in_array('video', $present, true)) {
+            $types[] = 'video';
         }
+        $types[] = 'file'; // «Документы» — с фичи 05
         return $types;
     }
 
@@ -254,6 +253,10 @@ final class Media
     public static function filePaths(array $row): array
     {
         $paths = [];
+        if (($row['type'] ?? '') === 'file') {
+            $p = (string)($row['path'] ?? '');
+            return $p !== '' && !str_contains($p, '..') && $p[0] !== '/' && !str_contains($p, "\0") ? [$p] : [];
+        }
         foreach (media_variants($row) as $v) {
             foreach (['webp', 'jpg'] as $f) {
                 $p = $v[$f] ?? null;

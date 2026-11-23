@@ -26,3 +26,10 @@ AddType image/webp .webp
         SetHandler none
     </IfModule>
 </FilesMatch>
+
+# Документы: PDF и картинки открываются в браузере, Office-файлы скачиваются (ARCHITECTURE §6.3)
+<FilesMatch "\.(docx?|xlsx?|pptx?)$">
+    <IfModule mod_headers.c>
+        Header set Content-Disposition "attachment"
+    </IfModule>
+</FilesMatch>

@@ -415,3 +415,31 @@ html.js .editor__source{display:none}
 .pv-body p{margin:0 0 14px}
 .pv-body picture{display:block;margin:0 0 14px}
 .pv-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:24px}
+
+/* Документы (фича 05) */
+.doc-banner{display:flex;gap:14px;align-items:flex-start;padding:16px 20px;border-radius:14px;background:var(--warn-bg);color:var(--warn);border:1px solid #F2D2A6}
+.doc-banner--ok{background:var(--ok-bg);color:var(--ok);border-color:#BFE3CA}
+.doc-banner p{margin:4px 0 0}
+.doc-layout{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.doc-main{flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.doc-form{flex:0 1 380px;min-width:280px}
+.doc-form h2{margin:0;font-size:20px}
+.doc-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #EEF0F3}
+.doc-row--missing{background:#FFFBFA}
+.doc-row__main{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.doc-row__title{font-weight:600;color:var(--text);overflow-wrap:anywhere}
+.doc-row__meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.doc-row__actions{display:flex;gap:2px}
+.doc-row__actions .icon-btn:disabled{opacity:.35;cursor:not-allowed}
+.doc-badge{width:48px;height:56px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.doc-badge--pdf{background:var(--danger-bg);color:var(--danger)}
+.doc-badge--xls{background:var(--ok-bg);color:var(--ok)}
+.doc-badge--other{background:#EAF0FD;color:var(--accent)}
+.doc-badge--none{background:#F0F2F5;color:var(--muted)}
+.pill-state--warn{background:var(--warn-bg);color:var(--warn)}
+.pill-state--danger{background:var(--danger-bg);color:var(--danger)}
+.doc-drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:20px;border:2px dashed var(--border-input);border-radius:12px;text-align:center;cursor:pointer;color:var(--muted)}
+.doc-drop b{color:var(--accent)}
+.doc-drop__name{color:var(--text);font-weight:600;overflow-wrap:anywhere}
+.doc-dates{display:flex;flex-wrap:wrap;gap:12px}
+.doc-dates .field{flex:1 1 150px}

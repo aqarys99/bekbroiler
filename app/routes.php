@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Controllers\Admin\AuthController;
 use App\Controllers\Admin\DashboardController;
+use App\Controllers\Admin\DocumentsController;
 use App\Controllers\Admin\MediaController;
 use App\Controllers\Admin\NewsController;
 use App\Controllers\Admin\ProfileController;
@@ -47,6 +48,12 @@ return static function (Router $r): void {
     $r->get($a . '/news/{id:\d+}/preview', Guard::wrap([NewsController::class, 'preview']));
     $r->post($a . '/news/{id:\d+}', Guard::wrap([NewsController::class, 'update']));
     $r->post($a . '/news/{id:\d+}/delete', Guard::wrap([NewsController::class, 'delete']));
+
+    $r->get($a . '/documents', Guard::wrap([DocumentsController::class, 'index']));
+    $r->post($a . '/documents', Guard::wrap([DocumentsController::class, 'store']));
+    $r->post($a . '/documents/{id:\d+}/replace', Guard::wrap([DocumentsController::class, 'replace']));
+    $r->post($a . '/documents/{id:\d+}/delete', Guard::wrap([DocumentsController::class, 'delete']));
+    $r->post($a . '/documents/{id:\d+}/move', Guard::wrap([DocumentsController::class, 'move']));
 
     $r->get($a . '/users', Guard::wrap([UsersController::class, 'index'], 'owner'));
     $r->get($a . '/users/new', Guard::wrap([UsersController::class, 'create'], 'owner'));

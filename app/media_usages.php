@@ -5,6 +5,7 @@ declare(strict_types=1);
 // реализующий App\Media\UsageProvider.
 $providers = [
     \App\Media\NewsUsageProvider::class,
+    \App\Media\DocumentUsageProvider::class,
 ];
 
 if (getenv('APP_ENV') === 'testing') {

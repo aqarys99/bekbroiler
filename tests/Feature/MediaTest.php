@@ -98,12 +98,12 @@ final class MediaTest extends TestCase
     public function testTypeFilterAndAvailableTypes(): void
     {
         $this->add('a.jpg');
-        $this->assertSame(['all', 'image'], Media::availableTypes());
+        $this->assertSame(['all', 'image', 'file'], Media::availableTypes());
         $this->assertSame('all', Media::normalizeType('video'), 'в 03 видео нет — вариант не предлагается');
         $this->assertSame('all', Media::normalizeType('hack'));
         $this->assertSame('image', Media::normalizeType('image'));
         $this->add('v.mp4', '', 'video');
-        $this->assertSame(['all', 'image', 'video'], Media::availableTypes());
+        $this->assertSame(['all', 'image', 'video', 'file'], Media::availableTypes());
         $this->assertSame('video', Media::normalizeType('video'));
         $this->assertSame(1, Media::list('', 'video')['total']);
         $this->assertSame(1, Media::list('', 'image')['total']);
