@@ -12,7 +12,9 @@ return [
     'install.req.pdo_sqlite' => 'Расширение pdo_sqlite (база данных)',
     'install.req.fileinfo' => 'Расширение fileinfo (проверка файлов)',
     'install.req.mbstring' => 'Расширение mbstring (русский и казахский текст)',
-    'install.req.image' => 'Обработка фото: GD с WebP или Imagick',
+    'install.req.image' => 'Обработка фото: GD с WebP',
+    'install.req.heic' => 'Фото HEIC с iPhone (Imagick, необязательно)',
+    'install.hint.heic' => 'Без Imagick фото HEIC не загрузятся без сжатия в браузере; остальные форматы работают.',
     'install.req.zip' => 'Расширение zip (резервные копии)',
     'install.req.upload_max_filesize' => 'Размер загружаемого файла (upload_max_filesize) от 64 МБ',
     'install.req.post_max_size' => 'Размер запроса (post_max_size) от 64 МБ',
@@ -252,4 +254,5 @@ return [
     'audit.media.upload' => 'Загрузил файл',
     'audit.media.update' => 'Изменил описание файла',
     'audit.media.delete' => 'Удалил файл',
+    'media.error.image_unsupported' => 'На хостинге не включена обработка фото (GD с WebP). Обратитесь к администратору хостинга.',
 ];

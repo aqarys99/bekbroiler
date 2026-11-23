@@ -11,12 +11,30 @@ final class ImageProcessor
 {
     public const SIZES = ['large' => 1920, 'medium' => 1200, 'thumb' => 400];
 
+    /** @var bool|null подмена доступности GD (тесты) */
+    private static ?bool $availableOverride = null;
+
+    public static function overrideAvailable(?bool $v): void
+    {
+        self::$availableOverride = $v;
+    }
+
+    /** GD с JPEG и WebP: без него фото обработать нельзя. */
+    public static function available(): bool
+    {
+        return self::$availableOverride
+            ?? (extension_loaded('gd') && function_exists('imagecreatefromjpeg') && function_exists('imagewebp'));
+    }
+
     /**
      * @return array{thumb:array,medium:array,large:array} каждый: w, h, webp (байты), jpg (байты)
      * @throws UploadException
      */
     public static function process(string $path, string $mime): array
     {
+        if (!self::available()) {
+            throw new UploadException('image_unsupported', 503);
+        }
         $isHeic = in_array($mime, ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'], true);
         $blob = null;
         if ($isHeic) {
@@ -24,9 +42,6 @@ final class ImageProcessor
             $path = null;
         } else {
             self::checkDimensions($path);
-        }
-        if (!extension_loaded('gd')) {
-            throw new \RuntimeException('GD не установлен');
         }
         $data = $blob ?? (string)file_get_contents($path);
         $orientation = (!$isHeic && $mime === 'image/jpeg') ? self::readOrientation($data) : 1;

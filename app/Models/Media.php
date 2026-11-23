@@ -250,7 +250,9 @@ final class Media
                 Logger::warning('Файл медиа уже отсутствует на диске', ['path' => $rel]);
                 continue;
             }
-            @unlink($file);
+            if (!@unlink($file)) {
+                Logger::warning('Не удалось удалить файл медиа', ['path' => $rel]);
+            }
         }
     }
 

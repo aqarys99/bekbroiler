@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 final class RequirementsTest extends TestCase
 {
-    private const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'zip',
+    private const KEYS = ['php', 'pdo_sqlite', 'fileinfo', 'mbstring', 'image', 'heic', 'zip',
         'upload_max_filesize', 'post_max_size', 'writable_storage', 'writable_config', 'writable_uploads', 'writable_sessions'];
 
     private function paths(): array
@@ -17,7 +17,7 @@ final class RequirementsTest extends TestCase
         return ['storage' => $d . '/s', 'config' => $d . '/c', 'uploads' => $d . '/u'];
     }
 
-    public function testAllTwelveKeys(): void
+    public function testAllRequirementKeys(): void
     {
         $rows = Requirements::check($this->paths());
         $this->assertSame(self::KEYS, array_column($rows, 'key'));

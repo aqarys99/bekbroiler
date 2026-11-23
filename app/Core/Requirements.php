@@ -35,9 +35,10 @@ final class Requirements
             $has = extension_loaded($ext);
             $add($ext, $has, $yn($has), 'fail', 'install.hint.extension');
         }
-        $gd = extension_loaded('gd') && function_exists('imagewebp');
-        $imagick = extension_loaded('imagick');
-        $add('image', $gd || $imagick, $gd ? 'GD + WebP' : ($imagick ? 'Imagick' : t('install.req.no')), 'fail', 'install.hint.extension');
+        $gd = ImageProcessor::available();
+        $add('image', $gd, $gd ? 'GD + WebP' : t('install.req.no'), 'fail', 'install.hint.extension');
+        $heic = ImageProcessor::heicSupported();
+        $add('heic', $heic, $yn($heic), 'warn', 'install.hint.heic');
         $zip = extension_loaded('zip');
         $add('zip', $zip, $yn($zip), 'warn', 'install.hint.extension');
 

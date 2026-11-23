@@ -13,3 +13,16 @@ Options -Indexes -ExecCGI
 <IfModule mod_php.c>
     php_flag engine off
 </IfModule>
+
+AddType image/webp .webp
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+<FilesMatch "\.(php\d?|phtml|phar)$">
+    RemoveHandler .php .phtml .phar
+    <IfModule mod_php.c>
+        SetHandler none
+    </IfModule>
+</FilesMatch>

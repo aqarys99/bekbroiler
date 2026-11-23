@@ -34,6 +34,9 @@ final class Uploader
      */
     public function handle(?array $file, ?int $userId): array
     {
+        if (!ImageProcessor::available()) {
+            throw new UploadException('image_unsupported', 503);
+        }
         $max = Media::maxUploadBytes();
         $tooLarge = new UploadException('too_large', 413, ['max' => format_bytes($max)]);
         if ($file === null || !isset($file['error'], $file['tmp_name']) || is_array($file['error'])) {
@@ -76,6 +79,7 @@ final class Uploader
         if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
             throw new UploadException('disk_full', 507);
         }
+        $this->sweepTmp($dir);
         $hex = bin2hex(random_bytes(16));
         $base = $rel . '/' . $hex;
         $written = [];
@@ -121,6 +125,16 @@ final class Uploader
                 @unlink($f);
             }
             throw $e;
+        }
+    }
+
+    /** Осиротевшие *.tmp старше часа в целевой папке. */
+    private function sweepTmp(string $dir): void
+    {
+        foreach (glob($dir . '/*.tmp') ?: [] as $f) {
+            if (is_file($f) && filemtime($f) < time() - 3600) {
+                @unlink($f);
+            }
         }
     }
 

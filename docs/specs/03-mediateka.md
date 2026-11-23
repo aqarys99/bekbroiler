@@ -77,7 +77,7 @@ CREATE INDEX idx_media_name ON media (original_name COLLATE NOCASE);
 2. Нет файла или `UPLOAD_ERR_*` ≠ OK → 422 `no_file`; `UPLOAD_ERR_INI_SIZE/FORM_SIZE` или размер > лимита → 413 `too_large`.
 3. Тип только по `finfo` (расширение и mime от браузера не учитываются). Белый список: `image/jpeg`, `image/png`, `image/webp`, `image/gif`. `image/heic`/`image/heif` → дальше только если есть Imagick и `Imagick::queryFormats('HEIC')` не пуст, иначе 415 `heic_unsupported`. Всё остальное, включая SVG, → 415 `not_image`.
 4. `getimagesize()` (читается только заголовок). Нет размеров → 422 `broken`. `w*h > media.max_pixels` → 422 `too_many_pixels`. Дополнительно: если оценка памяти `w*h*5*1.8` больше свободной до `memory_limit` → 422 `too_many_pixels`.
-5. Декодирование: GD (основной); Imagick — если нет GD или для HEIC. GIF: берётся первый кадр, анимация не сохраняется.
+5. Требование: GD с JPEG и WebP (`ImageProcessor::available()`); без него — 503 `image_unsupported` до обработки (не 500), установка такой сервер не пропускает. Декодирование: GD; Imagick — только для HEIC (опция, отдельная warn-строка в Requirements). GIF: берётся первый кадр, анимация не сохраняется.
 6. Поворот по EXIF Orientation (значения 1–8, включая зеркальные) для JPEG (и HEIC через Imagick). Если нет расширения `exif`, Orientation читается встроенным разборщиком APP1 (`ImageProcessor::readOrientation()`).
 7. Варианты: длинная сторона ≤ 400 / 1200 / 1920, пропорции сохраняются, **без увеличения** (маленькое фото — все три варианта в исходном размере). Каждый вариант — WebP (`webp_quality`, прозрачность сохраняется) и JPEG (`jpeg_quality`, прозрачность заливается белым, progressive).
 8. Метаданные удаляются: GD не переносит EXIF/XMP/ICC при перекодировании; Imagick — `stripImage()`. Ни в одном из 6 файлов нет EXIF, GPS, XMP.
@@ -85,7 +85,7 @@ CREATE INDEX idx_media_name ON media (original_name COLLATE NOCASE);
 10. Запись строки `media` в транзакции; если вставка упала — файлы удаляются. Временный файл загрузки PHP не сохраняется, оригинал не хранится.
 11. `audit_log`: `media.upload`, `media.update` (alt), `media.delete`, `entity='media'`.
 
-## Сжатие в браузере (`public/assets/admin/media-upload.js`)
+## Сжатие в браузере (`public/assets/admin/uploader.js`)
 - Файлы обрабатываются строго по очереди: сжать → отправить (XHR, `upload.onprogress`) → следующий. Без ограничения числа файлов в очереди (50 штук подряд должны проходить).
 - До сжатия: тип по `file.type` и расширению. Явно не картинка (pdf, docx, mp4 и т. п.) → строка с ошибкой `not_image`, на сервер не отправляется.
 - JPEG и HEIC, который браузер может декодировать (`createImageBitmap(file, {imageOrientation:'from-image'})`, запасной вариант — `<img>`): canvas, длинная сторона ≤ `client_max_side`, `toBlob('image/jpeg', client_quality)`. Ориентация применяется браузером, canvas не переносит EXIF.
@@ -169,13 +169,13 @@ CREATE INDEX idx_media_name ON media (original_name COLLATE NOCASE);
 | media-delete | Карточка файла | Кнопка «Удалить файл» (красная) в форме с `data-confirm` | Нажать, подтвердить «Удалить файл «имя»? Восстановить его будет нельзя.» | Строка и все 6 файлов удалены, редирект в `$a/media`, тост «Файл удалён», `media-disk-usage` уменьшился, `media.delete` в журнале | Файл используется → кнопка `disabled`, рядом `media-delete-blocked`; если использование появилось между открытием и нажатием — сервер отказывает, редирект на карточку, ошибка «Файл используется: …», ничего не удалено; отмена confirm — ничего; двойной клик — один запрос (`data-once`); уже удалён → 404 |
 | media-delete-blocked | Карточка файла | Пояснение «Удалить нельзя: файл используется. Сначала уберите его из мест, перечисленных выше.» | — | Видно только при непустом `usages()` | — |
 | media-back | Карточка файла | Ссылка «← Медиатека» | Нажать | Возврат в `$a/media` (с прежними `q`, `type`, `page`, если пришли из списка — передаются в `?back=`, принимается только путь внутри `$a/media`) | Чужой `back` → `$a/media` |
-| media-picker-field | Форма фичи-потребителя (в 03 — `/__test/media-picker`) | Поле компонента: скрытый `input name` + превью + кнопки | — | Разметка через `partials/media-picker.php` (`name`, `multiple`, `value`, `label`) | Значение указывает на несуществующий id → превью «Файл удалён», значение очищается при сохранении формы |
+| media-picker-field | Форма фичи-потребителя (в 03 — `/__test/media-picker`) | Поле компонента: скрытый `input name` + превью + кнопки | — | Разметка через `partials/media-field.php` (`name`, `multiple`, `value`, `label`) | Значение указывает на несуществующий id → превью «Файл удалён», значение очищается при сохранении формы |
 | media-picker-open | Поле компонента | Кнопка «Выбрать из медиатеки» | Нажать | Открывается `media-picker-modal` на вкладке «Медиатека», фокус в поиске | Двойной клик — одно окно; нет сети → в окне «Не удалось загрузить список» и кнопка повторить (`media-picker-more`) |
 | media-picker-preview | Поле компонента | Превью выбранного (одно фото или ряд миниатюр) | — | Миниатюры выбранных с alt | Пусто → текст «Фото не выбрано» |
 | media-picker-clear | Поле компонента | Кнопка «Убрать» (одиночный режим) / «×» на миниатюре (множественный) | Нажать | Значение поля очищается / удаляется одно фото; превью обновляется | Нет, когда ничего не выбрано |
 | media-picker-modal | Модальное окно | `role="dialog" aria-modal="true"`, заголовок «Выбор фото» | — | Фокус удерживается внутри окна, фон не прокручивается | Esc закрывает без изменений |
 | media-picker-tab-library | Модальное окно | Вкладка «Медиатека» (`role="tab"`) | Нажать / стрелки | Сетка фото из `$a/media/picker`, уже выбранные отмечены | Пусто → «В медиатеке пока нет фото» + переход на вкладку загрузки по кнопке |
-| media-picker-tab-upload | Модальное окно | Вкладка «Загрузить» | Нажать | Показана зона загрузки и очередь (тот же `media-upload.js`) | — |
+| media-picker-tab-upload | Модальное окно | Вкладка «Загрузить» | Нажать | Показана зона загрузки и очередь (тот же `uploader.js`) | — |
 | media-picker-search | Модальное окно | Поле поиска | Ввести текст | Через 300 мс после последнего символа список перезагружается с `q` | Ответы на старые запросы игнорируются (выводится только последний) |
 | media-picker-item | Модальное окно | Плитка фото (`aria-pressed`) | Нажать / Enter / Space | Одиночный режим: выбрано только это фото; множественный: отмечается/снимается, счётчик «Выбрано: N» на `media-picker-confirm` | — |
 | media-picker-more | Модальное окно | Кнопка «Показать ещё» | Нажать | Догружается следующая страница в конец сетки | Нет на последней странице; двойной клик — одна догрузка |
@@ -320,8 +320,8 @@ audit.media.delete => 'Удалил файл'
 - Обновить `docs/ARCHITECTURE.md` §5 (поля `source_size`, `alt_kk`, `uploaded_by`) и `docs/DEPLOY.md` (лимиты PHP, Imagick для HEIC).
 
 **frontend-builder**
-- `admin-views/media/index.php` (зона, плашка GPS, очередь, фильтр/поиск, сетка, пагинация, диск), `admin-views/media/show.php` (карточка), `admin-views/partials/media-picker.php` (поле + разметка модального окна), `admin-views/testing/media-picker.php`.
-- `public/assets/admin/media-upload.js` (очередь, сжатие canvas, XHR с прогрессом, ошибки, retry, `beforeunload`; экспортирует загрузчик для окна выбора), `public/assets/admin/media-picker.js` (окно, вкладки, поиск с задержкой, выбор, фокус-ловушка).
+- `admin-views/media/index.php` (зона, плашка GPS, очередь, фильтр/поиск, сетка, пагинация, диск), `admin-views/media/show.php` (карточка), `admin-views/partials/media-field.php` (поле + разметка модального окна), `admin-views/testing/media-picker.php`.
+- `public/assets/admin/uploader.js` (очередь, сжатие canvas, XHR с прогрессом, ошибки, retry, `beforeunload`; экспортирует загрузчик для окна выбора), `public/assets/admin/media-picker.js` (окно, вкладки, поиск с задержкой, выбор, фокус-ловушка).
 - Иконка `image` в `partials/icon.php`; гамбургер: кнопка `nav-toggle` в `partials/header.php`, `id="admin-nav"` и `nav-backdrop` в `partials/menu.php`, логика в `admin.js`, стили < 900px в `admin.css`.
 - Стили медиатеки, очереди, модального окна в `admin.css` по Gallery.dc.html; все элементы ≥ 44px по высоте.
 

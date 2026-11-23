@@ -4,7 +4,7 @@
  *   $mf = ['name' => 'cover_media_id', 'label' => '...', 'multiple' => false,
  *          'values' => Media::pickerValues($ids), 'upload' => [...], 'pickerUrl' => '...', 'maxLabel' => '...'];
  *   include __DIR__ . '/../partials/media-field.php';
- * Скрипты (uploader.js, media-picker.js) подключаются один раз на странице: $mfScripts = true (по умолчанию).
+ * Скрипты (uploader.js, media-picker.js) партиал подключает сам, один раз на страницу.
  * Скрытые input'ы создаёт media-picker.js: name (одиночный) или name[] (множественный).
  *
  * @var array $mf
@@ -30,7 +30,7 @@ $fid = 'mf-' . preg_replace('/[^a-z0-9_-]/i', '', (string)$mf['name']);
   <div data-role="inputs"></div>
   <button type="button" class="btn btn--md btn--ghost" data-role="open" data-testid="media-picker-open"><?= e(t('picker.open')) ?></button>
 </div>
-<?php if (($mfScripts ?? true) !== false): ?>
+<?php static $mfScriptsDone = false; if (!$mfScriptsDone): $mfScriptsDone = true; ?>
 <script src="<?= e(asset('admin/uploader.js')) ?>" defer></script>
 <script src="<?= e(asset('admin/media-picker.js')) ?>" defer></script>
 <?php endif; ?>

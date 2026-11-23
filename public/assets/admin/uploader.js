@@ -2,11 +2,13 @@
    Используется на экране «Медиатека» (авто-инициализация [data-uploader]) и в окне выбора (media-picker.js). */
 (function () {
   'use strict';
+  if (window.__mediaUploaderInit) { return; }
+  window.__mediaUploaderInit = true;
 
   var EXT_IMAGE = /\.(jpe?g|png|webp|gif|heic|heif)$/i;
   var EXT_JPEG = /\.jpe?g$/i;
   var EXT_HEIC = /\.(heic|heif)$/i;
-  var NON_RETRY = { not_image: 1, too_large: 1, heic_unsupported: 1, broken: 1, too_many_pixels: 1, no_file: 1, disk_full: 1, session: 1 };
+  var NON_RETRY = { not_image: 1, too_large: 1, heic_unsupported: 1, broken: 1, too_many_pixels: 1, no_file: 1, disk_full: 1, session: 1, image_unsupported: 1 };
 
   function fmt(b) {
     b = Math.max(0, Math.round(b));
@@ -99,6 +101,13 @@
     return EXT_IMAGE.test(file.name || '');
   }
 
+  // Один обработчик beforeunload на страницу, даже если окна пикера открывались много раз
+  var registry = [];
+  var leaveText = '';
+  window.addEventListener('beforeunload', function (ev) {
+    if (registry.some(function (u) { return u.isBusy(); })) { ev.preventDefault(); ev.returnValue = leaveText; return leaveText; }
+  });
+
   // ---------- загрузчик ----------
   /**
    * opts: cfg{url,maxBytes,maxSide,quality,csrf}, i18n, queue{root,summary,saved,clear,list},
@@ -111,9 +120,8 @@
     var running = false;
     var halted = false;
 
-    window.addEventListener('beforeunload', function (ev) {
-      if (isBusy()) { ev.preventDefault(); ev.returnValue = t.leave; return t.leave; }
-    });
+    registry = registry.filter(function (u) { return u.isBusy(); });
+    leaveText = t.leave;
 
     function active(it) { return it.status === 'wait' || it.status === 'compress' || it.status === 'upload'; }
     function isBusy() { return items.some(active); }
@@ -247,6 +255,8 @@
         pending.splice(0).forEach(function (o) { setError(o, 'session', t.err_session, true); });
         return;
       }
+      if (res.status === 413 && !(j && j.code)) { setError(it, 'too_large', t.err_too_large); return; }
+      if (j && j.ok === false && j.code === 'image_unsupported') { setError(it, 'image_unsupported', j.message || t.err_network); return; }
       if (res.status === 400 && j && j.code === 'csrf') { setError(it, 'csrf', t.err_csrf); return; }
       if (j && j.ok === false && j.code && res.status < 500) {
         var msg = t['err_' + j.code] || j.message || t.err_network;
@@ -288,7 +298,9 @@
       refresh();
     });
     refresh();
-    return { add: add, isBusy: isBusy };
+    var api = { add: add, isBusy: isBusy };
+    registry.push(api);
+    return api;
   }
 
   function filesFromDrop(dt) {

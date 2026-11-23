@@ -18,6 +18,8 @@
   }
 
   function init(root) {
+    if (root.__mp) { return; }
+    root.__mp = true;
     var t = {};
     try { t = JSON.parse(root.getAttribute('data-i18n') || '{}'); } catch (e) { t = {}; }
     var state = [];
