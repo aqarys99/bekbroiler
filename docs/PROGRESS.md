@@ -5,7 +5,7 @@
 
 ## Текущее состояние
 - Ветка разработки: `claude/sharp-galileo-xzk77w`
-- Следующая фича: **05. Документы и чек-лист** (см. `docs/ROADMAP.md`)
+- Следующая фича: **06. Фотогалерея** (см. `docs/ROADMAP.md`)
 - Как продолжить: `/build-feature next`
 
 ## 00. Подготовка — ✅ 2026-11-19
@@ -42,3 +42,11 @@
 - Ключевые файлы: `migrations/005_news.sql`, `app/Core/{Clock,Slug,HtmlSanitizer}.php`, `app/Models/News.php`, `app/Media/NewsUsageProvider.php`, `app/Controllers/Admin/NewsController.php`, `admin-views/news/*`, `admin-views/partials/editor.php`, `public/assets/admin/{editor,news-form,news-preview}.js`.
 - Решения: ҚАЗ-копия русского без изменений = «нет перевода» (`News::isTranslated`, `TRANSLATED_SQL`, `translationStats()` для фичи 08); `News::published()`/`latest(3)` для фич 08/11; требуется расширение `dom`; `media-field.php` перезаписывает `$v,$m,$state` — не использовать эти имена в шаблоне-хозяине.
 - Тесты: PHPUnit 480 (1 skip), E2E 04 + crawl зелёные; полный прогон после исправлений шёл, ревью не проводилось.
+
+## 05. Документы и чек-лист — ✅ 2026-11-23 (без ревью, E2E не писались)
+- Сделано: экран «Документы» (баннер N из 10, вкладки категорий, бейджи типа, статусы На сайте / Истекает через N дн. / Срок истёк / Нет файла, «Загрузить» у пустых пунктов с предзаполнением формы), форма «Новый документ» (RU/ҚАЗ, категория, пункт чек-листа, даты), замена файла, удаление, порядок вверх/вниз.
+- Ключевые файлы: `migrations/006_documents.sql`, `app/Models/{Document,Checklist}.php`, `app/Core/DocumentUploader.php`, `app/Media/DocumentUsageProvider.php`, `app/Controllers/Admin/DocumentsController.php`, `admin-views/documents/index.php`, `public/assets/admin/documents.js`.
+- Решения: файлы — `media` type='file', путь `docs/ГГГГ/ММ/<hex>.<ext>` (путь = файл, `Media::filePaths` для file); тип по расширению из белого списка + сигнатура (%PDF, OLE, zip+папка OOXML, finfo для jpg/png); обычная multipart-форма без JS-загрузчика; Content-Disposition attachment для doc/xls/ppt в `public/uploads/.htaccess`; фильтр медиатеки «Документы» показывается всегда; файл удаляется вместе с документом (через `Media::delete`).
+- Для фич 08/11: `Checklist::status()` -> items[state ok|warn|missing], done, total, missing; `Document::publishedByCategory()`; истёкший срок считается warn (пункт засчитан), документы с is_published=0 не учитываются (UI публикации нет, по умолчанию 1).
+- Проверено: php -l, PHPUnit 480 зелёный (поправлен MediaTest под тип «file»), ручной прогон php -S: загрузка PDF, отказ .php, перемещение, замена, удаление — без 500. Долги: E2E для documents-*; Playwright-проверка JS замены файла; при превышении post_max_size форма даёт 400 (CSRF), а не понятный текст.
+- К исправлению на этапе тестирования (05): истёкший документ сейчас `warn` (засчитан) — должен быть `missing`/красный; нет редактирования полей документа (только замена файла/удаление); нет переключателя «показывать на сайте»; при превышении `post_max_size` ответ 400 вместо понятного текста.
