@@ -5,7 +5,7 @@
 
 ## Текущее состояние
 - Ветка разработки: `claude/sharp-galileo-xzk77w`
-- Следующая фича: **04. Новости** (см. `docs/ROADMAP.md`)
+- Следующая фича: **05. Документы и чек-лист** (см. `docs/ROADMAP.md`)
 - Как продолжить: `/build-feature next`
 
 ## 00. Подготовка — ✅ 2026-11-19
@@ -33,3 +33,12 @@
 - Решения: требуется GD с WebP (иначе 503 `image_unsupported`, установка не проходит), Imagick — опция для HEIC; оригиналы не храним; фильтр показывает только доступные типы; потребитель медиа = провайдер в `app/media_usages.php` + FK `ON DELETE RESTRICT`; фото выводятся только через `media_picture()`; JSON-режим Guard (CSRF в `X-CSRF-Token`); пикер подключается partial'ом `media-field.php`, скрипты один раз через `once()`.
 - Тесты: PHPUnit 212 (1 skip root), E2E 213 (вкл. crawl); testid 45/45; связи I-01, I-02, I-07, I-16, I-23–I-27 (через тестовый провайдер `/__test/media-usage`).
 - Долги: **в фиче 06** — `uploader.js:123` фильтр реестра выкидывает простаивающий загрузчик страницы (beforeunload не сработает на странице альбома с пикером): удалять только загрузчики вне DOM; HEIC через Imagick не проверен (нет Imagick в среде); webServer Playwright с `-d upload_max_filesize=25M`.
+
+## Режим работы с фичи 04 (решение пользователя 2026-11-23)
+- Без reviewer, test-writer и циклов исправлений: одна фича = один агент (сервер + экраны) по ARCHITECTURE, дизайну и шаблону предыдущих фич; после фичи — только `php -l`; общий прогон тестов и проверка безопасности — в конце проекта.
+
+## 04. Новости — ✅ 2026-11-23 (без финального ревью)
+- Сделано: список (поиск, фильтр со счётчиками, пагинация, бейдж ҚАЗ), редактор RU/ҚАЗ на своём `editor.js` (contenteditable, Ж/К/H3/список/ссылка/фото из медиатеки, вставка простым текстом), обложка и фото (сортировка) через `media-field.php`, черновик/сейчас/запланировать (Asia/Almaty, без cron), slug с транслитом каз. букв, автосохранение (5 с / ≥15 с), конфликт версий 409, защита от дублей `form_key`, предпросмотр, удаление.
+- Ключевые файлы: `migrations/005_news.sql`, `app/Core/{Clock,Slug,HtmlSanitizer}.php`, `app/Models/News.php`, `app/Media/NewsUsageProvider.php`, `app/Controllers/Admin/NewsController.php`, `admin-views/news/*`, `admin-views/partials/editor.php`, `public/assets/admin/{editor,news-form,news-preview}.js`.
+- Решения: ҚАЗ-копия русского без изменений = «нет перевода» (`News::isTranslated`, `TRANSLATED_SQL`, `translationStats()` для фичи 08); `News::published()`/`latest(3)` для фич 08/11; требуется расширение `dom`; `media-field.php` перезаписывает `$v,$m,$state` — не использовать эти имена в шаблоне-хозяине.
+- Тесты: PHPUnit 480 (1 skip), E2E 04 + crawl зелёные; полный прогон после исправлений шёл, ревью не проводилось.
