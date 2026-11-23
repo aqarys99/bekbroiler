@@ -23,7 +23,11 @@ final class Guard
         $fn = static function (array $params = []) use ($handler, $role) {
             $user = Auth::user();
             $isRead = in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true);
+            $json = Json::wanted();
             if ($user === null) {
+                if ($json) {
+                    return Json::respond(401, ['ok' => false, 'code' => 'session', 'message' => t('media.error.session')]);
+                }
                 $reason = Auth::endReason();
                 if ($reason === 'timeout') {
                     Flash::set('info', 'auth.timeout');
@@ -38,10 +42,30 @@ final class Guard
                 redirect($login);
             }
             if ($role === 'owner' && ($user['role'] ?? '') !== 'owner') {
+                if ($json) {
+                    return Json::respond(403, ['ok' => false, 'code' => 'forbidden', 'message' => t('error.403.title')]);
+                }
                 throw new HttpException(403);
             }
-            if (!$isRead && !csrf_verify(is_string($_POST['_csrf'] ?? null) ? $_POST['_csrf'] : null)) {
-                throw new HttpException(400);
+            if (!$isRead && $json) {
+                // тело больше post_max_size: PHP отдаёт пустые $_POST/$_FILES — это 413, а не ложный 400
+                $postMax = self::iniBytes((string)ini_get('post_max_size'));
+                $len = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+                if ($postMax > 0 && $len > $postMax) {
+                    return Json::respond(413, ['ok' => false, 'code' => 'too_large', 'message' => t('media.error.too_large', ['max' => format_bytes(min($postMax, \App\Models\Media::maxUploadBytes()))])]);
+                }
+            }
+            if (!$isRead) {
+                $token = is_string($_POST['_csrf'] ?? null) ? $_POST['_csrf'] : null;
+                if ($json && ($token === null || $token === '') && is_string($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
+                    $token = $_SERVER['HTTP_X_CSRF_TOKEN'];
+                }
+                if (!csrf_verify($token)) {
+                    if ($json) {
+                        return Json::respond(400, ['ok' => false, 'code' => 'csrf', 'message' => t('media.error.csrf')]);
+                    }
+                    throw new HttpException(400);
+                }
             }
             if ($handler instanceof Closure) {
                 return $handler($params);
@@ -52,6 +76,22 @@ final class Guard
         self::$roles ??= new WeakMap();
         self::$roles[$fn] = $role;
         return $fn;
+    }
+
+    /** Значение php.ini ('8M', '2G', '512K', '-1') в байтах; <= 0 — без лимита. */
+    public static function iniBytes(string $v): int
+    {
+        $v = trim($v);
+        if ($v === '' || !preg_match('/^(-?\d+)\s*([kmg]?)/i', $v, $m)) {
+            return 0;
+        }
+        $n = (int)$m[1];
+        return match (strtolower($m[2])) {
+            'k' => $n * 1024,
+            'm' => $n * 1024 * 1024,
+            'g' => $n * 1024 * 1024 * 1024,
+            default => $n,
+        };
     }
 
     /** Допустимый адрес возврата после входа (внутри админки), иначе адрес главной админки. */

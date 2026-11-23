@@ -121,3 +121,94 @@ if (!function_exists('redirect')) {
         exit;
     }
 }
+
+if (!function_exists('format_bytes')) {
+    /** 0 Б, 312 КБ, 9,8 МБ, 1,2 ГБ (основание 1024). */
+    function format_bytes(int $b): string
+    {
+        if ($b < 1024) {
+            return max(0, $b) . ' Б';
+        }
+        $kb = (int)round($b / 1024);
+        if ($kb < 1024) {
+            return $kb . ' КБ';
+        }
+        $mb = $b / 1048576;
+        if (round($mb, 1) < 1024) {
+            return str_replace('.', ',', number_format($mb, 1, '.', '')) . ' МБ';
+        }
+        return str_replace('.', ',', number_format($b / 1073741824, 1, '.', '')) . ' ГБ';
+    }
+}
+
+if (!function_exists('media_variants')) {
+    /** @return array<string,array<string,mixed>> */
+    function media_variants(array $media): array
+    {
+        $v = $media['variants'] ?? [];
+        if (is_string($v)) {
+            $v = json_decode($v, true);
+        }
+        return is_array($v) ? $v : [];
+    }
+}
+
+if (!function_exists('media_url')) {
+    /** URL варианта фото (size: thumb|medium|large, format: webp|jpg); '' если варианта нет. */
+    function media_url(array $media, string $size = 'medium', string $format = 'webp'): string
+    {
+        $rel = media_variants($media)[$size][$format] ?? null;
+        return is_string($rel) && $rel !== '' ? url('/uploads/' . ltrim($rel, '/')) : '';
+    }
+}
+
+if (!function_exists('media_picture')) {
+    /** <picture> с WebP-srcset и JPEG-фолбэком; null (файл удалён) — пустая строка. */
+    function media_picture(?array $media, string $size = 'medium', array $attrs = []): string
+    {
+        if ($media === null) {
+            return '';
+        }
+        $variants = media_variants($media);
+        $main = $variants[$size] ?? null;
+        if (!is_array($main) || empty($main['jpg'])) {
+            return '';
+        }
+        $set = [];
+        foreach (['thumb', 'medium', 'large'] as $s) {
+            if (isset($variants[$s]['webp'], $variants[$s]['w'])) {
+                $set[(int)$variants[$s]['w']] = media_url($media, $s, 'webp') . ' ' . (int)$variants[$s]['w'] . 'w';
+            }
+        }
+        ksort($set);
+        $alt = array_key_exists('alt', $attrs) ? (string)$attrs['alt'] : (string)($media['alt'] ?? '');
+        unset($attrs['alt']);
+        $img = ['src' => media_url($media, $size, 'jpg'), 'loading' => 'lazy'];
+        if (isset($main['w'], $main['h'])) {
+            $img['width'] = (int)$main['w'];
+            $img['height'] = (int)$main['h'];
+        }
+        $sizes = null;
+        if (isset($attrs['sizes'])) {
+            $sizes = (string)$attrs['sizes'];
+            unset($attrs['sizes']);
+        }
+        foreach ($attrs as $k => $v) {
+            $k = (string)$k;
+            if (preg_match('/^[a-zA-Z][a-zA-Z0-9_:-]*$/', $k) && !preg_match('/^(src|srcset|on)/i', $k)) {
+                $img[$k] = (string)$v;
+            }
+        }
+        $img['alt'] = $alt;
+        $html = '<picture>';
+        if ($set) {
+            $html .= '<source type="image/webp" srcset="' . e(implode(', ', $set)) . '"'
+                . ($sizes !== null ? ' sizes="' . e($sizes) . '"' : '') . '>';
+        }
+        $html .= '<img';
+        foreach ($img as $k => $v) {
+            $html .= ' ' . $k . '="' . e($v) . '"';
+        }
+        return $html . '></picture>';
+    }
+}
