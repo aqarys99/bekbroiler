@@ -45,6 +45,9 @@ final class PagesController extends BaseController
     public function edit(array $params): string
     {
         $row = $this->mustFind($params);
+        if (Page::isAttestation($row)) {
+            redirect(Page::adminUrl($row));
+        }
         return $this->form($row, $row, null, [], [], 200);
     }
 

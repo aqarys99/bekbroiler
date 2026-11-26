@@ -29,7 +29,7 @@ final class Page
     /** Список для админки: поиск по названию/адресу, статус (all|shown|hidden), число документов. */
     public static function search(string $q = '', string $status = 'all'): array
     {
-        $where = [];
+        $where = ["p.kind = 'regular'"];
         $args = [];
         if ($q !== '') {
             Database::registerLower();
@@ -72,7 +72,18 @@ final class Page
     /** Страницы для выбора (меню, документы). */
     public static function options(): array
     {
-        return Database::fetchAll('SELECT id, slug, title, title_kk, is_published FROM pages ORDER BY sort, id');
+        return Database::fetchAll('SELECT id, slug, title, title_kk, is_published, kind FROM pages ORDER BY sort, id');
+    }
+
+    public static function isAttestation(?array $row): bool
+    {
+        return $row !== null && ($row['kind'] ?? 'regular') === 'attestation';
+    }
+
+    /** Экран страницы в админке: «Аттестация» или «Страницы». */
+    public static function adminUrl(array $row): string
+    {
+        return admin_url((self::isAttestation($row) ? '/attestation/' : '/pages/') . (int)$row['id']);
     }
 
     public static function create(array $data): int
@@ -82,6 +93,7 @@ final class Page
             return Database::insert('pages', [
                 'slug' => $data['slug'], 'title' => $data['title'], 'title_kk' => $data['title_kk'],
                 'body' => $data['body'], 'body_kk' => $data['body_kk'], 'is_published' => $data['is_published'], 'sort' => $sort,
+                'kind' => ($data['kind'] ?? 'regular') === 'attestation' ? 'attestation' : 'regular',
             ]);
         });
     }

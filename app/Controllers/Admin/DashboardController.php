@@ -72,7 +72,7 @@ final class DashboardController extends BaseController
     {
         $all = [
             ['key' => 'photo', 'label' => 'dashboard.action.photo', 'url' => '/gallery', 'icon' => 'image', 'role' => 'editor'],
-            ['key' => 'document', 'label' => 'dashboard.action.document', 'url' => '/documents/new', 'icon' => 'doc', 'role' => 'editor'],
+            ['key' => 'document', 'label' => 'dashboard.action.document', 'url' => '/attestation', 'icon' => 'doc', 'role' => 'editor'],
             ['key' => 'video', 'label' => 'dashboard.action.video', 'url' => '/videos', 'icon' => 'video', 'role' => 'editor'],
             ['key' => 'news', 'label' => 'dashboard.action.news', 'url' => '/news/new', 'icon' => 'news', 'role' => 'editor'],
         ];

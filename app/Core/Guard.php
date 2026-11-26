@@ -58,6 +58,18 @@ final class Guard
                     return Json::respond(413, ['ok' => false, 'code' => 'too_large', 'message' => t('media.error.too_large', ['max' => format_bytes(min($postMax, \App\Models\Media::maxUploadBytes()))])]);
                 }
             }
+            if (!$isRead && !$json) {
+                // тело больше post_max_size: PHP отдал пустые $_POST/$_FILES — понятная ошибка вместо ложного 400
+                $postMax = self::iniBytes((string)ini_get('post_max_size'));
+                $len = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+                if ($postMax > 0 && $len > $postMax && $_POST === [] && $_FILES === []) {
+                    $uri = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+                    $ref = (string)parse_url((string)($_SERVER['HTTP_REFERER'] ?? ''), PHP_URL_PATH);
+                    $back = $ref !== '' && str_starts_with($ref, admin_url()) ? $ref : admin_url();
+                    Flash::set('error', str_contains($uri, '/attestation') ? 'attestation.error.post_too_large' : 'error.post_too_large', ['max' => format_bytes($postMax)]);
+                    redirect($back);
+                }
+            }
             if (!$isRead) {
                 $token = is_string($_POST['_csrf'] ?? null) ? $_POST['_csrf'] : null;
                 if ($json && ($token === null || $token === '') && is_string($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {

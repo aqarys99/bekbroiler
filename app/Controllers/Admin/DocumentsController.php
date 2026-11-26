@@ -35,37 +35,27 @@ final class DocumentsController extends BaseController
         ]);
     }
 
-    /** «Загрузить» у пункта чек-листа: сначала выбрать страницу, затем форма добавления на её экране. */
+    /** Старый адрес «Загрузить» у пункта чек-листа: теперь выбор страницы в разделе «Аттестация». */
     public function choose(array $params = []): string
     {
         $key = is_string($_GET['checklist'] ?? null) ? $_GET['checklist'] : '';
-        $item = null;
-        foreach (Document::checklistItems() as $c) {
-            if ($c['key'] === $key) {
-                $item = $c;
-            }
-        }
-        $pages = Page::options();
-        $pid = is_string($_GET['page'] ?? null) && preg_match('/^\d{1,9}$/', $_GET['page']) ? (int)$_GET['page'] : 0;
-        foreach ($pages as $p) {
-            if ((int)$p['id'] === $pid) {
-                redirect(self::addUrl($pid, $key));
-            }
-        }
-        return $this->page('documents/choose', t('documents.choose.title'), [
-            $this->home(), ['label' => t('documents.title'), 'url' => admin_url('/documents')], ['label' => t('documents.choose.title'), 'url' => null],
-        ], ['item' => $item, 'key' => $item['key'] ?? '', 'pages' => $pages]);
+        redirect(self::uploadUrl($key));
     }
 
-    /** Ссылка на форму добавления документа на экране страницы (с предвыбранным пунктом чек-листа). */
+    /** Ссылка на форму добавления файла на экране страницы (с предвыбранным пунктом чек-листа). */
     public static function addUrl(int $pageId, string $checklist = ''): string
     {
+        $page = Page::find($pageId);
+        if (Page::isAttestation($page)) {
+            return admin_url('/attestation/' . $pageId) . ($checklist !== '' ? '?' . http_build_query(['checklist' => $checklist]) : '') . '#att-add';
+        }
         return admin_url('/pages/' . $pageId) . ($checklist !== '' ? '?' . http_build_query(['checklist' => $checklist]) : '') . '#page-docs-form';
     }
 
+    /** «Загрузить» у пункта чек-листа: раздел «Аттестация» -> выбор страницы -> форма с предвыбранным пунктом. */
     public static function uploadUrl(string $checklist): string
     {
-        return admin_url('/documents/new') . '?' . http_build_query(['checklist' => $checklist]);
+        return admin_url('/attestation/choose') . ($checklist !== '' ? '?' . http_build_query(['checklist' => $checklist]) : '');
     }
 
     /** Подписи и ссылки строк списка документов (для экрана документов и экрана страницы). */
@@ -126,12 +116,14 @@ final class DocumentsController extends BaseController
         Document::update((int)$doc['id'], $data, $published);
         Audit::log((int)$user['id'], 'documents.update', 'documents', (int)$doc['id']);
         Flash::set('success', 'documents.flash.updated');
-        redirect(admin_url('/pages/' . (int)$data['page_id']) . '#page-docs');
+        $target = Page::find((int)$data['page_id']);
+        redirect($target !== null ? Page::adminUrl($target) . (Page::isAttestation($target) ? '#att-files' : '#page-docs') : admin_url('/documents'));
     }
 
     private function renderEdit(array $doc, array $values, array $errors, int $status = 200): string
     {
-        $back = $doc['page_id'] !== null ? admin_url('/pages/' . (int)$doc['page_id']) . '#page-docs' : admin_url('/documents');
+        $own = $doc['page_id'] !== null ? Page::find((int)$doc['page_id']) : null;
+        $back = $own !== null ? Page::adminUrl($own) . (Page::isAttestation($own) ? '#att-files' : '#page-docs') : admin_url('/documents');
         return $this->page('documents/edit', t('documents.edit.title'), [
             $this->home(),
             ['label' => t('documents.title'), 'url' => admin_url('/documents')],
@@ -223,8 +215,9 @@ final class DocumentsController extends BaseController
     {
         $raw = $_POST['back_page'] ?? '';
         $id = is_string($raw) && preg_match('/^\d{1,9}$/', $raw) ? (int)$raw : 0;
-        if ($id > 0 && Page::find($id) !== null) {
-            return admin_url('/pages/' . $id) . '#page-docs';
+        $page = $id > 0 ? Page::find($id) : null;
+        if ($page !== null) {
+            return Page::adminUrl($page) . (Page::isAttestation($page) ? '#att-files' : '#page-docs');
         }
         return admin_url('/documents');
     }

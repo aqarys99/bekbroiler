@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AchievementsController;
+use App\Controllers\Admin\AttestationController;
 use App\Controllers\Admin\AuditController;
 use App\Controllers\Admin\AuthController;
 use App\Controllers\Admin\BackupsController;
@@ -112,6 +113,18 @@ return static function (Router $r): void {
     $r->post($a . '/videos/{id:\d+}/publish', Guard::wrap([VideosController::class, 'publish']));
     $r->post($a . '/videos/{id:\d+}/move', Guard::wrap([VideosController::class, 'move']));
     $r->post($a . '/videos/{id:\d+}/delete', Guard::wrap([VideosController::class, 'delete']));
+
+    $r->get($a . '/attestation', Guard::wrap([AttestationController::class, 'index']));
+    $r->get($a . '/attestation/new', Guard::wrap([AttestationController::class, 'create']));
+    $r->get($a . '/attestation/choose', Guard::wrap([AttestationController::class, 'choose']));
+    $r->post($a . '/attestation', Guard::wrap([AttestationController::class, 'store']));
+    $r->get($a . '/attestation/{id:\d+}', Guard::wrap([AttestationController::class, 'edit']));
+    $r->post($a . '/attestation/{id:\d+}', Guard::wrap([AttestationController::class, 'update']));
+    $r->post($a . '/attestation/{id:\d+}/publish', Guard::wrap([AttestationController::class, 'publish']));
+    $r->post($a . '/attestation/{id:\d+}/move', Guard::wrap([AttestationController::class, 'move']));
+    $r->post($a . '/attestation/{id:\d+}/delete', Guard::wrap([AttestationController::class, 'delete']));
+    $r->post($a . '/attestation/{id:\d+}/files', Guard::wrap([AttestationController::class, 'addFiles']));
+    $r->post($a . '/attestation/{id:\d+}/uploaded', Guard::wrap([AttestationController::class, 'uploaded']));
 
     $r->get($a . '/pages', Guard::wrap([PagesController::class, 'index']));
     $r->get($a . '/pages/new', Guard::wrap([PagesController::class, 'create']));

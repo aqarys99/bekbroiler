@@ -649,3 +649,26 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .menu-node__label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .menu-kind{flex:none;white-space:nowrap}
 .menu-btn{flex:none}
+
+/* Раздел «Аттестация» */
+.att-form{display:flex;flex-direction:column;gap:20px}
+.att-files h2{margin:0 0 4px;font-size:20px}
+.att-rows{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+.att-row{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--border);border-radius:12px;background:#FAFBFC}
+.att-row.is-error{border-color:var(--danger);background:#FFFBFA}
+.att-row__main{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.att-row__title{flex:1 1 220px;min-width:0}
+.att-pick{flex:0 1 240px;max-width:100%;cursor:pointer;overflow:hidden}
+.att-pick span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.att-row__status{font-size:14px;color:var(--muted);min-height:0}
+.att-row__status:empty{display:none}
+.att-row__status--ok{color:#17703A}
+.att-row__status--error{color:var(--danger)}
+.att-more summary{cursor:pointer;color:var(--accent);font-size:14px;min-height:32px;display:flex;align-items:center}
+.att-more__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:8px}
+.att-add-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.att-multi{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500}
+.att-multi input{font-weight:400;max-width:100%}
+.att-actions{margin-top:20px}
+.att-rows.is-busy{opacity:.85}
+@media (max-width:599px){.att-pick{flex:1 1 100%}.att-row__title{flex:1 1 100%}}

@@ -25,9 +25,17 @@ final class DocumentUploader
     public const PAGE_TYPES = ['pdf', 'doc', 'docx', 'xls', 'xlsx'];
     public const MAX_BYTES = 20 * 1024 * 1024;
 
-    public function __construct(private ?string $root = null)
+    /** @var callable */
+    private $isUploaded;
+    /** @var callable */
+    private $mover;
+
+    /** $isUploaded и $mover подменяются только в тестах. */
+    public function __construct(private ?string $root = null, ?callable $isUploaded = null, ?callable $mover = null)
     {
         $this->root = rtrim($root ?? DiskUsage::uploadsDir(), '/');
+        $this->isUploaded = $isUploaded ?? 'is_uploaded_file';
+        $this->mover = $mover ?? 'move_uploaded_file';
     }
 
     /**
@@ -47,7 +55,7 @@ final class DocumentUploader
             throw new UploadException('too_large', 413, ['max' => format_bytes($max)]);
         }
         $tmp = (string)$file['tmp_name'];
-        if ($err !== UPLOAD_ERR_OK || $tmp === '' || !is_uploaded_file($tmp) || !is_file($tmp)) {
+        if ($err !== UPLOAD_ERR_OK || $tmp === '' || !($this->isUploaded)($tmp) || !is_file($tmp)) {
             throw new UploadException('no_file', 422);
         }
         $size = (int)filesize($tmp);
@@ -73,7 +81,7 @@ final class DocumentUploader
         }
         $path = $rel . '/' . bin2hex(random_bytes(16)) . '.' . $ext;
         $dest = $this->root . '/' . $path;
-        if (!@move_uploaded_file($tmp, $dest)) {
+        if (!@($this->mover)($tmp, $dest)) {
             throw new UploadException('disk_full', 507);
         }
         @chmod($dest, 0644);

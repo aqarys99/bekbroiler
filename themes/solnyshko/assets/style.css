@@ -250,3 +250,4 @@ html.a11y .menu-toggle { color: #000; }
 .doc-card__main b { display: block; }
 .doc-card__act { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn-sm { padding: 7px 16px; font-size: 14px; }
+.page-docs--att{margin-top:24px}

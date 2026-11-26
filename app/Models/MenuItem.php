@@ -12,6 +12,7 @@ final class MenuItem
     public const TYPES = ['page', 'section', 'link', 'group'];
     public const MAX_ITEMS = 100;
     public const TITLE_MAX = 100;
+    public const ATTESTATION_GROUP = 'Аттестация';
     /** раздел => [путь на сайте, ключ подсветки (meta.active), ключ строки темы nav.*, ключ флага Sections::flags] */
     public const SECTIONS = [
         'home'         => ['/', 'home', 'home', null],
@@ -178,7 +179,88 @@ final class MenuItem
                     $put($sub, $id, $j + 1);
                 }
             }
+            if ($menu === 'main') {
+                self::syncAttestationFromMenu();
+            }
         });
+    }
+
+    /** Группа главного меню «Аттестация» (верхний уровень); при $create создаётся в конце меню. */
+    public static function attestationGroupId(bool $create = false): ?int
+    {
+        $id = Database::fetchValue("SELECT id FROM menu_items WHERE menu = 'main' AND type = 'group' AND parent_id IS NULL AND title_ru = ? ORDER BY sort, id LIMIT 1", [self::ATTESTATION_GROUP]);
+        if ($id !== null) {
+            return (int)$id;
+        }
+        if (!$create) {
+            return null;
+        }
+        $sort = (int)Database::fetchValue("SELECT COALESCE(MAX(sort), 0) FROM menu_items WHERE menu = 'main' AND parent_id IS NULL") + 1;
+        return Database::insert('menu_items', ['menu' => 'main', 'parent_id' => null, 'sort' => $sort, 'type' => 'group',
+            'title_ru' => self::ATTESTATION_GROUP, 'title_kk' => self::ATTESTATION_GROUP]);
+    }
+
+    /** Страница аттестации -> последний пункт группы «Аттестация» (группа создаётся, если её нет). */
+    public static function addAttestationPage(int $pageId): void
+    {
+        Database::immediate(static function () use ($pageId): void {
+            $gid = (int)self::attestationGroupId(true);
+            $sort = (int)Database::fetchValue('SELECT COALESCE(MAX(sort), 0) FROM menu_items WHERE parent_id = ?', [$gid]) + 1;
+            Database::insert('menu_items', ['menu' => 'main', 'parent_id' => $gid, 'sort' => $sort, 'type' => 'page', 'page_id' => $pageId]);
+        });
+    }
+
+    /** Порядок страниц аттестации (pages.sort) -> порядок их пунктов (вызывать внутри транзакции или отдельно) в группе «Аттестация»; прочие пункты группы остаются на местах. */
+    public static function syncAttestationOrder(): void
+    {
+        (static function (): void {
+            $gid = self::attestationGroupId(false);
+            if ($gid === null) {
+                return;
+            }
+            $rank = array_flip(array_map('intval', array_column(Database::fetchAll("SELECT id FROM pages WHERE kind = 'attestation' ORDER BY sort, id"), 'id')));
+            $kids = Database::fetchAll('SELECT id, page_id FROM menu_items WHERE parent_id = ? ORDER BY sort, id', [$gid]);
+            $mine = [];
+            foreach ($kids as $n => $k) {
+                if ($k['page_id'] !== null && isset($rank[(int)$k['page_id']])) {
+                    $mine[$n] = $k;
+                }
+            }
+            $order = $mine;
+            uasort($order, static fn(array $a, array $b): int => [$rank[(int)$a['page_id']], (int)$a['id']] <=> [$rank[(int)$b['page_id']], (int)$b['id']]);
+            $positions = array_keys($mine);
+            foreach (array_values($order) as $i => $k) {
+                Database::query('UPDATE menu_items SET sort = ? WHERE id = ?', [$positions[$i] + 1, $k['id']]);
+            }
+            foreach ($kids as $n => $k) {
+                if (!isset($mine[$n])) {
+                    Database::query('UPDATE menu_items SET sort = ? WHERE id = ?', [$n + 1, $k['id']]);
+                }
+            }
+        })();
+    }
+
+    /** Меню сохранено вручную (последнее действие побеждает): порядок страниц аттестации берётся из группы «Аттестация». */
+    public static function syncAttestationFromMenu(): void
+    {
+        $gid = self::attestationGroupId(false);
+        if ($gid === null) {
+            return;
+        }
+        $ids = array_map('intval', array_column(Database::fetchAll(
+            "SELECT m.page_id FROM menu_items m JOIN pages p ON p.id = m.page_id AND p.kind = 'attestation'
+             WHERE m.parent_id = ? ORDER BY m.sort, m.id", [$gid]), 'page_id'));
+        $ids = array_values(array_unique($ids));
+        if (count($ids) < 2) {
+            return;
+        }
+        $in = implode(',', $ids);
+        $values = array_map('intval', array_column(Database::fetchAll('SELECT sort FROM pages WHERE id IN (' . $in . ') ORDER BY sort, id'), 'sort'));
+        $values = array_values($values);
+        sort($values);
+        foreach ($ids as $i => $pid) {
+            Database::query('UPDATE pages SET sort = ? WHERE id = ?', [$values[$i], $pid]);
+        }
     }
 
     /** Перед удалением страницы: подпункты её пунктов выносятся на верхний уровень, пункты удаляются. */

@@ -1,11 +1,12 @@
 <?php
 /** Текстовая страница (о нас, программа, режим, питание, условия). @var array $row @var string $heading @var string $body @var array $docs */
 use App\Site\Ctx;
+$isAtt = ($row['kind'] ?? 'regular') === 'attestation'; // страница аттестации: заголовок и карточки файлов, без текста
 ?>
 <section class="page">
   <div class="container narrow">
     <h1 data-testid="page-title"><?= e($heading) ?></h1>
-    <?php if (trim(strip_tags($body, '<img><div>')) !== ''): ?><div class="prose" data-testid="page-body"><?= $body /* санитизировано при сохранении */ ?></div><?php endif; ?>
+    <?php if (!$isAtt && trim(strip_tags($body, '<img><div>')) !== ''): ?><div class="prose" data-testid="page-body"><?= $body /* санитизировано при сохранении */ ?></div><?php endif; ?>
     <?php if (!empty($row['schedule'])): ?>
       <div class="schedule" data-testid="page-schedule">
         <?php foreach ($row['schedule'] as $it): ?>
@@ -13,9 +14,9 @@ use App\Site\Ctx;
         <?php endforeach; ?>
       </div>
     <?php endif; ?>
-    <?php if ($docs || trim(strip_tags($body, '<img><div>')) === ''): ?>
-    <div class="page-docs" data-testid="page-docs">
-      <h2><?= e(tt('page.docs')) ?></h2>
+    <?php if ($docs || $isAtt || trim(strip_tags($body, '<img><div>')) === ''): ?>
+    <div class="page-docs<?= $isAtt ? ' page-docs--att' : '' ?>" data-testid="page-docs">
+      <?php if (!$isAtt): ?><h2><?= e(tt('page.docs')) ?></h2><?php endif; ?>
       <?php if (!$docs): ?><p class="empty" data-testid="page-docs-empty"><?= e(tt('page.docs_empty')) ?></p><?php endif; ?>
       <div class="grid grid-2">
       <?php foreach ($docs as $d):

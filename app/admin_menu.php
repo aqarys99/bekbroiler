@@ -8,6 +8,7 @@ return [
         'label' => 'menu.group.content',
         'items' => [
             ['key' => 'dashboard', 'label' => 'menu.dashboard', 'url' => '', 'icon' => 'home', 'role' => 'editor', 'testid' => 'nav-dashboard'],
+            ['key' => 'attestation', 'label' => 'menu.attestation', 'url' => '/attestation', 'icon' => 'attest', 'role' => 'editor', 'testid' => 'nav-attestation'],
             ['key' => 'news', 'label' => 'menu.news', 'url' => '/news', 'icon' => 'news', 'role' => 'editor', 'testid' => 'nav-news'],
             ['key' => 'documents', 'label' => 'menu.documents', 'url' => '/documents', 'icon' => 'doc', 'role' => 'editor', 'testid' => 'nav-documents'],
             ['key' => 'gallery', 'label' => 'menu.gallery', 'url' => '/gallery', 'icon' => 'image', 'role' => 'editor', 'testid' => 'nav-gallery'],
