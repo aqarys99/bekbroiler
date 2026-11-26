@@ -10,6 +10,7 @@ use App\Controllers\Admin\DocumentsController;
 use App\Controllers\Admin\GalleryController;
 use App\Controllers\Admin\GroupsController;
 use App\Controllers\Admin\MediaController;
+use App\Controllers\Admin\MenusController;
 use App\Controllers\Admin\NewsController;
 use App\Controllers\Admin\PagesController;
 use App\Controllers\Admin\ProfileController;
@@ -37,9 +38,6 @@ return static function (Router $r): void {
         $site = static fn(string $action, array $fixed = []): \Closure
             => static fn(array $p = []) => (new SiteController($lang))->dispatch($action, $fixed + $p);
         $r->get($lang === 'kk' ? '/kk' : '/', $site('home'));
-        foreach (SiteController::PAGES as $slug) {
-            $r->get($pre . '/' . $slug, $site('staticPage', ['slug' => $slug]));
-        }
         $r->get($pre . '/pedagogi', $site('staff'));
         $r->get($pre . '/gruppy', $site('groups'));
         $r->get($pre . '/novosti', $site('newsList'));
@@ -97,7 +95,7 @@ return static function (Router $r): void {
     $r->post($a . '/gallery/{id:\d+}/photo/{mid:\d+}/{act:move|cover|remove|caption}', Guard::wrap([GalleryController::class, 'photoAction']));
 
     $r->get($a . '/documents', Guard::wrap([DocumentsController::class, 'index']));
-    $r->post($a . '/documents', Guard::wrap([DocumentsController::class, 'store']));
+    $r->get($a . '/documents/new', Guard::wrap([DocumentsController::class, 'choose']));
     $r->get($a . '/documents/{id:\d+}/edit', Guard::wrap([DocumentsController::class, 'edit']));
     $r->post($a . '/documents/{id:\d+}', Guard::wrap([DocumentsController::class, 'update']));
     $r->post($a . '/documents/{id:\d+}/replace', Guard::wrap([DocumentsController::class, 'replace']));
@@ -116,6 +114,12 @@ return static function (Router $r): void {
     $r->post($a . '/videos/{id:\d+}/delete', Guard::wrap([VideosController::class, 'delete']));
 
     $r->get($a . '/pages', Guard::wrap([PagesController::class, 'index']));
+    $r->get($a . '/pages/new', Guard::wrap([PagesController::class, 'create']));
+    $r->post($a . '/pages', Guard::wrap([PagesController::class, 'store']));
+    $r->get($a . '/pages/slug', Guard::wrap([PagesController::class, 'slug']));
+    $r->post($a . '/pages/{id:\d+}/delete', Guard::wrap([PagesController::class, 'delete']));
+    $r->post($a . '/pages/{id:\d+}/documents', Guard::wrap([PagesController::class, 'addDocument']));
+    $r->post($a . '/pages/{id:\d+}/documents/order', Guard::wrap([PagesController::class, 'orderDocuments']));
     $r->get($a . '/pages/{id:\d+}', Guard::wrap([PagesController::class, 'edit']));
     $r->post($a . '/pages/{id:\d+}', Guard::wrap([PagesController::class, 'update']));
     $r->post($a . '/pages/{id:\d+}/publish', Guard::wrap([PagesController::class, 'publish']));
@@ -168,12 +172,21 @@ return static function (Router $r): void {
     $r->get($a . '/users/{id:\d+}/password', Guard::wrap([UsersController::class, 'passwordForm'], 'owner'));
     $r->post($a . '/users/{id:\d+}/password', Guard::wrap([UsersController::class, 'resetPassword'], 'owner'));
 
+    $r->get($a . '/menus', Guard::wrap([MenusController::class, 'index'], 'owner'));
+    $r->post($a . '/menus', Guard::wrap([MenusController::class, 'save'], 'owner'));
+
     $r->get($a . '/backups', Guard::wrap([BackupsController::class, 'index'], 'owner'));
     $r->post($a . '/backups/archive', Guard::wrap([BackupsController::class, 'archive'], 'owner'));
     $r->post($a . '/backups/create', Guard::wrap([BackupsController::class, 'create'], 'owner'));
     $r->get($a . '/backups/download/{name:[A-Za-z0-9._-]+}', Guard::wrap([BackupsController::class, 'download'], 'owner'));
     $r->post($a . '/backups/delete/{name:[A-Za-z0-9._-]+}', Guard::wrap([BackupsController::class, 'delete'], 'owner'));
     $r->get($a . '/audit', Guard::wrap([AuditController::class, 'index'], 'owner'));
+
+    // Страницы, созданные в админке: /{slug} и /kk/{slug} — строго после всех остальных маршрутов
+    foreach (['ru', 'kk'] as $lang) {
+        $r->get($lang === 'kk' ? '/kk/{slug:[a-z0-9]+(?:-[a-z0-9]+)*}' : '/{slug:[a-z0-9]+(?:-[a-z0-9]+)*}',
+            static fn(array $p = []) => (new SiteController($lang))->dispatch('staticPage', $p));
+    }
 
     if (getenv('APP_ENV') === 'testing') {
         $r->get('/__test/error', [ErrorController::class, 'throw']);

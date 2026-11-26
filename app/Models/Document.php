@@ -40,12 +40,12 @@ final class Document
         return Database::fetch(self::baseSql() . ' WHERE d.id = ?', [$id]);
     }
 
-    /** @return array<int,array> документы категории (0 — все) с данными файла */
-    public static function all(int $categoryId = 0): array
+    /** @return array<int,array> документы страницы (0 — все) с данными файла и статусом срока */
+    public static function all(int $pageId = 0): array
     {
-        $rows = $categoryId > 0
-            ? Database::fetchAll(self::baseSql() . ' WHERE d.category_id = ? ORDER BY c.sort, d.sort, d.id', [$categoryId])
-            : Database::fetchAll(self::baseSql() . ' ORDER BY c.sort, d.sort, d.id');
+        $rows = $pageId > 0
+            ? Database::fetchAll(self::baseSql() . ' WHERE d.page_id = ? ORDER BY d.sort, d.id', [$pageId])
+            : Database::fetchAll(self::baseSql() . ' ORDER BY p.sort, d.page_id, d.sort, d.id');
         $today = self::today();
         foreach ($rows as &$r) {
             $r += self::statusOf($r, $today);
@@ -53,20 +53,21 @@ final class Document
         return $rows;
     }
 
-    /** @return array<int,int> category_id => число документов */
+    /** @return array<int,int> page_id => число документов */
     public static function counts(): array
     {
         $out = [];
-        foreach (Database::fetchAll('SELECT category_id, COUNT(*) AS n FROM documents GROUP BY category_id') as $r) {
-            $out[(int)$r['category_id']] = (int)$r['n'];
+        foreach (Database::fetchAll('SELECT page_id, COUNT(*) AS n FROM documents WHERE page_id IS NOT NULL GROUP BY page_id') as $r) {
+            $out[(int)$r['page_id']] = (int)$r['n'];
         }
         return $out;
     }
 
     private static function baseSql(): string
     {
-        return 'SELECT d.*, c.title AS category_title, c.title_kk AS category_title_kk, m.path AS file_path, m.original_name AS file_name, m.size AS file_size, m.mime AS file_mime
-                FROM documents d JOIN document_categories c ON c.id = d.category_id JOIN media m ON m.id = d.media_id';
+        return 'SELECT d.*, p.title AS page_title, p.title_kk AS page_title_kk, p.slug AS page_slug, p.is_published AS page_published,
+                       m.path AS file_path, m.original_name AS file_name, m.size AS file_size, m.mime AS file_mime
+                FROM documents d LEFT JOIN pages p ON p.id = d.page_id JOIN media m ON m.id = d.media_id';
     }
 
     /**
@@ -113,9 +114,9 @@ final class Document
         if (mb_strlen($titleKk) > self::TITLE_MAX) {
             $errors['title_kk'] = t('documents.error.title_long', ['max' => self::TITLE_MAX]);
         }
-        $cat = preg_match('/^\d{1,9}$/', $s('category_id')) ? (int)$s('category_id') : 0;
-        if (self::category($cat) === null) {
-            $errors['category_id'] = t('documents.error.category');
+        $pageId = preg_match('/^\d{1,9}$/', $s('page_id')) ? (int)$s('page_id') : 0;
+        if (Page::find($pageId) === null) {
+            $errors['page_id'] = t('documents.error.page');
         }
         $key = $s('checklist_key');
         if ($key !== '' && Database::fetchValue('SELECT 1 FROM attestation_checklist WHERE key = ?', [$key]) === null) {
@@ -138,7 +139,7 @@ final class Document
         $mode = $s('view_mode');
         return ['errors' => $errors, 'data' => [
             'view_mode' => in_array($mode, self::VIEW_MODES, true) ? $mode : 'reader',
-            'title' => $title, 'title_kk' => $titleKk, 'category_id' => $cat,
+            'title' => $title, 'title_kk' => $titleKk, 'page_id' => $pageId,
             'checklist_key' => $key !== '' ? $key : null,
             'doc_date' => $dates['doc_date'] !== '' ? $dates['doc_date'] : null,
             'valid_until' => $dates['valid_until'] !== '' ? $dates['valid_until'] : null,
@@ -150,7 +151,7 @@ final class Document
     {
         $now = gmdate('Y-m-d H:i:s');
         return (int)Database::immediate(static function () use ($data, $mediaId, $userId, $now): int {
-            $sort = (int)Database::fetchValue('SELECT COALESCE(MAX(sort), 0) FROM documents WHERE category_id = ?', [$data['category_id']]) + 1;
+            $sort = (int)Database::fetchValue('SELECT COALESCE(MAX(sort), 0) FROM documents WHERE page_id = ?', [$data['page_id']]) + 1;
             return Database::insert('documents', $data + [
                 'media_id' => $mediaId, 'sort' => $sort, 'is_published' => 1, 'created_by' => $userId,
                 'created_at' => $now, 'updated_at' => $now,
@@ -172,13 +173,18 @@ final class Document
         return self::ext($row) === 'PDF';
     }
 
-    /** Опубликованный PDF для страницы просмотра (иначе null). */
-    public static function findPublishedPdf(int $id): ?array
+    /** Для страницы просмотра: опубликованный PDF или DOCX на показанной странице (иначе null). kind = pdf | docx. */
+    public static function findPublishedViewable(int $id): ?array
     {
         $row = self::find($id);
-        if ($row === null || (int)$row['is_published'] !== 1 || !self::isPdf($row)) {
+        if ($row === null || (int)$row['is_published'] !== 1 || ($row['page_id'] !== null && (int)$row['page_published'] !== 1)) {
             return null;
         }
+        $ext = self::ext($row);
+        if ($ext !== 'PDF' && $ext !== 'DOCX') {
+            return null;
+        }
+        $row['kind'] = strtolower($ext);
         $row['url'] = self::fileUrl($row);
         return $row;
     }
@@ -229,16 +235,16 @@ final class Document
         }
     }
 
-    /** Порядок: сдвиг на одну позицию внутри категории. dir = -1 (вверх) | 1 (вниз). */
+    /** Порядок: сдвиг на одну позицию внутри страницы. dir = -1 (вверх) | 1 (вниз). */
     public static function move(int $id, int $dir): bool
     {
         return (bool)Database::immediate(static function () use ($id, $dir): bool {
-            $row = Database::fetch('SELECT id, category_id FROM documents WHERE id = ?', [$id]);
+            $row = Database::fetch('SELECT id, page_id FROM documents WHERE id = ?', [$id]);
             if ($row === null) {
                 return false;
             }
             $ids = array_map('intval', array_column(
-                Database::fetchAll('SELECT id FROM documents WHERE category_id = ? ORDER BY sort, id', [$row['category_id']]),
+                Database::fetchAll('SELECT id FROM documents WHERE page_id IS ? ORDER BY sort, id', [$row['page_id']]),
                 'id'
             ));
             $i = array_search($id, $ids, true);
@@ -254,22 +260,54 @@ final class Document
         });
     }
 
+    /** Новый порядок документов страницы: $ids — id документов этой страницы в нужном порядке. */
+    public static function reorder(int $pageId, array $ids): bool
+    {
+        return (bool)Database::immediate(static function () use ($pageId, $ids): bool {
+            $own = array_map('intval', array_column(Database::fetchAll('SELECT id FROM documents WHERE page_id = ?', [$pageId]), 'id'));
+            $ids = array_values(array_unique(array_map('intval', $ids)));
+            if (!$ids || array_diff($ids, $own)) {
+                return false;
+            }
+            $rest = array_values(array_diff($own, $ids));
+            foreach (array_merge($ids, $rest) as $n => $docId) {
+                Database::query('UPDATE documents SET sort = ? WHERE id = ?', [$n + 1, $docId]);
+            }
+            return true;
+        });
+    }
+
+    /** Опубликованные документы страницы для сайта (url, ext, can_view = есть просмотрщик). */
+    public static function publishedForPage(int $pageId): array
+    {
+        $out = [];
+        foreach (Database::fetchAll(self::baseSql() . ' WHERE d.page_id = ? AND d.is_published = 1 ORDER BY d.sort, d.id', [$pageId]) as $r) {
+            $out[] = self::forSite($r);
+        }
+        return $out;
+    }
+
+    private static function forSite(array $r): array
+    {
+        $r['url'] = self::fileUrl($r);
+        $r['ext'] = self::ext($r);
+        $r['can_view'] = in_array($r['ext'], ['PDF', 'DOCX'], true);
+        return $r;
+    }
+
     /**
-     * Для публичного сайта (I-06, фича 11): опубликованные документы по категориям.
-     * @return array<int,array{category:array,documents:array<int,array>}> пустые категории пропускаются
+     * Для общего списка /dokumenty (I-06): опубликованные документы показанных страниц, по страницам.
+     * @return array<int,array{page:array,documents:array<int,array>}>
      */
-    public static function publishedByCategory(): array
+    public static function publishedByPage(): array
     {
         $groups = [];
-        foreach (self::categories() as $c) {
-            $groups[(int)$c['id']] = ['category' => $c, 'documents' => []];
-        }
-        $rows = Database::fetchAll(self::baseSql() . ' WHERE d.is_published = 1 ORDER BY c.sort, d.sort, d.id');
+        $rows = Database::fetchAll(self::baseSql() . ' WHERE d.is_published = 1 AND p.is_published = 1 ORDER BY p.sort, p.id, d.sort, d.id');
         foreach ($rows as $r) {
-            $r['url'] = self::fileUrl($r);
-            $r['ext'] = self::ext($r);
-            $groups[(int)$r['category_id']]['documents'][] = $r;
+            $pid = (int)$r['page_id'];
+            $groups[$pid]['page'] ??= ['id' => $pid, 'slug' => $r['page_slug'], 'title' => $r['page_title'], 'title_kk' => $r['page_title_kk']];
+            $groups[$pid]['documents'][] = self::forSite($r);
         }
-        return array_values(array_filter($groups, static fn(array $g): bool => $g['documents'] !== []));
+        return array_values($groups);
     }
 }

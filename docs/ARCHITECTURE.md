@@ -112,7 +112,8 @@ sadik/
 | `login_attempts` | ip, login, created_at | Защита от подбора пароля. Для лимита текущего пароля в профиле `ip` = `profile:<id пользователя>`, `login` = `password` |
 | `remember_tokens` | id, user_id, selector, token_hash, prev_hash, rotated_at, expires_at, last_used_at | «Запомнить меня»: в БД только SHA-256 validator; `prev_hash`/`rotated_at` — прошлый хэш, действует 10 с после ротации (параллельные вкладки) |
 | `settings` | key, value (JSON) | Название, контакты, логотип, тема, цвета, соцсети, часы работы, лицензия |
-| `pages` | id, slug, title, body, sort, is_published | Статичные разделы: «О нас», «Программа», «Режим дня», «Питание», «Условия» |
+| `pages` | id, slug, title(_kk), body(_kk), sort, is_published, has_schedule | Обычные страницы, создаются в админке (фича 15); «Режим дня» — `has_schedule` |
+| `menu_items` | id, menu (`main`/`footer`), parent_id, sort, type (`page`/`section`/`link`/`group`), page_id, section_key, url, title_ru, title_kk, target_blank | Меню сайта, до 2 уровней (фича 15) |
 | `news` | id, slug, title, excerpt, body, cover_media_id, status (`draft`/`published`), published_at, author_id | Новости и объявления |
 | `news_media` | news_id, media_id, sort | Фото внутри новости |
 | `media` | id, type (`image`/`video`/`file`), original_name, path, mime, size (сумма байтов всех файлов), source_size (байты, пришедшие на сервер), width, height, variants (JSON), alt, alt_kk, status (`ready`/`processing`/`failed`), uploaded_by | Единая медиатека |
@@ -120,7 +121,7 @@ sadik/
 | `album_media` | album_id, media_id, sort | Фото в альбоме |
 | `videos` | id, title, source (`youtube`/`upload`), url, media_id, poster_media_id, is_published | Видео |
 | `document_categories` | id, title, sort | «Аттестация», «Нормативные», «Отчёты», «Для родителей» |
-| `documents` | id, category_id, title, media_id, doc_date, valid_until, checklist_key, is_published | Документы (PDF, DOCX, XLSX) |
+| `documents` | id, page_id (CASCADE), category_id (устарело, nullable), title, media_id, doc_date, valid_until, checklist_key, is_published, view_mode | Документы страниц (PDF, Word, Excel) |
 | `attestation_checklist` | key, title, is_required | Список документов, обязательных для аттестации |
 | `staff` | id, full_name, position, category, education, experience_years, photo_media_id, sort | Педагоги и сотрудники |
 | `groups` | id, name, age_range, children_count, teacher_ids, sort | Возрастные группы |

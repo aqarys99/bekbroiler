@@ -33,6 +33,11 @@ final class SecurityHeaders
             $i = array_search("script-src 'self'", $csp, true);
             $csp[$i] = "script-src 'self' 'wasm-unsafe-eval'";
             $csp[] = "worker-src 'self' blob:";
+            // docx-preview кладёт картинки и шрифты документа в blob:/data:
+            $j = array_search("img-src 'self' data: https://img.youtube.com https://i.ytimg.com", $csp, true);
+            $csp[$j] .= ' blob:';
+            $k = array_search("font-src 'self'", $csp, true);
+            $csp[$k] = "font-src 'self' data: blob:";
         }
         $h = [
             'Content-Security-Policy' => implode('; ', $csp),

@@ -26,7 +26,8 @@ final class SiteController
     public const NEWS_PER_PAGE = 9;
     public const PDFJS_VERSION = '6.5.438';
     public const PAGEFLIP_VERSION = '2.0.7';
-    public const PAGES = ['o-nas', 'programma', 'rezhim', 'pitanie', 'usloviya'];
+    public const DOCXPREVIEW_VERSION = '0.4.1';
+    public const JSZIP_VERSION = '3.10.1';
 
     public function __construct(private readonly string $lang)
     {
@@ -117,14 +118,15 @@ final class SiteController
 
     protected function staticPage(array $p): string
     {
-        $slug = (string)($p['slug'] ?? '');
-        $row = in_array($slug, self::PAGES, true) ? Page::published($slug) : null;
+        $row = Page::published((string)($p['slug'] ?? ''));
         if ($row === null) {
             throw new HttpException(404);
         }
+        $slug = (string)$row['slug'];
         $title = loc($row, 'title');
         $body = News::renderBody(loc($row, 'body'), 'large', tt('news.video_missing'));
-        return $this->page('page', ['row' => $row, 'heading' => $title, 'body' => $body], [
+        $docs = Document::publishedForPage((int)$row['id']);
+        return $this->page('page', ['row' => $row, 'heading' => $title, 'body' => $body, 'docs' => $docs], [
             'key' => $slug, 'path' => '/' . $slug, 'title' => $title,
             'description' => $this->excerpt($body) ?: tt('home.description', ['name' => $this->siteName()]),
         ]);
@@ -215,24 +217,26 @@ final class SiteController
 
     protected function documents(array $p): string
     {
-        return $this->page('documents', ['groups' => Document::publishedByCategory()], [
+        return $this->page('documents', ['groups' => Document::publishedByPage()], [
             'key' => 'dokumenty', 'path' => '/dokumenty', 'title' => tt('nav.documents'), 'description' => tt('documents.lead'),
         ]);
     }
 
     protected function documentView(array $p): string
     {
-        $doc = Document::findPublishedPdf((int)($p['id'] ?? 0));
+        $doc = Document::findPublishedViewable((int)($p['id'] ?? 0));
         if ($doc === null) {
             throw new HttpException(404);
         }
         $title = loc($doc, 'title');
-        $cat = loc($doc, 'category_title', 'category_title_kk', false);
+        $cat = $doc['page_id'] !== null ? loc($doc, 'page_title', 'page_title_kk', false) : '';
         return $this->page('document-view', [
             'doc' => $doc, 'heading' => $title, 'category' => $cat,
             'date' => !empty($doc['doc_date']) ? date('d.m.Y', (int)strtotime((string)$doc['doc_date'])) : '',
-            'mode' => (string)$doc['view_mode'] === 'book' ? 'book' : 'reader',
+            'mode' => $doc['kind'] === 'pdf' && (string)$doc['view_mode'] === 'book' ? 'book' : 'reader',
             'vendor' => [
+                'docx' => url('/assets/vendor/docx-preview/' . self::DOCXPREVIEW_VERSION . '/docx-preview.min.js'),
+                'jszip' => url('/assets/vendor/jszip/' . self::JSZIP_VERSION . '/jszip.min.js'),
                 'pdfjs' => url('/assets/vendor/pdfjs/' . self::PDFJS_VERSION . '/'),
                 'pageflip' => url('/assets/vendor/page-flip/' . self::PAGEFLIP_VERSION . '/page-flip.browser.js'),
             ],
@@ -295,11 +299,14 @@ final class SiteController
             }
         }
         $logoId = (int)setting('logo_media_id', 0);
+        $flags = Sections::flags();
+        $activeKey = (string)($meta['key'] ?? '');
         $site = [
             'name' => $name,
             'logo' => $logoId > 0 ? Media::find($logoId) : null,
-            'flags' => Sections::flags(),
+            'flags' => $flags,
             'pages' => Sections::pages(),
+            'nav' => ['main' => \App\Site\SiteMenu::build('main', $flags, $activeKey), 'footer' => \App\Site\SiteMenu::build('footer', $flags, $activeKey)],
             'contacts' => ['phones' => (array)setting('phones', []), 'email' => (string)setting('email', ''), 'address' => $this->settingLoc('address')],
             'kk' => Ctx::kkEnabled(),
             'a11y_enabled' => (bool)setting('a11y_enabled', true),

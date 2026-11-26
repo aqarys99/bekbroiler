@@ -12,23 +12,9 @@ use App\Site\Theme;
 
 $lang = Ctx::$lang;
 $f = $site['flags'];
-$has = static fn(string $slug): bool => isset($site['pages'][$slug]);
-$menu = [];
-if ($has('o-nas')) { $menu[] = ['o-nas', '/o-nas', tt('nav.about')]; }
-if ($f['news']) { $menu[] = ['novosti', '/novosti', tt('nav.news')]; }
-if ($f['staff']) { $menu[] = ['pedagogi', '/pedagogi', tt('nav.staff')]; }
-if ($f['gallery']) { $menu[] = ['fotogalereya', '/fotogalereya', tt('nav.gallery')]; }
-if ($f['documents']) { $menu[] = ['dokumenty', '/dokumenty', tt('nav.documents')]; }
-$menu[] = ['kontakty', '/kontakty', tt('nav.contacts')];
-
-$more = [];
-foreach (['programma' => 'nav.program', 'rezhim' => 'nav.schedule', 'pitanie' => 'nav.food', 'usloviya' => 'nav.conditions'] as $slug => $key) {
-    if ($has($slug)) { $more[] = ['/' . $slug, tt($key)]; }
-}
-if ($f['groups']) { $more[] = ['/gruppy', tt('nav.groups')]; }
-if ($f['achievements']) { $more[] = ['/dostizheniya', tt('nav.achievements')]; }
-if ($f['videos']) { $more[] = ['/video', tt('nav.videos')]; }
-if ($f['reviews']) { $more[] = ['/otzyvy', tt('nav.reviews')]; }
+$navMain = $site['nav']['main'];
+$navFoot = $site['nav']['footer'];
+$navAttr = static fn(array $it): string => ($it['blank'] ? ' target="_blank" rel="noopener"' : '');
 ?>
 <!doctype html>
 <html lang="<?= e($lang) ?>"<?= Ctx::$a11y ? ' class="a11y"' : '' ?>>
@@ -83,8 +69,20 @@ if ($f['reviews']) { $more[] = ['/otzyvy', tt('nav.reviews')]; }
     <button class="burger" type="button" aria-label="<?= e(tt('menu.open')) ?>" aria-expanded="false" aria-controls="menu" data-testid="site-burger">☰</button>
     <nav aria-label="<?= e(tt('menu.label')) ?>">
       <ul class="menu" id="menu">
-        <?php foreach ($menu as [$key, $path, $label]): ?>
-          <li><a href="<?= e(surl($path)) ?>"<?= $meta['active'] === $key ? ' aria-current="page"' : '' ?> data-testid="nav-<?= e($key) ?>"><?= e($label) ?></a></li>
+        <?php foreach ($navMain as $i => $it): ?>
+          <?php if ($it['children']): $sid = 'submenu-' . $i; ?>
+          <li class="has-sub<?= $it['active'] ? ' is-active' : '' ?>" data-testid="nav-group-<?= (int)$i ?>">
+            <?php if ($it['url'] !== '' && !$it['group']): ?><a href="<?= e($it['url']) ?>"<?= $navAttr($it) ?><?= $it['active'] ? ' aria-current="page"' : '' ?>><?= e($it['label']) ?></a><?php endif; ?>
+            <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="<?= e($sid) ?>" data-testid="nav-toggle-<?= (int)$i ?>"<?= ($it['url'] !== '' && !$it['group']) ? ' aria-label="' . e(tt('menu.sub')) . ': ' . e($it['label']) . '"' : '' ?>><?= ($it['url'] !== '' && !$it['group']) ? '' : e($it['label']) ?></button>
+            <ul class="submenu" id="<?= e($sid) ?>">
+              <?php foreach ($it['children'] as $sub): ?>
+                <li><a href="<?= e($sub['url']) ?>"<?= $navAttr($sub) ?><?= $sub['active'] ? ' aria-current="page"' : '' ?> data-testid="nav-<?= e($sub['key'] !== '' ? $sub['key'] : 'link') ?>"><?= e($sub['label']) ?></a></li>
+              <?php endforeach; ?>
+            </ul>
+          </li>
+          <?php elseif ($it['url'] !== ''): ?>
+          <li><a href="<?= e($it['url']) ?>"<?= $navAttr($it) ?><?= $it['active'] ? ' aria-current="page"' : '' ?> data-testid="nav-<?= e($it['key'] !== '' ? $it['key'] : 'link') ?>"><?= e($it['label']) ?></a></li>
+          <?php endif; ?>
         <?php endforeach; ?>
       </ul>
     </nav>
@@ -119,9 +117,17 @@ if ($f['reviews']) { $more[] = ['/otzyvy', tt('nav.reviews')]; }
       <?php foreach ((array)$site['contacts']['phones'] as $ph): ?><p><a href="tel:<?= e(preg_replace('/[^0-9+]/', '', (string)$ph)) ?>"><?= e($ph) ?></a></p><?php endforeach; ?>
       <?php if ($site['contacts']['email'] !== ''): ?><p><a href="mailto:<?= e($site['contacts']['email']) ?>"><?= e($site['contacts']['email']) ?></a></p><?php endif; ?>
     </div>
-    <?php if ($more): ?>
-    <ul class="foot-nav" aria-label="<?= e(tt('footer.sections')) ?>">
-      <?php foreach ($more as [$path, $label]): ?><li><a href="<?= e(surl($path)) ?>"><?= e($label) ?></a></li><?php endforeach; ?>
+    <?php if ($navFoot): ?>
+    <ul class="foot-nav" aria-label="<?= e(tt('footer.sections')) ?>" data-testid="site-footer-nav">
+      <?php foreach ($navFoot as $it): ?>
+        <?php if ($it['children']): ?>
+        <li class="foot-group"><span><?= e($it['label']) ?></span><ul>
+          <?php foreach ($it['children'] as $sub): ?><li><a href="<?= e($sub['url']) ?>"<?= $navAttr($sub) ?>><?= e($sub['label']) ?></a></li><?php endforeach; ?>
+        </ul></li>
+        <?php elseif ($it['url'] !== ''): ?>
+        <li><a href="<?= e($it['url']) ?>"<?= $navAttr($it) ?>><?= e($it['label']) ?></a></li>
+        <?php endif; ?>
+      <?php endforeach; ?>
     </ul>
     <?php endif; ?>
   </div>

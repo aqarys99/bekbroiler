@@ -26,6 +26,12 @@ return [
         ],
     ],
     [
+        'label' => 'menu.group.appearance',
+        'items' => [
+            ['key' => 'menus', 'label' => 'menu.menus', 'url' => '/menus', 'icon' => 'menu', 'role' => 'owner', 'testid' => 'nav-menus'],
+        ],
+    ],
+    [
         'label' => 'menu.group.system',
         'items' => [
             ['key' => 'settings', 'label' => 'menu.settings', 'url' => '/settings', 'icon' => 'gear', 'role' => 'owner', 'testid' => 'nav-settings'],

@@ -1,6 +1,6 @@
 <?php
 /**
- * Просмотр PDF: «Читалка» и «Книга» (PDF.js и page-flip из public/assets/vendor, без CDN).
+ * Просмотр PDF и DOCX: «Читалка» и «Книга» (PDF.js и page-flip из public/assets/vendor, без CDN).
  * @var array $doc @var string $heading @var string $category @var string $date @var string $mode @var array $vendor @var string $listUrl
  */
 use App\Site\Theme;
@@ -12,6 +12,31 @@ foreach (['loading', 'loading_pct', 'error', 'fullscreen', 'fullscreen_off', 'pa
 $file = $doc['url'];
 $ico = static fn(string $d): string => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $d . '</svg>';
 ?>
+<?php if ($doc['kind'] === 'docx'): ?>
+<section class="page docview">
+  <div class="container">
+    <p class="back"><a href="<?= e($listUrl) ?>" data-testid="docview-back">← <?= e(tt('docview.back')) ?></a></p>
+    <h1 data-testid="docview-title"><?= e($heading) ?></h1>
+    <p class="muted" data-testid="docview-meta"><?= e($category) ?><?= $date !== '' ? ' · ' . e($date) : '' ?></p>
+    <p class="dv-nojs" data-dv-nojs><?= e(tt('docview.nojs')) ?> <a class="btn btn-primary" href="<?= e($file) ?>" data-testid="docview-open-file"><?= e(tt('docview.open_file')) ?></a></p>
+    <div class="dv-docx" data-docx-viewer hidden data-src="<?= e($file) ?>" data-jszip="<?= e($vendor['jszip']) ?>" data-docx="<?= e($vendor['docx']) ?>">
+      <div class="dv-top">
+        <span class="dv-sp"></span>
+        <a class="dv-btn" href="<?= e($file) ?>" download data-testid="docview-download"><span><?= e(tt('docview.download')) ?></span></a>
+      </div>
+      <div class="dv-state" data-dv-loading role="status"><span class="dv-spin" aria-hidden="true"></span><span><?= e(tt('docview.loading')) ?></span></div>
+      <div class="dv-state dv-state--err" data-dv-error role="alert" hidden>
+        <b><?= e(tt('docview.error')) ?></b>
+        <span><?= e(tt('docview.error_hint')) ?></span>
+        <a class="btn btn-primary" href="<?= e($file) ?>" download data-testid="docview-error-download"><?= e(tt('docview.download')) ?></a>
+      </div>
+      <div class="dv-docx__body" data-docx-body tabindex="0" role="region" aria-label="<?= e($heading) ?>" data-testid="docview-docx"></div>
+    </div>
+  </div>
+</section>
+<link rel="stylesheet" href="<?= e(Theme::assetUrl('pdf-viewer.css')) ?>">
+<script src="<?= e(Theme::assetUrl('docx-viewer.js')) ?>" defer></script>
+<?php else: ?>
 <link rel="stylesheet" href="<?= e(Theme::assetUrl('pdf-viewer.css')) ?>">
 <section class="page docview">
   <div class="container">
@@ -89,3 +114,4 @@ $ico = static fn(string $d): string => '<svg width="18" height="18" viewBox="0 0
   </div>
 </section>
 <script src="<?= e(Theme::assetUrl('pdf-viewer.js')) ?>" defer></script>
+<?php endif; ?>

@@ -21,6 +21,10 @@ final class DocumentUploader
         'png'  => ['image/png', 'image/png'],
     ];
 
+    /** Допустимые для документов страниц типы: PDF, Word, Excel. */
+    public const PAGE_TYPES = ['pdf', 'doc', 'docx', 'xls', 'xlsx'];
+    public const MAX_BYTES = 20 * 1024 * 1024;
+
     public function __construct(private ?string $root = null)
     {
         $this->root = rtrim($root ?? DiskUsage::uploadsDir(), '/');
@@ -28,12 +32,13 @@ final class DocumentUploader
 
     /**
      * @param array<string,mixed>|null $file элемент $_FILES
+     * @param string[]|null $allowed ограничение по расширениям (null — весь белый список)
      * @return array<string,mixed> строка media
      * @throws UploadException
      */
-    public function handle(?array $file, ?int $userId): array
+    public function handle(?array $file, ?int $userId, ?array $allowed = null): array
     {
-        $max = Media::maxUploadBytes();
+        $max = min(Media::maxUploadBytes(), self::MAX_BYTES);
         if ($file === null || !isset($file['error'], $file['tmp_name']) || is_array($file['error'])) {
             throw new UploadException('no_file', 422);
         }
@@ -57,7 +62,7 @@ final class DocumentUploader
         if ($ext === 'jpeg') {
             $ext = 'jpg';
         }
-        if (!isset(self::TYPES[$ext]) || !$this->signatureOk($tmp, $ext)) {
+        if (!isset(self::TYPES[$ext]) || ($allowed !== null && !in_array($ext, $allowed, true)) || !$this->signatureOk($tmp, $ext)) {
             throw new UploadException('doc_type', 415);
         }
 
@@ -89,7 +94,7 @@ final class DocumentUploader
         $head = (string)file_get_contents($tmp, false, null, 0, 1024);
         $kind = self::TYPES[$ext][1];
         if ($kind === 'pdf') {
-            return str_contains($head, '%PDF-');
+            return str_contains($head, '%PDF-') && (string)(new \finfo(FILEINFO_MIME_TYPE))->file($tmp) === 'application/pdf';
         }
         if ($kind === 'ole') {
             return str_starts_with($head, "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1");

@@ -24,9 +24,9 @@ final class DashboardController extends BaseController
         usort($items, static fn(array $a, array $b): int => $order[$a['state']] <=> $order[$b['state']]);
         foreach ($items as &$it) {
             $it['date'] = $it['valid_until'] !== '' ? date('d.m.Y', (int)strtotime($it['valid_until'] . ' UTC')) : '';
-            $it['url'] = admin_url('/documents') . '?' . http_build_query(['cat' => 1, 'checklist' => $it['key']]) . '#documents-form';
+            $it['url'] = DocumentsController::uploadUrl($it['key']);
             if ($it['state'] === 'warn' || $it['state'] === 'expired') {
-                $it['url'] = admin_url('/documents') . '?cat=1';
+                $it['url'] = admin_url('/documents');
             }
         }
         unset($it);
@@ -72,7 +72,7 @@ final class DashboardController extends BaseController
     {
         $all = [
             ['key' => 'photo', 'label' => 'dashboard.action.photo', 'url' => '/gallery', 'icon' => 'image', 'role' => 'editor'],
-            ['key' => 'document', 'label' => 'dashboard.action.document', 'url' => '/documents#documents-form', 'icon' => 'doc', 'role' => 'editor'],
+            ['key' => 'document', 'label' => 'dashboard.action.document', 'url' => '/documents/new', 'icon' => 'doc', 'role' => 'editor'],
             ['key' => 'video', 'label' => 'dashboard.action.video', 'url' => '/videos', 'icon' => 'video', 'role' => 'editor'],
             ['key' => 'news', 'label' => 'dashboard.action.news', 'url' => '/news/new', 'icon' => 'news', 'role' => 'editor'],
         ];

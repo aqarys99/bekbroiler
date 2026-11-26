@@ -21,7 +21,7 @@ final class Sections
             'news'         => $n("SELECT COUNT(*) FROM news WHERE status = 'published' AND published_at <= ?", [$now]),
             'gallery'      => $n('SELECT COUNT(*) FROM albums WHERE is_published = 1'),
             'videos'       => $n("SELECT COUNT(*) FROM videos WHERE is_published = 1 AND status = 'ready'"),
-            'documents'    => $n('SELECT COUNT(*) FROM documents WHERE is_published = 1'),
+            'documents'    => $n('SELECT COUNT(*) FROM documents d JOIN pages p ON p.id = d.page_id WHERE d.is_published = 1 AND p.is_published = 1'),
             'achievements' => $n('SELECT COUNT(*) FROM achievements WHERE is_published = 1'),
             'reviews'      => $n('SELECT COUNT(*) FROM reviews WHERE is_published = 1'),
         ];

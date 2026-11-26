@@ -78,3 +78,10 @@
   .dv-ib--txt span { display: none; }
   .dv-body { height: 72vh; }
 }
+
+/* DOCX: отрисовка docx-preview */
+.dv-docx { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.dv-docx[hidden] { display: none; }
+.dv-docx__body { overflow: auto; max-height: 80vh; padding: 12px; background: #e7e9ee; }
+.dv-docx__body .docx-wrapper { background: transparent !important; padding: 0 !important; }
+.dv-docx__body .docx-wrapper > section.docx { margin: 0 auto 12px !important; box-shadow: 0 1px 6px rgba(0,0,0,.2); }

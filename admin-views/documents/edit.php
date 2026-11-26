@@ -1,7 +1,7 @@
 <?php
 /**
  * Изменение полей документа (файл заменяется на экране списка).
- * @var array $doc @var bool $isPdf @var array $values @var array $errors @var array $cats @var array $checkItems @var string $action @var string $back
+ * @var array $doc @var bool $isPdf @var array $values @var array $errors @var array $pages @var array $checkItems @var string $action @var string $back
  */
 $errFor = static function (string $name) use ($errors): string {
     $m = $errors[$name] ?? null;
@@ -28,11 +28,11 @@ $inv = static fn(string $name): string => !empty($errors[$name]) ? ' aria-invali
     <?= $errFor('title_kk') ?>
   </div>
   <div class="field">
-    <label for="documents-category"><?= e(t('documents.form.category')) ?></label>
-    <select class="input select" id="documents-category" name="category_id" data-testid="documents-edit-category"<?= $inv('category_id') ?>>
-      <?php foreach ($cats as $c): ?><option value="<?= (int)$c['id'] ?>"<?= (int)$values['category_id'] === (int)$c['id'] ? ' selected' : '' ?>><?= e($c['title']) ?></option><?php endforeach; ?>
+    <label for="documents-page"><?= e(t('documents.form.page')) ?></label>
+    <select class="input select" id="documents-page" name="page_id" data-testid="documents-edit-page"<?= $inv('page_id') ?>>
+      <?php foreach ($pages as $p): ?><option value="<?= (int)$p['id'] ?>"<?= (int)$values['page_id'] === (int)$p['id'] ? ' selected' : '' ?>><?= e($p['title']) ?></option><?php endforeach; ?>
     </select>
-    <?= $errFor('category_id') ?>
+    <?= $errFor('page_id') ?>
   </div>
   <div class="field">
     <label for="documents-checklist"><?= e(t('documents.form.checklist')) ?></label>

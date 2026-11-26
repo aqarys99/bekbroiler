@@ -10,51 +10,99 @@ use App\Core\Flash;
 use App\Core\UploadException;
 use App\Models\Checklist;
 use App\Models\Document;
-use App\Models\Media;
+use App\Models\Page;
 
 final class DocumentsController extends BaseController
 {
     public function index(array $params = []): string
     {
-        return $this->render(200, $this->prefill(), []);
+        $pages = Page::options();
+        $pageId = $this->pageParam($pages);
+        $docs = self::decorate(Document::all($pageId));
+        $check = Checklist::status();
+        $missingRows = [];
+        foreach ($check['items'] as $it) {
+            if ($it['state'] === 'missing' && $pageId === 0) {
+                $missingRows[] = $it + ['upload_url' => self::uploadUrl($it['key'])];
+            }
+        }
+        return $this->page('documents/index', t('documents.title'), [
+            $this->home(),
+            ['label' => t('documents.title'), 'url' => null],
+        ], [
+            'docs' => $docs, 'missingRows' => $missingRows, 'check' => $check, 'pages' => $pages, 'pageId' => $pageId,
+            'base' => admin_url('/documents'),
+        ]);
     }
 
-    public function store(array $params = []): string
+    /** «Загрузить» у пункта чек-листа: сначала выбрать страницу, затем форма добавления на её экране. */
+    public function choose(array $params = []): string
     {
-        $user = $this->currentUser();
-        $prep = Document::prepare($_POST, true);
-        $values = $this->values();
-        $errors = $prep['errors'];
-        $file = is_array($_FILES['file'] ?? null) ? $_FILES['file'] : null;
-        if ($file === null || (int)($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
-            $errors['file'] = t('documents.error.file_required');
-        }
-        if ($errors) {
-            return $this->render(422, $values, $errors);
-        }
-        $media = null;
-        try {
-            $media = (new DocumentUploader())->handle($file, (int)$user['id']);
-            $id = Document::create($prep['data'], (int)$media['id'], (int)$user['id']);
-            Audit::log((int)$user['id'], 'documents.create', 'documents', $id);
-        } catch (UploadException $e) {
-            return $this->render($e->status() >= 500 ? 500 : 422, $values, ['file' => $e->userMessage()]);
-        } catch (\Throwable $e) {
-            ErrorHandler::report($e);
-            if ($media !== null) {
-                Document::dropMedia((int)$media['id']);
+        $key = is_string($_GET['checklist'] ?? null) ? $_GET['checklist'] : '';
+        $item = null;
+        foreach (Document::checklistItems() as $c) {
+            if ($c['key'] === $key) {
+                $item = $c;
             }
-            return $this->render(500, $values, ['file' => t('documents.error.save')]);
         }
-        Flash::set('success', 'documents.flash.created');
-        redirect(admin_url('/documents') . '?cat=' . (int)$prep['data']['category_id']);
+        $pages = Page::options();
+        $pid = is_string($_GET['page'] ?? null) && preg_match('/^\d{1,9}$/', $_GET['page']) ? (int)$_GET['page'] : 0;
+        foreach ($pages as $p) {
+            if ((int)$p['id'] === $pid) {
+                redirect(self::addUrl($pid, $key));
+            }
+        }
+        return $this->page('documents/choose', t('documents.choose.title'), [
+            $this->home(), ['label' => t('documents.title'), 'url' => admin_url('/documents')], ['label' => t('documents.choose.title'), 'url' => null],
+        ], ['item' => $item, 'key' => $item['key'] ?? '', 'pages' => $pages]);
+    }
+
+    /** Ссылка на форму добавления документа на экране страницы (с предвыбранным пунктом чек-листа). */
+    public static function addUrl(int $pageId, string $checklist = ''): string
+    {
+        return admin_url('/pages/' . $pageId) . ($checklist !== '' ? '?' . http_build_query(['checklist' => $checklist]) : '') . '#page-docs-form';
+    }
+
+    public static function uploadUrl(string $checklist): string
+    {
+        return admin_url('/documents/new') . '?' . http_build_query(['checklist' => $checklist]);
+    }
+
+    /** Подписи и ссылки строк списка документов (для экрана документов и экрана страницы). */
+    public static function decorate(array $docs): array
+    {
+        $byPage = [];
+        foreach ($docs as $d) {
+            $byPage[(int)$d['page_id']][] = (int)$d['id'];
+        }
+        foreach ($docs as &$d) {
+            $list = $byPage[(int)$d['page_id']];
+            $d['first'] = $list[0] === (int)$d['id'];
+            $d['last'] = end($list) === (int)$d['id'];
+            $d['ext'] = Document::ext($d);
+            $d['url'] = Document::fileUrl($d);
+            $d['required'] = $d['checklist_key'] !== null;
+            $meta = [];
+            $meta[] = $d['doc_date'] ? t('documents.meta.date', ['date' => self::fmt((string)$d['doc_date'])]) : t('documents.meta.uploaded', ['date' => self::fmt(substr((string)$d['created_at'], 0, 10))]);
+            if ($d['valid_until']) {
+                $meta[] = t('documents.meta.until', ['date' => self::fmt((string)$d['valid_until'])]);
+            }
+            $meta[] = format_bytes((int)$d['file_size']);
+            $d['meta'] = implode(' · ', $meta);
+            $d['status_label'] = match ($d['state']) {
+                'warn' => t('documents.status.warn', ['n' => (int)$d['days_left']]),
+                'expired' => t('documents.status.expired'),
+                default => t('documents.status.ok'),
+            };
+        }
+        return $docs;
     }
 
     public function edit(array $params): string
     {
         $doc = $this->mustFind($params);
         return $this->renderEdit($doc, [
-            'title' => (string)$doc['title'], 'title_kk' => (string)$doc['title_kk'], 'category_id' => (int)$doc['category_id'],
+            'title' => (string)$doc['title'], 'title_kk' => (string)$doc['title_kk'], 'page_id' => (int)$doc['page_id'],
             'checklist_key' => (string)($doc['checklist_key'] ?? ''), 'doc_date' => (string)($doc['doc_date'] ?? ''),
             'valid_until' => (string)($doc['valid_until'] ?? ''), 'is_published' => (int)$doc['is_published'] === 1,
             'view_mode' => (string)$doc['view_mode'],
@@ -72,25 +120,26 @@ final class DocumentsController extends BaseController
             return $this->renderEdit($doc, $values, $prep['errors'], 422);
         }
         $data = $prep['data'];
-        if (!Document::isPdf($doc)) {
+        if (!in_array(Document::ext($doc), ['PDF'], true)) {
             unset($data['view_mode']);
         }
         Document::update((int)$doc['id'], $data, $published);
         Audit::log((int)$user['id'], 'documents.update', 'documents', (int)$doc['id']);
         Flash::set('success', 'documents.flash.updated');
-        redirect(admin_url('/documents') . '?cat=' . (int)$data['category_id']);
+        redirect(admin_url('/pages/' . (int)$data['page_id']) . '#page-docs');
     }
 
     private function renderEdit(array $doc, array $values, array $errors, int $status = 200): string
     {
+        $back = $doc['page_id'] !== null ? admin_url('/pages/' . (int)$doc['page_id']) . '#page-docs' : admin_url('/documents');
         return $this->page('documents/edit', t('documents.edit.title'), [
             $this->home(),
             ['label' => t('documents.title'), 'url' => admin_url('/documents')],
             ['label' => t('documents.edit.title'), 'url' => null],
         ], [
-            'doc' => $doc, 'isPdf' => Document::isPdf($doc), 'values' => $values, 'errors' => $errors,
-            'cats' => Document::categories(), 'checkItems' => Document::checklistItems(),
-            'action' => admin_url('/documents/' . (int)$doc['id']), 'back' => admin_url('/documents') . '?cat=' . (int)$doc['category_id'],
+            'doc' => $doc, 'isPdf' => Document::ext($doc) === 'PDF', 'values' => $values, 'errors' => $errors,
+            'pages' => Page::options(), 'checkItems' => Document::checklistItems(),
+            'action' => admin_url('/documents/' . (int)$doc['id']), 'back' => $back,
         ], $status);
     }
 
@@ -101,7 +150,7 @@ final class DocumentsController extends BaseController
         $file = is_array($_FILES['file'] ?? null) ? $_FILES['file'] : null;
         $media = null;
         try {
-            $media = (new DocumentUploader())->handle($file, (int)$user['id']);
+            $media = (new DocumentUploader())->handle($file, (int)$user['id'], DocumentUploader::PAGE_TYPES);
             $old = Document::replaceFile((int)$doc['id'], (int)$media['id']);
             Audit::log((int)$user['id'], 'documents.replace', 'documents', (int)$doc['id']);
         } catch (UploadException $e) {
@@ -147,125 +196,37 @@ final class DocumentsController extends BaseController
 
     // ------------------------------------------------------------------ служебное
 
-    private function render(int $status, array $values, array $errors): string
-    {
-        $cats = Document::categories();
-        $catId = $this->catParam($cats);
-        $docs = Document::all($catId);
-        $check = Checklist::status();
-        $today = Document::today();
-
-        // позиция внутри категории: кнопки вверх/вниз
-        $byCat = [];
-        foreach ($docs as $d) {
-            $byCat[(int)$d['category_id']][] = (int)$d['id'];
-        }
-        foreach ($docs as &$d) {
-            $list = $byCat[(int)$d['category_id']];
-            $d['first'] = $list[0] === (int)$d['id'];
-            $d['last'] = end($list) === (int)$d['id'];
-            $d['ext'] = Document::ext($d);
-            $d['url'] = Document::fileUrl($d);
-            $d['required'] = $d['checklist_key'] !== null;
-            $meta = [];
-            $meta[] = $d['doc_date'] ? t('documents.meta.date', ['date' => self::fmt((string)$d['doc_date'])]) : t('documents.meta.uploaded', ['date' => self::fmt(substr((string)$d['created_at'], 0, 10))]);
-            if ($d['valid_until']) {
-                $meta[] = t('documents.meta.until', ['date' => self::fmt((string)$d['valid_until'])]);
-            }
-            $meta[] = format_bytes((int)$d['file_size']);
-            $d['meta'] = implode(' · ', $meta);
-            $d['status_label'] = match ($d['state']) {
-                'warn' => t('documents.status.warn', ['n' => (int)$d['days_left']]),
-                'expired' => t('documents.status.expired'),
-                default => t('documents.status.ok'),
-            };
-        }
-        unset($d);
-
-        $missingRows = [];
-        if ($catId === 0 || $catId === Document::ATTESTATION_CATEGORY) {
-            foreach ($check['items'] as $it) {
-                if ($it['state'] === 'missing') {
-                    $missingRows[] = $it + ['upload_url' => admin_url('/documents') . '?' . http_build_query(['cat' => $catId, 'checklist' => $it['key']]) . '#documents-form'];
-                }
-            }
-        }
-        $counts = Document::counts();
-        $tabs = [['id' => 0, 'label' => t('documents.tab.all'), 'n' => array_sum($counts)]];
-        foreach ($cats as $c) {
-            $tabs[] = ['id' => (int)$c['id'], 'label' => (string)$c['title'], 'n' => $counts[(int)$c['id']] ?? 0];
-        }
-        $max = Media::maxUploadBytes();
-
-        return $this->page('documents/index', t('documents.title'), [
-            $this->home(),
-            ['label' => t('documents.title'), 'url' => null],
-        ], [
-            'docs'        => $docs,
-            'missingRows' => $missingRows,
-            'check'       => $check,
-            'tabs'        => $tabs,
-            'catId'       => $catId,
-            'cats'        => $cats,
-            'checkItems'  => Document::checklistItems(),
-            'values'      => $values,
-            'errors'      => $errors,
-            'today'       => $today,
-            'maxLabel'    => format_bytes($max),
-            'accept'      => '.' . implode(',.', array_keys(DocumentUploader::TYPES)),
-            'formAction'  => admin_url('/documents'),
-            'base'        => admin_url('/documents'),
-            'backCat'     => $catId,
-        ], $status);
-    }
-
-    /** Значения формы по умолчанию (в т.ч. «Загрузить» у пустого пункта чек-листа). */
-    private function prefill(): array
-    {
-        $v = ['title' => '', 'title_kk' => '', 'category_id' => 0, 'checklist_key' => '', 'doc_date' => '', 'valid_until' => '', 'view_mode' => 'reader'];
-        $key = is_string($_GET['checklist'] ?? null) ? $_GET['checklist'] : '';
-        foreach (Document::checklistItems() as $c) {
-            if ($c['key'] === $key) {
-                $v['checklist_key'] = $key;
-                $v['title'] = (string)$c['title'];
-                $v['title_kk'] = (string)$c['title_kk'];
-                $v['category_id'] = Document::ATTESTATION_CATEGORY;
-            }
-        }
-        if ($v['category_id'] === 0) {
-            $c = $this->catParam(Document::categories());
-            $v['category_id'] = $c > 0 ? $c : Document::ATTESTATION_CATEGORY;
-        }
-        return $v;
-    }
-
     private function values(): array
     {
         $v = [];
         foreach (['title', 'title_kk', 'checklist_key', 'doc_date', 'valid_until', 'view_mode'] as $k) {
             $v[$k] = self::post($k);
         }
-        $v['category_id'] = (int)self::post('category_id');
+        $v['page_id'] = (int)self::post('page_id');
         return $v;
     }
 
-    private function catParam(array $cats): int
+    private function pageParam(array $pages): int
     {
-        $raw = $_GET['cat'] ?? $_POST['back_cat'] ?? '';
+        $raw = $_GET['page'] ?? '';
         $id = is_string($raw) && preg_match('/^\d{1,9}$/', $raw) ? (int)$raw : 0;
-        foreach ($cats as $c) {
-            if ((int)$c['id'] === $id) {
+        foreach ($pages as $p) {
+            if ((int)$p['id'] === $id) {
                 return $id;
             }
         }
         return 0;
     }
 
+    /** Куда вернуться после действия: на экран страницы (back_page) или в общий список. */
     private function back(): string
     {
-        $raw = $_POST['back_cat'] ?? '';
+        $raw = $_POST['back_page'] ?? '';
         $id = is_string($raw) && preg_match('/^\d{1,9}$/', $raw) ? (int)$raw : 0;
-        return admin_url('/documents') . ($id > 0 ? '?cat=' . $id : '');
+        if ($id > 0 && Page::find($id) !== null) {
+            return admin_url('/pages/' . $id) . '#page-docs';
+        }
+        return admin_url('/documents');
     }
 
     private function mustFind(array $params): array
@@ -277,7 +238,7 @@ final class DocumentsController extends BaseController
         return $row;
     }
 
-    private static function fmt(string $ymd): string
+    public static function fmt(string $ymd): string
     {
         $d = \DateTimeImmutable::createFromFormat('!Y-m-d', substr($ymd, 0, 10));
         return $d ? $d->format('d.m.Y') : $ymd;

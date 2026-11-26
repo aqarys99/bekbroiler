@@ -16,7 +16,7 @@ final class Slug
         'ә' => 'a', 'ғ' => 'g', 'қ' => 'q', 'ң' => 'n', 'ө' => 'o', 'ұ' => 'u', 'ү' => 'u', 'һ' => 'h', 'і' => 'i',
     ];
 
-    public static function make(string $text): string
+    public static function make(string $text, string $fallback = 'novost'): string
     {
         $s = strtr(mb_strtolower($text, 'UTF-8'), self::MAP);
         $s = (string)preg_replace('/[^a-z0-9]+/', '-', $s);
@@ -26,6 +26,6 @@ final class Slug
             $pos = strrpos($cut, '-');
             $s = $pos !== false && $pos > 0 && $s[self::MAX] !== '-' ? substr($cut, 0, $pos) : rtrim($cut, '-');
         }
-        return $s === '' ? 'novost' : $s;
+        return $s === '' ? $fallback : $s;
     }
 }

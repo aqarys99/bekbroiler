@@ -18,6 +18,48 @@
     });
   }
 
+  // выпадающие группы меню: наведение, клик, клавиатура; aria-expanded
+  var subs = Array.prototype.slice.call(document.querySelectorAll('.menu .has-sub'));
+  var desktop = window.matchMedia('(min-width: 901px)');
+  function setSub(li, open) {
+    li.classList.toggle('open', open);
+    var b = li.querySelector('.menu-toggle');
+    if (b) { b.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+    if (!open) { li.removeAttribute('data-pinned'); }
+  }
+  subs.forEach(function (li) {
+    li.classList.add('js-sub');
+    var b = li.querySelector('.menu-toggle');
+    if (!b) { return; }
+    b.addEventListener('click', function () {
+      if (li.getAttribute('data-hover') === '1') { // уже раскрыто наведением: клик закрепляет
+        li.removeAttribute('data-hover');
+        if (!li.hasAttribute('data-pinned')) { li.setAttribute('data-pinned', '1'); return; }
+      }
+      setSub(li, !li.classList.contains('open'));
+      if (li.classList.contains('open')) { li.setAttribute('data-pinned', '1'); }
+    });
+    li.addEventListener('mouseenter', function () {
+      if (!desktop.matches) { return; }
+      subs.forEach(function (o) { if (o !== li) { setSub(o, false); } });
+      if (!li.classList.contains('open')) { li.setAttribute('data-hover', '1'); setSub(li, true); }
+    });
+    li.addEventListener('mouseleave', function () {
+      if (!desktop.matches) { return; }
+      li.removeAttribute('data-hover');
+      if (!li.hasAttribute('data-pinned')) { setSub(li, false); }
+    });
+    li.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && li.classList.contains('open')) { setSub(li, false); b.focus(); }
+    });
+    li.addEventListener('focusout', function (e) {
+      if (desktop.matches && !li.contains(e.relatedTarget)) { setSub(li, false); }
+    });
+  });
+  document.addEventListener('click', function (e) {
+    subs.forEach(function (li) { if (!li.contains(e.target)) { setSub(li, false); } });
+  });
+
   // версия для слабовидящих: выбор хранится в cookie на год, страницы с сервера кэшируются отдельно
   var a11y = document.querySelector('[data-a11y-toggle]');
   if (a11y) {
