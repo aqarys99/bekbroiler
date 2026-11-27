@@ -13,6 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title><?= e($title) ?></title>
+<link rel="stylesheet" href="<?= e(asset('fonts/montserrat.css')) ?>">
 <link rel="stylesheet" href="<?= e(asset('admin/admin.css')) ?>">
 <script src="<?= e(asset('admin/boot.js')) ?>"></script>
 <script src="<?= e(asset('admin/news-preview.js')) ?>" defer></script>

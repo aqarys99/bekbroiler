@@ -7,6 +7,7 @@ $wide = isset($requirements);
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($title) ?></title>
+<link rel="stylesheet" href="<?= e(asset('fonts/montserrat.css')) ?>">
 <link rel="stylesheet" href="<?= e(asset('admin/admin.css')) ?>">
 <script src="<?= e(asset('admin/admin.js')) ?>" defer></script>
 </head>

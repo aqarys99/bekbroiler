@@ -16,12 +16,12 @@ $text = static function (string $k, string $label, array $o = []) use ($f, $erro
 };
 $tabs = ['main' => t('settings.tab.main'), 'look' => t('settings.tab.look'), 'contacts' => t('settings.tab.contacts')];
 $themes = [
-    'sun' => ['#FFF8EC', '#F2A516'],
+    'sun' => ['#FFF8EC', '#FB8500'],
     'official' => ['#F3F5F9', '#1F4E9C'],
     'nature' => ['#F1F8F2', '#2E8B57'],
 ];
-$colorNames = ['#F2A516' => 'orange', '#1F5BD8' => 'blue', '#2E8B57' => 'green', '#0F8B8D' => 'teal', '#D0447A' => 'pink', '#6A4BC4' => 'violet'];
-$curColor = strtoupper($val('color') ?: '#F2A516');
+$colorNames = ['#C2410C' => 'orange', '#1F5BD8' => 'blue', '#2E8B57' => 'green', '#0F8B8D' => 'teal', '#D0447A' => 'pink', '#6A4BC4' => 'violet'];
+$curColor = strtoupper($val('color') ?: '#C2410C');
 $isPreset = isset($colorNames[$curColor]);
 ?>
 <div class="page-head"><h1><?= e(t('settings.heading')) ?></h1></div>

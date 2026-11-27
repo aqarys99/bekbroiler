@@ -41,6 +41,8 @@ $navAttr = static fn(array $it): string => ($it['blank'] ? ' target="_blank" rel
 <?php if ($meta['og_image'] !== ''): ?><meta property="og:image" content="<?= e($meta['og_image']) ?>">
 <meta name="twitter:card" content="summary_large_image">
 <?php endif; ?>
+<link rel="stylesheet" href="<?= e(asset('fonts/montserrat.css')) ?>">
+<meta name="color-scheme" content="light">
 <?php foreach (Theme::cssUrls() as $css): ?><link rel="stylesheet" href="<?= e($css) ?>">
 <?php endforeach; ?>
 <?php if (($vars = Theme::cssVars()) !== ''): ?><style><?= $vars /* только проверенный #RRGGBB */ ?></style>

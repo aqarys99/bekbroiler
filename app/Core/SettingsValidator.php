@@ -9,7 +9,7 @@ use App\Models\Media;
 final class SettingsValidator
 {
     public const THEMES = ['sun', 'official', 'nature'];
-    public const COLORS = ['#F2A516', '#1F5BD8', '#2E8B57', '#0F8B8D', '#D0447A', '#6A4BC4'];
+    public const COLORS = ['#C2410C', '#1F5BD8', '#2E8B57', '#0F8B8D', '#D0447A', '#6A4BC4'];
     public const MAP_HOSTS = ['2gis.kz', '2gis.ru', 'yandex.kz', 'yandex.ru'];
     public const SOCIALS = ['instagram', 'facebook', 'telegram', 'twogis'];
 

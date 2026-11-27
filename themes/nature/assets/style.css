@@ -1,14 +1,13 @@
-/* Тема «Зелёная»: те же шаблоны, другой стиль. */
+/* Тема «Зелёная»: те же шаблоны, светлая свежая зелень. */
 :root {
-  --bg: #f6fbf5; --soft: #e8f4e6; --text: #1f3326; --muted: #4c6354;
-  --border: #cfe5cf; --radius: 28px; --shadow: 0 8px 24px rgba(46, 139, 87, .10);
-  --font: Georgia, "Times New Roman", serif;
+  --bg: #f4fbf0; --soft: #e3f5dc; --text: #17402b; --muted: #3f5f4c;
+  --tint-a: #f4fbf0; --tint-b: #e3f5dc; --tint-c: #fdfbe8;
+  --border: #c5e6c1; --radius: 28px; --shadow: 0 10px 26px rgba(56, 176, 0, .14), 0 4px 10px rgba(42, 157, 143, .10);
+  --hero-bg: radial-gradient(circle at 88% 12%, rgba(163, 230, 53, .40), transparent 45%), linear-gradient(135deg, #e6f8da 0%, #f7fdf0 55%, #dbf3ef 100%);
+  --footer-bg: linear-gradient(135deg, #dff4d3 0%, #f2fbe9 50%, #d5f0ec 100%);
 }
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #14201a; --surface: #1b2a22; --soft: #213329; --text: #e9f3ec; --muted: #b3c9ba; --border: #2f4a3a; }
-}
-h1, h2, h3, .menu a, .btn, .logo, .eyebrow, .tag, .lang a, .a11y-btn, .stat b { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-.hero { background: radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--primary) 28%, transparent), transparent 50%), var(--bg); }
-.hero-art { border-radius: 40px; }
+section h2:not(.sub)::after, .section-head h2::after { background: linear-gradient(90deg, #38b000, #2a9d8f); }
+.hero-art { border-radius: 40px; border-color: #38b000; }
 .hero-photo { border-radius: 28px; }
-.site-footer { background: color-mix(in srgb, var(--primary) 14%, var(--bg)); }
+.hero h1 span { color: #1b7a3d; }
+.site-footer { border-top-color: #38b000; }

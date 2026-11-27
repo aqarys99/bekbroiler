@@ -183,7 +183,8 @@ final class Theme
         [$r, $g, $b] = [hexdec(substr($color, 1, 2)), hexdec(substr($color, 3, 2)), hexdec(substr($color, 5, 2))];
         $lin = static fn(int $c): float => ($c / 255) <= 0.03928 ? ($c / 255) / 12.92 : ((($c / 255) + 0.055) / 1.055) ** 2.4;
         $lum = 0.2126 * $lin($r) + 0.7152 * $lin($g) + 0.0722 * $lin($b);
-        $on = $lum > 0.4 ? '#1c1f2e' : '#ffffff';
+        // текст кнопки: тот из двух цветов, у которого выше контраст с основным (белый или тёмно-синий #1c1f2e)
+        $on = (1.05 / ($lum + 0.05)) >= (($lum + 0.05) / 0.064) ? '#ffffff' : '#1c1f2e';
         return ':root{--primary:' . $color . ';--on-primary:' . $on . '}';
     }
 
